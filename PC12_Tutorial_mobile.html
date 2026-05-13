@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PC-12 教學">
+<meta name="theme-color" content="#080c12">
+<title>PC-12 飛行教學 | MSFS 2024</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c12;
+    --panel: #0d1520;
+    --panel2: #111d2e;
+    --border: #1e3a5a;
+    --accent: #00d4ff;
+    --accent2: #ff6b00;
+    --accent3: #00ff88;
+    --warn: #ffcc00;
+    --danger: #ff3a3a;
+    --text: #c8dff0;
+    --text-dim: #5a7a99;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(0,80,160,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(0,180,120,0.07) 0%, transparent 50%);
+  }
+
+  header {
+    position: relative;
+    text-align: center;
+    padding: 52px 24px 40px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(0,30,60,0.8) 0%, transparent 100%);
+  }
+  .header-badge {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.25);
+    padding: 5px 16px;
+    border-radius: 2px;
+    margin-bottom: 18px;
+  }
+  header h1 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 52px);
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 0 40px rgba(0,212,255,0.5);
+  }
+  header h1 span { color: var(--accent); }
+  .subtitle { margin-top: 12px; font-size: 15px; color: var(--text-dim); letter-spacing: 1px; }
+
+  .phase-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8,12,18,0.96);
+    backdrop-filter: blur(12px);
+  }
+  .phase-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .phase-btn:hover, .phase-btn.active {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    box-shadow: 0 0 16px rgba(0,212,255,0.25);
+  }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .phase-section { display: none; animation: fadeIn 0.4s ease; }
+  .phase-section.visible { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .phase-title {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-icon-wrap { font-size: 32px; filter: drop-shadow(0 0 10px rgba(0,212,255,0.5)); }
+  .phase-title h2 { font-family: 'Orbitron', monospace; font-size: clamp(18px,3vw,26px); font-weight: 700; color:#fff; }
+  .phase-title .phase-num { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 13px; letter-spacing:3px; }
+
+  /* === STEP CARD === */
+  .steps-grid { display: grid; gap: 12px; }
+  .step-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 5px;
+    padding: 14px 18px 14px 14px;
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    cursor: pointer;
+    transition: all 0.22s;
+    position: relative;
+    overflow: hidden;
+  }
+  .step-card::before {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(90deg, rgba(0,212,255,0.04) 0%, transparent 60%);
+    opacity:0; transition: opacity 0.3s;
+  }
+  .step-card:hover::before { opacity:1; }
+  .step-card:hover { border-left-color: var(--accent); border-color: rgba(0,212,255,0.3); transform: translateX(3px); }
+  .step-card.done { border-left-color: var(--accent3); background: rgba(0,255,136,0.04); }
+  .step-card.done .step-num { background: var(--accent3); color:#000; }
+  .step-card.warn-card { border-left-color: var(--warn); }
+  .step-card.danger-card { border-left-color: var(--danger); }
+
+  /* === COCKPIT ICON COLUMN === */
+  .step-icon-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .step-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px; font-weight: 700;
+    color: #000; background: var(--accent);
+    width: 24px; height: 24px;
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .cockpit-icon {
+    width: 46px; height: 46px;
+    flex-shrink: 0;
+  }
+
+  .step-content { flex:1; }
+  .step-action { font-weight: 500; font-size: 15px; color: #e8f4ff; margin-bottom: 5px; line-height:1.4; }
+  .step-detail { font-size: 13px; color: var(--text-dim); line-height: 1.65; }
+  .step-detail .val { color: var(--accent); font-family: 'Share Tech Mono', monospace; font-size:13px; }
+  .step-detail .warn-val { color: var(--warn); font-family: 'Share Tech Mono', monospace; font-size:13px; }
+  .step-detail .danger-val { color: var(--danger); font-family: 'Share Tech Mono', monospace; }
+  .step-check { font-size: 20px; opacity:0; transition: opacity 0.3s; margin-top:3px; align-self:center; }
+  .step-card.done .step-check { opacity:1; }
+
+  .alert-box {
+    display:flex; gap:14px; padding:14px 18px;
+    border-radius:4px; margin-bottom:20px; align-items:flex-start;
+  }
+  .alert-box.warn-box { background:rgba(255,204,0,0.07); border:1px solid rgba(255,204,0,0.3); }
+  .alert-box.info-box { background:rgba(0,212,255,0.06); border:1px solid rgba(0,212,255,0.25); }
+  .alert-box.danger-box { background:rgba(255,58,58,0.07); border:1px solid rgba(255,58,58,0.3); }
+  .alert-icon { font-size:22px; flex-shrink:0; }
+  .alert-text { font-size:13px; line-height:1.7; }
+  .alert-text strong { display:block; margin-bottom:4px; font-size:12px; letter-spacing:1px; text-transform:uppercase; }
+  .alert-box.warn-box .alert-text strong { color:var(--warn); }
+  .alert-box.info-box .alert-text strong { color:var(--accent); }
+  .alert-box.danger-box .alert-text strong { color:var(--danger); }
+
+  .data-table { width:100%; border-collapse:collapse; margin:12px 0 20px; font-size:13px; }
+  .data-table th { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--accent); text-align:left; padding:9px 14px; background:rgba(0,212,255,0.06); border:1px solid var(--border); text-transform:uppercase; }
+  .data-table td { padding:9px 14px; border:1px solid var(--border); color:var(--text); }
+  .data-table tr:hover td { background:rgba(0,212,255,0.04); }
+  .data-table .mono { font-family:'Share Tech Mono',monospace; color:var(--accent2); }
+
+  .subsection { margin:26px 0 12px; font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--accent2); text-transform:uppercase; display:flex; align-items:center; gap:10px; }
+  .subsection::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+
+  .progress-wrap { background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:14px 18px; margin-bottom:24px; display:flex; align-items:center; gap:14px; }
+  .progress-label { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text-dim); white-space:nowrap; }
+  .progress-bar-bg { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent3)); border-radius:3px; transition:width 0.4s ease; }
+  .progress-pct { font-family:'Orbitron',monospace; font-size:13px; color:var(--accent); min-width:38px; text-align:right; }
+  .reset-btn { font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--text-dim); background:transparent; border:1px solid var(--border); padding:5px 12px; border-radius:3px; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
+  .reset-btn:hover { color:var(--danger); border-color:var(--danger); }
+
+  .nav-arrows { display:flex; justify-content:space-between; margin-top:36px; padding-top:22px; border-top:1px solid var(--border); }
+  .nav-arrow-btn { font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:2px; color:var(--text-dim); background:var(--panel); border:1px solid var(--border); padding:10px 18px; border-radius:3px; cursor:pointer; transition:all 0.2s; text-transform:uppercase; }
+  .nav-arrow-btn:hover { color:var(--accent); border-color:var(--accent); }
+  .nav-arrow-btn:disabled { opacity:0.3; cursor:not-allowed; }
+
+  footer { text-align:center; padding:28px; border-top:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text-dim); letter-spacing:2px; }
+
+  /* ===== MOBILE ===== */
+  @media(max-width:640px){
+    header { padding: 28px 16px 22px; }
+    header h1 { font-size: 28px; }
+    .subtitle { font-size: 12px; letter-spacing: 0; }
+    .header-badge { font-size: 10px; letter-spacing: 2px; padding: 4px 10px; }
+    .phase-nav { display: none; }
+    .mobile-bottom-nav { display: flex !important; }
+    .main { padding: 20px 12px 110px; }
+    .step-card { grid-template-columns: 50px 1fr 28px; gap: 10px; padding: 13px 10px; min-height: 76px; }
+    .cockpit-icon { width: 40px; height: 40px; }
+    .step-num { width: 22px; height: 22px; font-size: 10px; }
+    .step-action { font-size: 14px; }
+    .step-detail { font-size: 12px; line-height: 1.6; }
+    .step-check { font-size: 18px; }
+    .phase-title h2 { font-size: 18px; }
+    .phase-icon-wrap { font-size: 26px; }
+    .progress-wrap { padding: 10px 14px; gap: 10px; }
+    .progress-label { font-size: 10px; }
+    .reset-btn { font-size: 10px; padding: 4px 10px; }
+    .alert-box { padding: 11px 13px; gap: 10px; }
+    .alert-text { font-size: 12px; }
+    .data-table th, .data-table td { padding: 7px 8px; font-size: 12px; }
+    .nav-arrows { flex-direction: column; gap: 10px; }
+    .nav-arrow-btn { text-align: center; padding: 14px; font-size: 12px; }
+    .nav-arrow-btn:disabled { display: none; }
+    .subsection { font-size: 10px; letter-spacing: 2px; }
+    .swipe-hint { display: block; }
+  }
+
+  /* ===== BOTTOM NAV (mobile only) ===== */
+  .mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 200;
+    background: rgba(8,12,18,0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .mobile-tab-row {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-tab-row::-webkit-scrollbar { display: none; }
+  .mobile-tab {
+    flex: 1 1 0;
+    min-width: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 6px 10px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s;
+  }
+  .mobile-tab:active { opacity: 0.6; }
+  .tab-icon { font-size: 19px; }
+  .tab-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .mobile-tab.active .tab-label { color: var(--accent); }
+  .mobile-tab.active .tab-icon { filter: drop-shadow(0 0 5px var(--accent)); }
+  .tab-bar {
+    width: 26px; height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .tab-bar-fill {
+    height: 100%;
+    background: var(--accent3);
+    border-radius: 1px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .swipe-hint {
+    display: none;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    opacity: 0.5;
+    padding: 6px 0 0;
+    letter-spacing: 1px;
+  }
+
+  /* install banner */
+  .install-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(0,212,255,0.06);
+    border-bottom: 1px solid rgba(0,212,255,0.18);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .install-banner.show { display: flex; }
+  .install-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.4);
+    padding: 5px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .install-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 2px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .step-card:active { transform: scale(0.985); }
+</style>
+</head>
+<body>
+
+<!-- ===== SVG ICON DEFINITIONS ===== -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+
+    <!-- BATTERY SWITCH -->
+    <symbol id="ico-battery" viewBox="0 0 48 48">
+      <rect x="4" y="8" width="34" height="20" rx="3" fill="#1a2a3a" stroke="#2a4a6a" stroke-width="1.5"/>
+      <rect x="38" y="14" width="6" height="8" rx="2" fill="#2a4a6a"/>
+      <rect x="7" y="11" width="8" height="14" rx="1.5" fill="#00d4ff" opacity="0.7"/>
+      <rect x="18" y="11" width="8" height="14" rx="1.5" fill="#00d4ff" opacity="0.5"/>
+      <rect x="29" y="11" width="8" height="14" rx="1.5" fill="#00d4ff" opacity="0.3"/>
+      <!-- lightning bolt -->
+      <path d="M21 32 L25 38 L23 38 L27 44" stroke="#ffcc00" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="6" font-family="monospace">BATT</text>
+    </symbol>
+
+    <!-- AVIONICS MASTER (screen/display) -->
+    <symbol id="ico-avionics" viewBox="0 0 48 48">
+      <rect x="3" y="5" width="42" height="30" rx="3" fill="#0a1a2a" stroke="#2a4a6a" stroke-width="1.5"/>
+      <rect x="6" y="8" width="36" height="24" rx="2" fill="#001a10"/>
+      <!-- PFD display elements -->
+      <circle cx="18" cy="20" r="8" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.8"/>
+      <line x1="18" y1="12" x2="18" y2="28" stroke="#00d4ff" stroke-width="0.8" opacity="0.4"/>
+      <line x1="10" y1="20" x2="26" y2="20" stroke="#00d4ff" stroke-width="0.8" opacity="0.4"/>
+      <path d="M12 20 L18 14 L24 20" stroke="#00ff88" stroke-width="1.2" fill="none"/>
+      <!-- MFD right side -->
+      <rect x="30" y="10" width="10" height="20" rx="1" fill="#001520" stroke="#1a3a5a" stroke-width="0.5"/>
+      <line x1="30" y1="16" x2="40" y2="16" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+      <line x1="30" y1="22" x2="40" y2="22" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+      <!-- power button -->
+      <circle cx="24" cy="40" r="4" fill="#1a2a3a" stroke="#2a4a6a" stroke-width="1"/>
+      <path d="M22 40 A2 2 0 1 1 26 40" stroke="#00ff88" stroke-width="1.2" fill="none"/>
+      <line x1="24" y1="37" x2="24" y2="40" stroke="#00ff88" stroke-width="1.2"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5.5" font-family="monospace">AVIONICS</text>
+    </symbol>
+
+    <!-- FUEL SHUTOFF RED HANDLE -->
+    <symbol id="ico-fuelshutoff" viewBox="0 0 48 48">
+      <!-- pedestal background -->
+      <rect x="14" y="28" width="20" height="16" rx="2" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+      <!-- red handle UP -->
+      <rect x="20" y="8" width="8" height="22" rx="2" fill="#cc2200" stroke="#ff4422" stroke-width="1.5"/>
+      <!-- handle grip ridges -->
+      <line x1="21" y1="12" x2="27" y2="12" stroke="#ff6644" stroke-width="1" opacity="0.7"/>
+      <line x1="21" y1="15" x2="27" y2="15" stroke="#ff6644" stroke-width="1" opacity="0.7"/>
+      <line x1="21" y1="18" x2="27" y2="18" stroke="#ff6644" stroke-width="1" opacity="0.7"/>
+      <!-- handle top T-bar -->
+      <rect x="16" y="6" width="16" height="4" rx="2" fill="#cc2200" stroke="#ff4422" stroke-width="1.2"/>
+      <!-- warning label -->
+      <rect x="10" y="30" width="28" height="8" rx="1" fill="#cc2200" opacity="0.2" stroke="#cc2200" stroke-width="0.8"/>
+      <text x="24" y="36.5" fill="#ff4422" font-size="4.5" font-family="monospace" text-anchor="middle">FUEL EMERG</text>
+      <text x="24" y="41.5" fill="#ff4422" font-size="4" font-family="monospace" text-anchor="middle">SHUT OFF</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="5.5" font-family="monospace">RED HDL</text>
+    </symbol>
+
+    <!-- CONDITION LEVER -->
+    <symbol id="ico-condition" viewBox="0 0 48 48">
+      <!-- detent gate -->
+      <rect x="18" y="6" width="12" height="36" rx="2" fill="#1a2a1a" stroke="#2a4a2a" stroke-width="1.2"/>
+      <!-- detent marks -->
+      <line x1="14" y1="11" x2="18" y2="11" stroke="#5a7a5a" stroke-width="1"/>
+      <text x="5" y="13" fill="#5a8a5a" font-size="4" font-family="monospace">HI</text>
+      <line x1="14" y1="20" x2="18" y2="20" stroke="#5a7a5a" stroke-width="1"/>
+      <text x="2" y="22" fill="#5a8a5a" font-size="3.8" font-family="monospace">LO-I</text>
+      <line x1="14" y1="34" x2="18" y2="34" stroke="#5a7a5a" stroke-width="1"/>
+      <text x="0" y="36" fill="#5a8a5a" font-size="3.8" font-family="monospace">F-OFF</text>
+      <!-- lever head (at FUEL OFF position = bottom) -->
+      <rect x="15" y="32" width="18" height="8" rx="3" fill="#3a5a3a" stroke="#4a8a4a" stroke-width="1.5"/>
+      <rect x="22" y="28" width="4" height="8" rx="1" fill="#2a4a2a" stroke="#4a8a4a" stroke-width="1"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">COND LVR</text>
+    </symbol>
+
+    <!-- POWER LEVER (THROTTLE) -->
+    <symbol id="ico-powerlever" viewBox="0 0 48 48">
+      <!-- gate -->
+      <rect x="19" y="4" width="10" height="38" rx="2" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="1.2"/>
+      <!-- detents -->
+      <line x1="14" y1="8" x2="19" y2="8" stroke="#4a6a8a" stroke-width="1"/>
+      <text x="2" y="10" fill="#4a6a8a" font-size="3.5" font-family="monospace">T.O.</text>
+      <line x1="14" y1="20" x2="19" y2="20" stroke="#4a6a8a" stroke-width="1"/>
+      <text x="1" y="22" fill="#4a6a8a" font-size="3.5" font-family="monospace">CLB</text>
+      <line x1="14" y1="33" x2="19" y2="33" stroke="#4a6a8a" stroke-width="1"/>
+      <text x="0" y="35" fill="#4a6a8a" font-size="3.5" font-family="monospace">IDLE</text>
+      <!-- BETA/REV zone -->
+      <rect x="19" y="36" width="10" height="6" rx="0" fill="#cc220022" stroke="#cc2200" stroke-width="0.8"/>
+      <text x="20" y="41" fill="#cc4422" font-size="3.5" font-family="monospace">REV</text>
+      <!-- lever at IDLE -->
+      <rect x="16" y="30" width="16" height="7" rx="3" fill="#2a3a5a" stroke="#4a6aaa" stroke-width="1.5"/>
+      <rect x="22" y="24" width="4" height="10" rx="1" fill="#1a2a3a" stroke="#3a5a8a" stroke-width="1"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="4.5" font-family="monospace">PWR LVR</text>
+    </symbol>
+
+    <!-- LANDING GEAR HANDLE -->
+    <symbol id="ico-gear" viewBox="0 0 48 48">
+      <!-- panel background -->
+      <rect x="8" y="4" width="32" height="36" rx="3" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="1.2"/>
+      <!-- gear shape icon on handle -->
+      <!-- main strut -->
+      <line x1="24" y1="24" x2="24" y2="34" stroke="#00d4ff" stroke-width="2"/>
+      <!-- wheels -->
+      <circle cx="18" cy="36" r="4" fill="none" stroke="#00d4ff" stroke-width="1.8"/>
+      <circle cx="30" cy="36" r="4" fill="none" stroke="#00d4ff" stroke-width="1.8"/>
+      <!-- nose gear -->
+      <line x1="24" y1="24" x2="24" y2="18" stroke="#00d4ff" stroke-width="1.5"/>
+      <circle cx="24" cy="14" r="3" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+      <!-- handle body -->
+      <rect x="14" y="6" width="20" height="12" rx="4" fill="#2a4a2a" stroke="#00aa44" stroke-width="1.5"/>
+      <text x="15" y="15" fill="#00ff88" font-size="5.5" font-family="monospace">DOWN</text>
+      <!-- 3 green lights -->
+      <circle cx="18" cy="42" r="2.5" fill="#00ff44"/>
+      <circle cx="24" cy="42" r="2.5" fill="#00ff44"/>
+      <circle cx="30" cy="42" r="2.5" fill="#00ff44"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">GEAR HDL</text>
+    </symbol>
+
+    <!-- FUEL GAUGE / EIS -->
+    <symbol id="ico-fuel" viewBox="0 0 48 48">
+      <rect x="3" y="4" width="42" height="38" rx="3" fill="#040e1a" stroke="#1a3a5a" stroke-width="1.5"/>
+      <!-- left tank gauge -->
+      <rect x="7" y="8" width="14" height="26" rx="2" fill="#081420" stroke="#1a3a5a" stroke-width="1"/>
+      <text x="14" y="14" fill="#5a8aaa" font-size="4.5" font-family="monospace" text-anchor="middle">L</text>
+      <rect x="9" y="16" width="10" height="16" rx="1" fill="#0a2030"/>
+      <rect x="9" y="22" width="10" height="10" rx="1" fill="#00aaff" opacity="0.6"/>
+      <text x="14" y="38" fill="#00d4ff" font-size="4" font-family="monospace" text-anchor="middle">60%</text>
+      <!-- right tank gauge -->
+      <rect x="27" y="8" width="14" height="26" rx="2" fill="#081420" stroke="#1a3a5a" stroke-width="1"/>
+      <text x="34" y="14" fill="#5a8aaa" font-size="4.5" font-family="monospace" text-anchor="middle">R</text>
+      <rect x="29" y="16" width="10" height="16" rx="1" fill="#0a2030"/>
+      <rect x="29" y="22" width="10" height="10" rx="1" fill="#00aaff" opacity="0.6"/>
+      <text x="34" y="38" fill="#00d4ff" font-size="4" font-family="monospace" text-anchor="middle">60%</text>
+      <!-- total label -->
+      <text x="24" y="46" fill="#5a7a99" font-size="5.5" font-family="monospace" text-anchor="middle">FUEL QTY</text>
+    </symbol>
+
+    <!-- BEACON LIGHT -->
+    <symbol id="ico-beacon" viewBox="0 0 48 48">
+      <rect x="6" y="22" width="36" height="22" rx="3" fill="#1a1a1a" stroke="#333" stroke-width="1.2"/>
+      <!-- beacon dome -->
+      <ellipse cx="24" cy="22" rx="12" ry="6" fill="#cc2200" stroke="#ff4422" stroke-width="1.5"/>
+      <ellipse cx="24" cy="20" rx="8" ry="4" fill="#ff4422" opacity="0.6"/>
+      <!-- flash rays -->
+      <line x1="24" y1="6" x2="24" y2="12" stroke="#ff6644" stroke-width="2" stroke-linecap="round"/>
+      <line x1="34" y1="10" x2="30" y2="14" stroke="#ff6644" stroke-width="2" stroke-linecap="round"/>
+      <line x1="14" y1="10" x2="18" y2="14" stroke="#ff6644" stroke-width="2" stroke-linecap="round"/>
+      <!-- switch -->
+      <rect x="18" y="28" width="12" height="10" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="1"/>
+      <text x="24" y="36" fill="#ff4422" font-size="5" font-family="monospace" text-anchor="middle">ON</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">BEACON</text>
+    </symbol>
+
+    <!-- ENGINE START SWITCH -->
+    <symbol id="ico-engstart" viewBox="0 0 48 48">
+      <!-- panel -->
+      <rect x="6" y="4" width="36" height="36" rx="3" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="1.5"/>
+      <!-- rotary switch -->
+      <circle cx="24" cy="22" r="13" fill="#0d1f0d" stroke="#2a4a2a" stroke-width="1.5"/>
+      <circle cx="24" cy="22" r="9" fill="#1a2a1a" stroke="#3a6a3a" stroke-width="1"/>
+      <!-- positions -->
+      <text x="24" y="12" fill="#4a7a4a" font-size="4" font-family="monospace" text-anchor="middle">GND</text>
+      <text x="36" y="24" fill="#4a7a4a" font-size="4" font-family="monospace" text-anchor="middle">START</text>
+      <text x="24" y="36" fill="#4a7a4a" font-size="4" font-family="monospace" text-anchor="middle">OFF</text>
+      <!-- indicator arrow (pointing to START) -->
+      <line x1="24" y1="22" x2="30" y2="20" stroke="#00ff44" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="24" cy="22" r="2" fill="#00ff44"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="4.5" font-family="monospace">ENG START</text>
+    </symbol>
+
+    <!-- ITT GAUGE -->
+    <symbol id="ico-itt" viewBox="0 0 48 48">
+      <rect x="3" y="3" width="42" height="38" rx="3" fill="#040e1a" stroke="#1a3a5a" stroke-width="1.5"/>
+      <!-- arc gauge -->
+      <path d="M10 34 A16 16 0 0 1 38 34" fill="none" stroke="#1a3a5a" stroke-width="4"/>
+      <path d="M10 34 A16 16 0 0 1 30 12" fill="none" stroke="#ffcc00" stroke-width="4" stroke-linecap="round"/>
+      <!-- red zone -->
+      <path d="M32 10 A16 16 0 0 1 38 34" fill="none" stroke="#ff3a3a" stroke-width="4" stroke-linecap="round"/>
+      <!-- needle -->
+      <line x1="24" y1="34" x2="30" y2="13" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="24" cy="34" r="3" fill="#2a4a6a"/>
+      <!-- labels -->
+      <text x="7" y="36" fill="#5a7a99" font-size="4" font-family="monospace">0</text>
+      <text x="32" y="14" fill="#ff5a5a" font-size="4" font-family="monospace">MAX</text>
+      <text x="24" y="46" fill="#ffcc00" font-size="5.5" font-family="monospace" text-anchor="middle">ITT °C</text>
+    </symbol>
+
+    <!-- GENERATOR SWITCH -->
+    <symbol id="ico-generator" viewBox="0 0 48 48">
+      <rect x="8" y="6" width="32" height="34" rx="3" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="1.5"/>
+      <!-- generator symbol -->
+      <circle cx="24" cy="20" r="10" fill="none" stroke="#4a6aaa" stroke-width="1.5"/>
+      <text x="24" y="24" fill="#6a8acc" font-size="9" font-family="monospace" text-anchor="middle" font-weight="bold">G</text>
+      <!-- output lines -->
+      <line x1="24" y1="30" x2="24" y2="36" stroke="#4a6aaa" stroke-width="1.5"/>
+      <line x1="18" y1="36" x2="30" y2="36" stroke="#4a6aaa" stroke-width="1.5"/>
+      <!-- ON indicator -->
+      <circle cx="24" cy="10" r="3" fill="#00ff44" opacity="0.8"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">GENERATOR</text>
+    </symbol>
+
+    <!-- FLAPS INDICATOR -->
+    <symbol id="ico-flaps" viewBox="0 0 48 48">
+      <!-- wing cross section -->
+      <path d="M4 28 Q12 16 44 20 L44 24 Q12 22 8 32 Z" fill="#1a2a4a" stroke="#2a4a7a" stroke-width="1.2"/>
+      <!-- flap extended -->
+      <path d="M28 24 L44 22 L44 26 Q36 32 28 30 Z" fill="#2a5aaa" stroke="#4a8acc" stroke-width="1"/>
+      <!-- angle indicator -->
+      <text x="30" y="40" fill="#00d4ff" font-size="8" font-family="monospace" text-anchor="middle">15°</text>
+      <!-- label -->
+      <text x="4" y="47" fill="#5a7a99" font-size="5.5" font-family="monospace">FLAPS</text>
+      <!-- position ticks -->
+      <line x1="6" y1="36" x2="6" y2="42" stroke="#3a5a7a" stroke-width="1"/>
+      <text x="3" y="46" fill="#4a7a9a" font-size="3.5" font-family="monospace">0</text>
+      <line x1="16" y1="36" x2="16" y2="42" stroke="#3a5a7a" stroke-width="1"/>
+      <text x="12" y="46" fill="#4a7a9a" font-size="3.5" font-family="monospace">T.O</text>
+      <line x1="26" y1="36" x2="26" y2="42" stroke="#ffcc00" stroke-width="1.5"/>
+      <line x1="38" y1="36" x2="38" y2="42" stroke="#3a5a7a" stroke-width="1"/>
+      <text x="33" y="46" fill="#4a7a9a" font-size="3.5" font-family="monospace">LDG</text>
+    </symbol>
+
+    <!-- PARKING BRAKE -->
+    <symbol id="ico-parkbrake" viewBox="0 0 48 48">
+      <circle cx="24" cy="22" r="18" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="1.5"/>
+      <!-- P symbol -->
+      <text x="24" y="30" fill="#ff6644" font-size="22" font-family="monospace" text-anchor="middle" font-weight="bold">P</text>
+      <!-- circle -->
+      <circle cx="24" cy="22" r="14" fill="none" stroke="#ff4422" stroke-width="2.5"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="4" font-family="monospace">PARK BRAKE</text>
+    </symbol>
+
+    <!-- TRANSPONDER -->
+    <symbol id="ico-xpdr" viewBox="0 0 48 48">
+      <rect x="3" y="8" width="42" height="32" rx="3" fill="#0a0a1a" stroke="#2a2a4a" stroke-width="1.5"/>
+      <!-- display -->
+      <rect x="6" y="11" width="28" height="12" rx="2" fill="#001500"/>
+      <text x="20" y="21" fill="#00ff44" font-size="10" font-family="monospace" text-anchor="middle" letter-spacing="2">7000</text>
+      <!-- mode buttons -->
+      <rect x="36" y="11" width="7" height="5" rx="1" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="0.8"/>
+      <text x="39.5" y="15" fill="#4a6aaa" font-size="3.5" font-family="monospace" text-anchor="middle">SBY</text>
+      <rect x="36" y="18" width="7" height="5" rx="1" fill="#1a2a1a" stroke="#2a4a2a" stroke-width="0.8"/>
+      <text x="39.5" y="22" fill="#00ff44" font-size="3.5" font-family="monospace" text-anchor="middle">ALT</text>
+      <!-- knobs -->
+      <circle cx="10" cy="32" r="5" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="1"/>
+      <circle cx="24" cy="32" r="5" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="1"/>
+      <circle cx="38" cy="32" r="5" fill="#1a1a2a" stroke="#2a2a4a" stroke-width="1"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">XPDR</text>
+    </symbol>
+
+    <!-- ALTIMETER -->
+    <symbol id="ico-altimeter" viewBox="0 0 48 48">
+      <circle cx="24" cy="22" r="20" fill="#040e1a" stroke="#1a3a5a" stroke-width="1.5"/>
+      <circle cx="24" cy="22" r="16" fill="#080f1a" stroke="#1a3a5a" stroke-width="0.8"/>
+      <!-- altitude text -->
+      <text x="24" y="18" fill="#00d4ff" font-size="6" font-family="monospace" text-anchor="middle">FL180</text>
+      <!-- QNH window -->
+      <rect x="14" y="28" width="20" height="8" rx="1" fill="#0a0a1a" stroke="#2a2a4a" stroke-width="0.8"/>
+      <text x="24" y="34" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">29.92</text>
+      <!-- needles -->
+      <line x1="24" y1="22" x2="24" y2="8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="24" y1="22" x2="34" y2="18" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="24" cy="22" r="2" fill="#aaa"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">ALTIMETER</text>
+    </symbol>
+
+    <!-- AUTOPILOT -->
+    <symbol id="ico-autopilot" viewBox="0 0 48 48">
+      <rect x="3" y="5" width="42" height="36" rx="3" fill="#0a0a1a" stroke="#2a2a5a" stroke-width="1.5"/>
+      <!-- AP label -->
+      <rect x="6" y="8" width="36" height="10" rx="2" fill="#001030"/>
+      <text x="24" y="16" fill="#00d4ff" font-size="7" font-family="monospace" text-anchor="middle" letter-spacing="2">A/P ON</text>
+      <!-- mode buttons -->
+      <rect x="6" y="21" width="10" height="7" rx="1" fill="#0a1a3a" stroke="#1a3a6a" stroke-width="0.8"/>
+      <text x="11" y="26.5" fill="#4a8acc" font-size="4" font-family="monospace" text-anchor="middle">HDG</text>
+      <rect x="19" y="21" width="10" height="7" rx="1" fill="#0a1a3a" stroke="#1a3a6a" stroke-width="0.8"/>
+      <text x="24" y="26.5" fill="#4a8acc" font-size="4" font-family="monospace" text-anchor="middle">ALT</text>
+      <rect x="32" y="21" width="10" height="7" rx="1" fill="#001a10" stroke="#1a4a2a" stroke-width="0.8"/>
+      <text x="37" y="26.5" fill="#00ff88" font-size="4" font-family="monospace" text-anchor="middle">FLC</text>
+      <!-- VS readout -->
+      <rect x="6" y="31" width="36" height="8" rx="1" fill="#050d05"/>
+      <text x="24" y="37" fill="#00ff44" font-size="5" font-family="monospace" text-anchor="middle">VS +1200</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">AUTOPILOT</text>
+    </symbol>
+
+    <!-- GPS / GNS -->
+    <symbol id="ico-gps" viewBox="0 0 48 48">
+      <rect x="3" y="5" width="42" height="36" rx="3" fill="#040e04" stroke="#1a3a1a" stroke-width="1.5"/>
+      <!-- screen -->
+      <rect x="6" y="8" width="28" height="26" rx="2" fill="#001008"/>
+      <!-- map dots / route -->
+      <circle cx="12" cy="28" r="2" fill="#00ff44"/>
+      <circle cx="20" cy="20" r="1.5" fill="#4aaa4a"/>
+      <circle cx="28" cy="14" r="2" fill="#00ff88"/>
+      <polyline points="12,28 20,20 28,14" fill="none" stroke="#00aa44" stroke-width="1" stroke-dasharray="2,2"/>
+      <!-- airplane icon -->
+      <path d="M20 20 L22 17 L24 20 L22 22 Z" fill="#00ffaa"/>
+      <!-- side buttons -->
+      <rect x="36" y="9" width="7" height="5" rx="1" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="0.8"/>
+      <rect x="36" y="17" width="7" height="5" rx="1" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="0.8"/>
+      <rect x="36" y="25" width="7" height="5" rx="1" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="0.8"/>
+      <!-- knob -->
+      <circle cx="10" cy="38" r="5" fill="#0d1a0d" stroke="#1a3a1a" stroke-width="1"/>
+      <circle cx="24" cy="38" r="5" fill="#0d1a0d" stroke="#1a3a1a" stroke-width="1"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5.5" font-family="monospace">GPS/FMS</text>
+    </symbol>
+
+    <!-- STROBE LIGHT -->
+    <symbol id="ico-strobe" viewBox="0 0 48 48">
+      <rect x="6" y="22" width="36" height="22" rx="3" fill="#1a1a1a" stroke="#333" stroke-width="1.2"/>
+      <!-- strobe flash -->
+      <path d="M28 4 L22 20 L26 20 L20 36 L32 14 L27 14 Z" fill="#ffffff" opacity="0.9"/>
+      <!-- glow -->
+      <ellipse cx="24" cy="18" rx="10" ry="6" fill="#ffffff" opacity="0.15"/>
+      <!-- switch -->
+      <rect x="18" y="28" width="12" height="10" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="1"/>
+      <text x="24" y="36" fill="#aaaaaa" font-size="5" font-family="monospace" text-anchor="middle">STRB</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">STROBE</text>
+    </symbol>
+
+    <!-- PROPELLER / REVERSE -->
+    <symbol id="ico-prop" viewBox="0 0 48 48">
+      <!-- hub -->
+      <circle cx="24" cy="24" r="5" fill="#2a3a4a" stroke="#4a6a8a" stroke-width="1.5"/>
+      <!-- 4 blades -->
+      <path d="M24 19 Q26 10 24 4 Q22 10 24 19" fill="#3a5a7a" stroke="#5a8aaa" stroke-width="1" opacity="0.9"/>
+      <path d="M29 24 Q38 22 44 24 Q38 26 29 24" fill="#3a5a7a" stroke="#5a8aaa" stroke-width="1" opacity="0.9"/>
+      <path d="M24 29 Q22 38 24 44 Q26 38 24 29" fill="#3a5a7a" stroke="#5a8aaa" stroke-width="1" opacity="0.9"/>
+      <path d="M19 24 Q10 26 4 24 Q10 22 19 24" fill="#3a5a7a" stroke="#5a8aaa" stroke-width="1" opacity="0.9"/>
+      <!-- center dot -->
+      <circle cx="24" cy="24" r="2.5" fill="#00d4ff"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="4" font-family="monospace">PROP/BETA</text>
+    </symbol>
+
+    <!-- RUNWAY / LANDING -->
+    <symbol id="ico-runway" viewBox="0 0 48 48">
+      <!-- sky -->
+      <rect x="3" y="3" width="42" height="28" rx="2" fill="#0a1428"/>
+      <!-- horizon -->
+      <line x1="3" y1="26" x2="45" y2="26" stroke="#4a6a8a" stroke-width="1"/>
+      <!-- runway perspective -->
+      <path d="M10 42 L20 26 L28 26 L38 42 Z" fill="#1a2a3a" stroke="#2a4a6a" stroke-width="1"/>
+      <!-- runway center dashes -->
+      <line x1="24" y1="40" x2="24" y2="36" stroke="#ffcc00" stroke-width="2"/>
+      <line x1="24" y1="34" x2="24" y2="30" stroke="#ffcc00" stroke-width="2"/>
+      <line x1="24" y1="28" x2="24" y2="27" stroke="#ffcc00" stroke-width="1"/>
+      <!-- PAPI lights -->
+      <circle cx="12" cy="36" r="2" fill="#ff4422"/>
+      <circle cx="12" cy="32" r="2" fill="#ff4422"/>
+      <circle cx="36" cy="36" r="2" fill="#ffffff"/>
+      <circle cx="36" cy="32" r="2" fill="#ffffff"/>
+      <!-- approach path plane -->
+      <path d="M24 10 L21 16 L24 15 L27 16 Z" fill="#00d4ff"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">APPROACH</text>
+    </symbol>
+
+    <!-- LANDING LIGHT -->
+    <symbol id="ico-landlight" viewBox="0 0 48 48">
+      <rect x="6" y="22" width="36" height="22" rx="3" fill="#1a1a1a" stroke="#333" stroke-width="1.2"/>
+      <!-- light beam -->
+      <path d="M24 14 L10 40 L38 40 Z" fill="#ffffaa" opacity="0.15"/>
+      <!-- lamp -->
+      <circle cx="24" cy="14" r="7" fill="#ffffee" opacity="0.9" stroke="#aaaa44" stroke-width="1"/>
+      <circle cx="24" cy="14" r="4" fill="#ffffff"/>
+      <!-- reflector -->
+      <path d="M17 14 A7 7 0 0 1 31 14" fill="none" stroke="#aaaa44" stroke-width="1.5"/>
+      <!-- switch -->
+      <rect x="18" y="28" width="12" height="10" rx="2" fill="#2a2a2a" stroke="#444" stroke-width="1"/>
+      <text x="24" y="36" fill="#ffffaa" font-size="4.5" font-family="monospace" text-anchor="middle">LDG LT</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="4.5" font-family="monospace">LAND LIGHT</text>
+    </symbol>
+
+    <!-- BRAKES -->
+    <symbol id="ico-brakes" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="18" fill="#0a0a0a" stroke="#1a1a1a" stroke-width="2"/>
+      <!-- wheel -->
+      <circle cx="24" cy="24" r="14" fill="#111" stroke="#222" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="7" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+      <!-- brake caliper -->
+      <path d="M14 14 L18 20 L18 28 L14 34" fill="none" stroke="#cc4422" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M34 14 L30 20 L30 28 L34 34" fill="none" stroke="#cc4422" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- spokes -->
+      <line x1="24" y1="10" x2="24" y2="38" stroke="#333" stroke-width="1"/>
+      <line x1="10" y1="24" x2="38" y2="24" stroke="#333" stroke-width="1"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5.5" font-family="monospace">BRAKES</text>
+    </symbol>
+
+    <!-- PITOT HEAT -->
+    <symbol id="ico-pitot" viewBox="0 0 48 48">
+      <!-- pitot tube shape -->
+      <line x1="6" y1="22" x2="40" y2="22" stroke="#4a6a8a" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="40" cy="22" r="3" fill="#6a8aaa"/>
+      <!-- heat waves -->
+      <path d="M15 16 Q18 13 21 16 Q24 19 27 16" fill="none" stroke="#ff6644" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M15 28 Q18 31 21 28 Q24 25 27 28" fill="none" stroke="#ff6644" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- ON indicator -->
+      <circle cx="38" cy="12" r="4" fill="#00ff44" opacity="0.8"/>
+      <text x="32" y="14.5" fill="#00ff44" font-size="4.5" font-family="monospace" text-anchor="middle">ON</text>
+      <!-- label -->
+      <text x="4" y="42" fill="#5a7a99" font-size="5" font-family="monospace">PITOT HT</text>
+    </symbol>
+
+    <!-- SPEED INDICATOR -->
+    <symbol id="ico-speed" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="20" fill="#040e1a" stroke="#1a3a5a" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="16" fill="#080f1a" stroke="#1a3a5a" stroke-width="0.8"/>
+      <!-- arc -->
+      <path d="M8 34 A18 18 0 0 1 40 34" fill="none" stroke="#1a3a5a" stroke-width="3"/>
+      <!-- green arc -->
+      <path d="M8 34 A18 18 0 0 1 22 8" fill="none" stroke="#00aa44" stroke-width="3" stroke-linecap="round"/>
+      <!-- yellow arc -->
+      <path d="M22 8 A18 18 0 0 1 36 10" fill="none" stroke="#ffcc00" stroke-width="3" stroke-linecap="round"/>
+      <!-- red line -->
+      <path d="M36 10 A18 18 0 0 1 40 34" fill="none" stroke="#ff3a3a" stroke-width="3" stroke-linecap="round"/>
+      <!-- needle -->
+      <line x1="24" y1="24" x2="26" y2="9" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="24" cy="24" r="3" fill="#2a4a6a"/>
+      <text x="24" y="34" fill="#00d4ff" font-size="7" font-family="monospace" text-anchor="middle">130</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">IAS kt</text>
+    </symbol>
+
+    <!-- VSI (Vertical Speed) -->
+    <symbol id="ico-vsi" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="20" fill="#040e1a" stroke="#1a3a5a" stroke-width="1.5"/>
+      <circle cx="24" cy="24" r="16" fill="#080f1a"/>
+      <!-- UP zone -->
+      <path d="M8 24 A16 16 0 0 1 40 24" fill="none" stroke="#00aa44" stroke-width="2.5"/>
+      <!-- DOWN zone -->
+      <path d="M40 24 A16 16 0 0 1 8 24" fill="none" stroke="#4a6a8a" stroke-width="2.5"/>
+      <!-- needle pointing UP -->
+      <line x1="24" y1="24" x2="30" y2="10" stroke="#00ff88" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="24" cy="24" r="2.5" fill="#2a4a6a"/>
+      <text x="24" y="20" fill="#00ff44" font-size="5.5" font-family="monospace" text-anchor="middle">+1200</text>
+      <text x="10" y="36" fill="#4a6a8a" font-size="4" font-family="monospace">FPM</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="5.5" font-family="monospace">V/S FPM</text>
+    </symbol>
+
+    <!-- ECS SHUTOFF -->
+    <symbol id="ico-ecs" viewBox="0 0 48 48">
+      <rect x="14" y="28" width="20" height="16" rx="2" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+      <!-- ECS red handle (same as fuel shutoff but blue-ish) -->
+      <rect x="20" y="8" width="8" height="22" rx="2" fill="#1a2a5a" stroke="#2a4aaa" stroke-width="1.5"/>
+      <line x1="21" y1="12" x2="27" y2="12" stroke="#4a6acc" stroke-width="1" opacity="0.7"/>
+      <line x1="21" y1="15" x2="27" y2="15" stroke="#4a6acc" stroke-width="1" opacity="0.7"/>
+      <line x1="21" y1="18" x2="27" y2="18" stroke="#4a6acc" stroke-width="1" opacity="0.7"/>
+      <rect x="16" y="6" width="16" height="4" rx="2" fill="#1a2a5a" stroke="#2a4aaa" stroke-width="1.2"/>
+      <!-- airflow symbol -->
+      <path d="M10 40 Q15 36 20 40 Q25 44 30 40" fill="none" stroke="#2a6acc" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">ECS SHTF</text>
+    </symbol>
+
+    <!-- ENGINE WARMUP -->
+    <symbol id="ico-warmup" viewBox="0 0 48 48">
+      <!-- engine shape -->
+      <ellipse cx="24" cy="24" rx="16" ry="12" fill="#0a1a0a" stroke="#1a3a1a" stroke-width="1.5"/>
+      <!-- temp waves/rings -->
+      <ellipse cx="24" cy="24" rx="8" ry="6" fill="none" stroke="#ff6600" stroke-width="1" opacity="0.8"/>
+      <ellipse cx="24" cy="24" rx="12" ry="9" fill="none" stroke="#ff8800" stroke-width="0.8" opacity="0.5"/>
+      <!-- thermometer -->
+      <rect x="22" y="10" width="4" height="20" rx="2" fill="#1a2a1a" stroke="#2a4a2a" stroke-width="0.8"/>
+      <rect x="23" y="20" width="2" height="8" rx="1" fill="#ffcc00"/>
+      <circle cx="24" cy="32" r="4" fill="#ffcc00"/>
+      <!-- timer arc -->
+      <path d="M38 18 A10 10 0 0 1 38 30" fill="none" stroke="#00d4ff" stroke-width="2" stroke-linecap="round"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">WARMUP</text>
+    </symbol>
+
+    <!-- FLARE / TOUCHDOWN -->
+    <symbol id="ico-flare" viewBox="0 0 48 48">
+      <!-- aircraft nose up -->
+      <path d="M8 36 L36 18 L40 20 L38 24 L12 40 Z" fill="#2a4a6a" stroke="#4a7aaa" stroke-width="1.2"/>
+      <!-- wing -->
+      <path d="M22 26 L38 16 L40 20 L24 28 Z" fill="#3a5a8a" stroke="#5a8acc" stroke-width="1"/>
+      <!-- ground line -->
+      <line x1="4" y1="42" x2="44" y2="42" stroke="#4a6a4a" stroke-width="2"/>
+      <!-- altitude arrows down -->
+      <line x1="42" y1="10" x2="42" y2="40" stroke="#ffcc00" stroke-width="1.5" stroke-dasharray="3,2"/>
+      <path d="M39 38 L42 42 L45 38" fill="none" stroke="#ffcc00" stroke-width="1.5" stroke-linecap="round"/>
+      <text x="34" y="10" fill="#ffcc00" font-size="4" font-family="monospace">30ft</text>
+      <text x="4" y="47" fill="#5a7a99" font-size="5.5" font-family="monospace">FLARE</text>
+    </symbol>
+
+    <!-- NAV LIGHTS -->
+    <symbol id="ico-navlights" viewBox="0 0 48 48">
+      <!-- aircraft top view -->
+      <path d="M24 6 L28 30 L24 28 L20 30 Z" fill="#2a4a6a" stroke="#4a7aaa" stroke-width="1"/>
+      <!-- left wing (red) -->
+      <path d="M24 18 L4 24 L6 28 L24 22 Z" fill="#2a3a5a" stroke="#3a5a8a" stroke-width="0.8"/>
+      <circle cx="5" cy="26" r="4" fill="#cc2200" opacity="0.9"/>
+      <!-- right wing (green) -->
+      <path d="M24 18 L44 24 L42 28 L24 22 Z" fill="#2a3a5a" stroke="#3a5a8a" stroke-width="0.8"/>
+      <circle cx="43" cy="26" r="4" fill="#00aa44" opacity="0.9"/>
+      <!-- tail (white) -->
+      <circle cx="24" cy="30" r="3" fill="#ffffff" opacity="0.7"/>
+      <text x="4" y="47" fill="#5a7a99" font-size="5" font-family="monospace">NAV LIGHTS</text>
+    </symbol>
+
+  </defs>
+</svg>
+
+<!-- Install to home screen banner -->
+<div class="install-banner" id="install-banner">
+  <span>📲 加入主畫面，隨飛隨用</span>
+  <button class="install-btn" id="install-btn">加入主畫面</button>
+  <button class="install-close" onclick="document.getElementById('install-banner').classList.remove('show')">×</button>
+</div>
+
+<header>
+  <div class="header-badge">MSFS 2024 · Flight Tutorial</div>
+  <h1>PILATUS <span>PC-12</span> NGX</h1>
+  <p class="subtitle">完整飛行程序 ‧ 從冷啟動到降落 ‧ 逐步操作教學</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · 飛前檢查</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 冷啟動</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 滑行</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 起飛</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 爬升 & 巡航</button>
+  <button class="phase-btn" onclick="showPhase(5)">06 · 下降 & 進場</button>
+  <button class="phase-btn" onclick="showPhase(6)">07 · 降落 & 關機</button>
+</nav>
+
+<div class="main">
+
+<!-- ==================== PHASE 0 ==================== -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title">
+    <span class="phase-icon-wrap">🔍</span>
+    <div><div class="phase-num">PHASE 01</div><h2>飛前檢查 Pre-flight</h2></div>
+  </div>
+  <div class="alert-box warn-box">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-text">
+      <strong>重要提示</strong>
+      冷啟動載入時，中央控制台後方的紅色燃油緊急截止手柄 (FUEL EMERG SHUT OFF) 預設為「拉起」狀態。必須確認將其推回原位才能啟動引擎！
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">完成進度</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div>
+    <span class="progress-pct" id="pct-0">0%</span>
+    <button class="reset-btn" onclick="resetPhase(0)">重置</button>
+  </div>
+  <div class="steps-grid" id="steps-0">
+
+    <div class="step-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-parkbrake"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認停機狀態 / 選擇冷啟動</div>
+        <div class="step-detail">確保飛機已停妥、停機煞車鎖定，選擇 <span class="val">Cold & Dark</span> 模式開始飛行。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-fuelshutoff"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認紅色燃油緊急截止手柄 → DOWN</div>
+        <div class="step-detail">中央控制台後側 → <span class="warn-val">FUEL EMERG SHUT OFF 手柄必須推下（DOWN）</span>，否則無法啟動引擎！</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ecs"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認 ECS 截止手柄 → DOWN</div>
+        <div class="step-detail">同在中央控制台後側 → <span class="warn-val">ECS SHUTOFF 手柄也必須推下（DOWN）</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-condition"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認 Condition Lever → FUEL OFF</div>
+        <div class="step-detail">確認 Condition Lever 在 <span class="val">FUEL OFF</span> 位置（最低位），引擎啟動後才移至 LO-IDLE。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-powerlever"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認 Power Lever → IDLE</div>
+        <div class="step-detail">油門桿應在 <span class="val">IDLE</span> 位置（最後方）。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-gear"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認起落架手柄 → DOWN</div>
+        <div class="step-detail">起落架手柄應在 <span class="val">DOWN（放下）</span> 位置，三個綠燈亮起確認。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-fuel"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認燃油量充足</div>
+        <div class="step-detail">使用 EIS 確認左右翼燃油量。每側翼油箱可用容量約 <span class="val">201 加侖</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-arrow-btn" disabled>← 上一階段</button>
+    <button class="nav-arrow-btn" onclick="showPhase(1)">下一階段：冷啟動 →</button>
+  </div>
+</section>
+
+<!-- ==================== PHASE 1 ==================== -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title">
+    <span class="phase-icon-wrap">🔋</span>
+    <div><div class="phase-num">PHASE 02</div><h2>冷啟動 Cold & Dark Start</h2></div>
+  </div>
+  <div class="alert-box info-box">
+    <span class="alert-icon">ℹ️</span>
+    <div class="alert-text">
+      <strong>PC-12 引擎特性</strong>
+      PC-12 搭載普惠 PT6A-67P 渦輪螺旋槳引擎。ITT 不可超過 <span style="color:var(--danger)">1090°C</span>，啟動過程正常峰值約 <span style="color:var(--warn)">700–850°C</span>。
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">完成進度</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div>
+    <span class="progress-pct" id="pct-1">0%</span>
+    <button class="reset-btn" onclick="resetPhase(1)">重置</button>
+  </div>
+  <div class="subsection">電力系統上電</div>
+  <div class="steps-grid" id="steps-1">
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-battery"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Battery 1 & 2 → ON</div>
+        <div class="step-detail">開啟兩個電池開關（BATT 1 & BATT 2），航電系統開始通電。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-avionics"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Avionics Master → ON</div>
+        <div class="step-detail">開啟航電主開關，PFD / MFD 等螢幕開始啟動自我測試。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-avionics"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">等待 PFD / MFD 完成開機</div>
+        <div class="step-detail">等待所有飛行儀錶顯示正常，EIS 完成初始化，約 <span class="val">30–60 秒</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-beacon"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Beacon Light → ON</div>
+        <div class="step-detail">開啟防撞燈，提示地勤人員引擎即將啟動。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-fuel"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Fuel Boost Pump → ON（如有低壓警告）</div>
+        <div class="step-detail">如燃油壓力警告亮起，開啟燃油升壓泵。啟動過程中短暫使用。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="subsection">引擎啟動程序</div>
+  <div class="alert-box danger-box" style="margin-bottom:14px">
+    <span class="alert-icon">🚨</span>
+    <div class="alert-text">
+      <strong>ITT 過熱警告</strong>
+      若 ITT 超過 <span style="color:var(--danger)">1090°C</span>，立即將 Condition Lever 移回 FUEL OFF，等待螺旋槳完全停止後再次嘗試。
+    </div>
+  </div>
+  <div class="steps-grid" id="steps-1b">
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-prop"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認螺旋槳區域淨空</div>
+        <div class="step-detail">目視或呼叫確認螺旋槳前後無人員或障礙物。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-engstart"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Engine Start Switch → START（按住）</div>
+        <div class="step-detail">將引擎啟動開關撥到 <span class="val">START</span> 並持續按住。螺旋槳開始旋轉，Ng 轉速開始上升。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">8</div><svg class="cockpit-icon"><use href="#ico-condition"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Ng 達到 12–13% → Condition Lever → LO-IDLE</div>
+        <div class="step-detail">Ng 達 <span class="warn-val">12–13%</span> 時，將 Condition Lever 移到 <span class="val">LO-IDLE</span>，燃油開始供應引擎點火。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">9</div><svg class="cockpit-icon"><use href="#ico-itt"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">監控 ITT 上升</div>
+        <div class="step-detail">ITT 正常峰值 <span class="warn-val">700–850°C</span>，然後逐漸穩定下降。繼續按住 Start Switch 直到 Ng 超過 <span class="val">50%</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">10</div><svg class="cockpit-icon"><use href="#ico-engstart"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Ng > 50% → 放開 Start Switch</div>
+        <div class="step-detail">引擎自持後，放開啟動開關，繼續監控 Ng 和 ITT 穩定在怠速值。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">11</div><svg class="cockpit-icon"><use href="#ico-warmup"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">等待引擎暖機穩定（2–3 分鐘）</div>
+        <div class="step-detail">ITT 穩定約 <span class="val">600–700°C</span>，Ng 穩定約 <span class="val">65–70%</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">12</div><svg class="cockpit-icon"><use href="#ico-generator"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Generator → ON</div>
+        <div class="step-detail">引擎穩定後開啟發電機，主要電力來源從電池切換至發電機，確認電壓正常。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">13</div><svg class="cockpit-icon"><use href="#ico-navlights"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Nav Lights → ON</div>
+        <div class="step-detail">開啟 Nav Lights（航行燈）：左翼紅色、右翼綠色、尾翼白色。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">14</div><svg class="cockpit-icon"><use href="#ico-gps"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">設定 GPS / FMS 航路</div>
+        <div class="step-detail">在 GNS 530/430 或 GTN 750 中輸入目的地、航路點，確認飛行計劃。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">15</div><svg class="cockpit-icon"><use href="#ico-altimeter"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">設定 Altimeter & Transponder</div>
+        <div class="step-detail">輸入當前 QNH 調整高度計。Transponder 設定 Squawk 並設為 <span class="val">ALT 模式</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-arrow-btn" onclick="showPhase(0)">← 飛前檢查</button>
+    <button class="nav-arrow-btn" onclick="showPhase(2)">下一階段：滑行 →</button>
+  </div>
+</section>
+
+<!-- ==================== PHASE 2 ==================== -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title">
+    <span class="phase-icon-wrap">🛞</span>
+    <div><div class="phase-num">PHASE 03</div><h2>滑行 Taxi</h2></div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">完成進度</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div>
+    <span class="progress-pct" id="pct-2">0%</span>
+    <button class="reset-btn" onclick="resetPhase(2)">重置</button>
+  </div>
+  <div class="steps-grid" id="steps-2">
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-parkbrake"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Parking Brake → OFF</div>
+        <div class="step-detail">確認周圍淨空後，釋放停機煞車。輕推油門桿使飛機開始滾動。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-speed"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">滑行速度控制</div>
+        <div class="step-detail">建議滑行速度不超過 <span class="val">20 kt</span>，轉彎時降至 <span class="val">10 kt</span> 以下。用方向舵踏板控制方向。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-brakes"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">煞車測試</div>
+        <div class="step-detail">滑行開始後立即輕踩左右煞車，確認煞車系統正常運作。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-runway"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">飛控面自我檢查（Full & Free）</div>
+        <div class="step-detail">完整活動方向舵、升降舵、副翼，確認操控面全行程自由無阻礙。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-flaps"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Flaps → T.O. 位（15°）</div>
+        <div class="step-detail">在跑道頭前設定起飛襟翼。PC-12 正常起飛建議使用 <span class="val">Flaps T.O.（15°）</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-speed"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認起飛參考速度</div>
+        <div class="step-detail">Vr 約 <span class="val">85–95 kt</span>，V2 約 <span class="val">95–105 kt</span>（依重量而異）。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-strobe"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">進入跑道前最終確認</div>
+        <div class="step-detail">Transponder → <span class="val">ALT</span> ｜ Strobe → <span class="val">ON</span> ｜ Landing Light → <span class="val">ON</span> ｜ Pitot Heat → <span class="val">ON</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-arrow-btn" onclick="showPhase(1)">← 冷啟動</button>
+    <button class="nav-arrow-btn" onclick="showPhase(3)">下一階段：起飛 →</button>
+  </div>
+</section>
+
+<!-- ==================== PHASE 3 ==================== -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title">
+    <span class="phase-icon-wrap">✈️</span>
+    <div><div class="phase-num">PHASE 04</div><h2>起飛 Takeoff</h2></div>
+  </div>
+  <div class="alert-box info-box">
+    <span class="alert-icon">📊</span>
+    <div class="alert-text">
+      <strong>PC-12 參考速度（一般載重）</strong>
+      <table class="data-table" style="margin-top:10px">
+        <tr><th>速度</th><th>說明</th><th>約略值</th></tr>
+        <tr><td>Vr</td><td>抬輪速度</td><td class="mono">85–95 kt</td></tr>
+        <tr><td>V2</td><td>安全起飛速度</td><td class="mono">95–105 kt</td></tr>
+        <tr><td>Vy</td><td>最佳爬升率速度</td><td class="mono">120–130 kt</td></tr>
+        <tr><td>Vfe (T.O.)</td><td>最大起飛襟翼速度</td><td class="mono">185 kt</td></tr>
+        <tr><td>Vno</td><td>最大常規操作速度</td><td class="mono">248 kt / M0.47</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">完成進度</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div>
+    <span class="progress-pct" id="pct-3">0%</span>
+    <button class="reset-btn" onclick="resetPhase(3)">重置</button>
+  </div>
+  <div class="steps-grid" id="steps-3">
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-runway"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">對齊跑道中心線</div>
+        <div class="step-detail">滑行至跑道端頭，對齊中心線，確認無來機、取得 ATC 起飛許可。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-powerlever"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Power Lever → 推至 Takeoff（最大推力）</div>
+        <div class="step-detail">平順推至起飛位。監控：Torque <span class="val">≤ 100%</span>，ITT <span class="val">≤ 820°C（5分鐘）</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-prop"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">加速滾行，方向舵維持中心線</div>
+        <div class="step-detail">用方向舵踏板（非副翼）維持中心線。螺旋槳扭力效應偏左，施加右腳踏板修正。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-speed"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">達 Vr → 平順抬輪</div>
+        <div class="step-detail">速度達 <span class="warn-val">Vr（約 85–95 kt）</span> 時，平順向後拉桿約 <span class="val">10–12°</span> 機頭俯仰角。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-gear"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">確認正向爬升率 → 收起落架</div>
+        <div class="step-detail">確認 VSI 顯示正向爬升後，起落架手柄移至 <span class="val">UP</span>。確認 3 個起落架指示燈全滅（收起完成）。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-flaps"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">加速至 V2+10 kt → 收起 Flaps</div>
+        <div class="step-detail">達到 <span class="val">V2 + 10 kt</span> 且離地 <span class="val">500 ft AGL</span> 以上，逐步收起襟翼至 0°。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-powerlever"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">轉換至爬升推力</div>
+        <div class="step-detail">收起落架與襟翼後，適當減少油門至 <span class="val">爬升功率（Climb Power）</span> 設定。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-arrow-btn" onclick="showPhase(2)">← 滑行</button>
+    <button class="nav-arrow-btn" onclick="showPhase(4)">下一階段：爬升 & 巡航 →</button>
+  </div>
+</section>
+
+<!-- ==================== PHASE 4 ==================== -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title">
+    <span class="phase-icon-wrap">🌤️</span>
+    <div><div class="phase-num">PHASE 05</div><h2>爬升 & 巡航 Climb & Cruise</h2></div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">完成進度</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div>
+    <span class="progress-pct" id="pct-4">0%</span>
+    <button class="reset-btn" onclick="resetPhase(4)">重置</button>
+  </div>
+  <div class="subsection">爬升階段</div>
+  <div class="steps-grid" id="steps-4">
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-speed"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">爬升速度 → 120–150 kt IAS</div>
+        <div class="step-detail">最佳爬升率速度 Vy 約 <span class="val">120–130 kt</span>，可使用 AP 的 FLC 或 VS 模式輔助。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-vsi"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">爬升率 → 500–1500 FPM</div>
+        <div class="step-detail">根據巡航高度設定適合的爬升率。高空引擎效率下降，爬升率自然減低是正常現象。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-altimeter"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">過渡高度 → 切換高度計 STD</div>
+        <div class="step-detail">到達過渡高度後，將高度計切換為 <span class="val">29.92 inHg（Standard）</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-autopilot"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Auto-Pilot 接管（400 ft AGL 以上）</div>
+        <div class="step-detail">接通 AP，設定目標高度與速度。建議巡航高度 <span class="val">FL150–FL250</span>（15,000–25,000 ft）。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="subsection">巡航階段</div>
+  <div class="steps-grid" id="steps-4b">
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-speed"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">巡航速度設定</div>
+        <div class="step-detail">典型巡航速度 <span class="val">210–260 kt TAS</span>（依高度）。上方 MFD 設定 Cruise Speed & Altitude。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-fuel"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">燃油管理監控</div>
+        <div class="step-detail">定期查看 EIS 燃油量，確認左右翼消耗平衡。正常燃耗約 <span class="val">60–80 加侖/小時</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-itt"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">定期監控引擎儀錶</div>
+        <div class="step-detail">確認：ITT 正常 ｜ Ng 穩定 ｜ 油壓正常 ｜ 無警告燈亮起。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">8</div><svg class="cockpit-icon"><use href="#ico-condition"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Condition Lever → HI-IDLE（巡航）</div>
+        <div class="step-detail">巡航階段將 Condition Lever 移至 <span class="val">HI-IDLE</span> 以獲得更好的引擎效率。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">9</div><svg class="cockpit-icon"><use href="#ico-gps"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">目的地前 30 分鐘 → 取得 ATIS / 下降許可</div>
+        <div class="step-detail">聯絡目的地 ATC，取得落地資訊（跑道、QNH、能見度）並請求下降許可。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-arrow-btn" onclick="showPhase(3)">← 起飛</button>
+    <button class="nav-arrow-btn" onclick="showPhase(5)">下一階段：下降 & 進場 →</button>
+  </div>
+</section>
+
+<!-- ==================== PHASE 5 ==================== -->
+<section class="phase-section" id="phase-5">
+  <div class="phase-title">
+    <span class="phase-icon-wrap">📡</span>
+    <div><div class="phase-num">PHASE 06</div><h2>下降 & 進場 Descent & Approach</h2></div>
+  </div>
+  <div class="alert-box info-box">
+    <span class="alert-icon">💡</span>
+    <div class="alert-text">
+      <strong>下降計算技巧</strong>
+      每 1,000 ft 高度需約 3 海里（NM）水平距離（3°進場角）。
+      例如從 18,000 ft 下降至 1,000 ft，需提前約 <span style="color:var(--accent)">51 NM</span> 開始下降。
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">完成進度</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-5" style="width:0%"></div></div>
+    <span class="progress-pct" id="pct-5">0%</span>
+    <button class="reset-btn" onclick="resetPhase(5)">重置</button>
+  </div>
+  <div class="subsection">下降階段</div>
+  <div class="steps-grid" id="steps-5">
+
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-powerlever"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">開始下降 → 減少油門</div>
+        <div class="step-detail">逐步減少油門，下降率 <span class="val">500–1500 FPM</span>，速度維持 <span class="val">200–220 kt IAS</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-altimeter"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">過渡高度層以下 → 切換高度計 QNH</div>
+        <div class="step-detail">下降通過過渡高度層時，將高度計從 Standard 換回目的地 <span class="val">QNH 數值</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-flaps"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">速度 &lt; 170 kt → 放出 Flaps T.O.</div>
+        <div class="step-detail">進場時速度降低，可逐步放出襟翼至起飛位。確保速度在各段限制以內。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-gear"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">速度 &lt; 150 kt → 放下起落架</div>
+        <div class="step-detail">速度低於 <span class="warn-val">150 kt</span> 放下起落架（Gear DOWN）。確認三個<span class="val">綠燈亮起</span>，起落架鎖定。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="subsection">最終進場</div>
+  <div class="steps-grid" id="steps-5b">
+
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-speed"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">最終進場速度 → Vref + 5–10 kt</div>
+        <div class="step-detail">進場參考速度 Vref 依重量約 <span class="val">80–90 kt</span>。建議保持 <span class="val">90–100 kt</span> 直到跑道入口。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-flaps"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Flaps → LAND（40° 全放）</div>
+        <div class="step-detail">最終進場穩定後，放出全量襟翼至 <span class="val">LAND（40°）</span>，確認飛機在下滑道上（3°）。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-runway"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">穩定進場確認（500 ft AGL）</div>
+        <div class="step-detail">500 ft AGL 前必須：速度穩定 ｜ 下滑道穩定 ｜ 構型完成 ｜ 起落架放下確認。否則考慮<span class="warn-val">複飛（Go-Around）</span>。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">8</div><svg class="cockpit-icon"><use href="#ico-landlight"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Landing Light → ON</div>
+        <div class="step-detail">確認降落燈已開啟，提升能見度供地面人員辨識。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-arrow-btn" onclick="showPhase(4)">← 爬升 & 巡航</button>
+    <button class="nav-arrow-btn" onclick="showPhase(6)">下一階段：降落 & 關機 →</button>
+  </div>
+</section>
+
+<!-- ==================== PHASE 6 ==================== -->
+<section class="phase-section" id="phase-6">
+  <div class="phase-title">
+    <span class="phase-icon-wrap">🏁</span>
+    <div><div class="phase-num">PHASE 07</div><h2>降落 & 關機 Landing & Shutdown</h2></div>
+  </div>
+  <div class="progress-wrap">
+    <span class="progress-label">完成進度</span>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-6" style="width:0%"></div></div>
+    <span class="progress-pct" id="pct-6">0%</span>
+    <button class="reset-btn" onclick="resetPhase(6)">重置</button>
+  </div>
+  <div class="subsection">接地 & 滾行</div>
+  <div class="steps-grid" id="steps-6">
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-flare"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">拉飄（Flare）接地</div>
+        <div class="step-detail">約 <span class="val">20–30 ft AGL</span> 開始平順拉飄，機頭抬高約 <span class="val">2–3°</span>，讓主輪先接地。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-powerlever"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">接地後 → 收油門至 IDLE</div>
+        <div class="step-detail">主輪接地後立即將油門收到 <span class="val">IDLE</span>，讓前輪輕觸跑道。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-prop"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Beta / Reverse 推力輔助減速</div>
+        <div class="step-detail">PC-12 螺旋槳可進入 <span class="val">Beta</span> 或 <span class="val">Reverse</span> 模式。油門桿拉過 IDLE 至 Reverse 區域以輔助減速。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-brakes"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">煞車 & 速度控制</div>
+        <div class="step-detail">平均施加煞車，速度降至約 <span class="val">30 kt</span> 以下後退出 Reverse，以 Idle + 煞車繼續減速。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-runway"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">脫離跑道</div>
+        <div class="step-detail">從適當滑行道脫離跑道，速度降至 <span class="val">< 15 kt</span>，通知 ATC 已脫離跑道。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="subsection">關機程序</div>
+  <div class="steps-grid" id="steps-6b">
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-parkbrake"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">停妥 → Parking Brake → SET</div>
+        <div class="step-detail">滑行至停機位，對齊停機線。設定停機煞車確保飛機靜止。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-warmup"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">引擎怠速冷卻（2–3 分鐘）</div>
+        <div class="step-detail">讓引擎在 <span class="val">LO-IDLE</span> 怠速 <span class="val">2–3 分鐘</span>，保護渦輪葉片壽命。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">8</div><svg class="cockpit-icon"><use href="#ico-condition"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Condition Lever → FUEL OFF</div>
+        <div class="step-detail">將 Condition Lever 移至 <span class="warn-val">FUEL OFF</span>，停止燃油供應，引擎開始停車。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">9</div><svg class="cockpit-icon"><use href="#ico-prop"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">等待螺旋槳完全停止</div>
+        <div class="step-detail">耐心等待螺旋槳完全停止旋轉，切勿在旋轉時接近螺旋槳。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">10</div><svg class="cockpit-icon"><use href="#ico-navlights"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">所有燈光 → OFF</div>
+        <div class="step-detail">關閉 Strobe、Landing Light、Nav Lights、Beacon 等所有燈光。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">11</div><svg class="cockpit-icon"><use href="#ico-avionics"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Avionics Master → OFF</div>
+        <div class="step-detail">關閉航電主開關，PFD / MFD 等螢幕關閉。</div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,6)">
+      <div class="step-icon-col"><div class="step-num">12</div><svg class="cockpit-icon"><use href="#ico-battery"/></svg></div>
+      <div class="step-content">
+        <div class="step-action">Battery 1 & 2 → OFF 🎉</div>
+        <div class="step-detail">關閉所有電池開關。飛機完全斷電，進入 Cold & Dark 狀態。<strong style="color:var(--accent3)">飛行圓滿完成！</strong></div>
+      </div>
+      <div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-arrow-btn" onclick="showPhase(5)">← 下降 & 進場</button>
+    <button class="nav-arrow-btn" style="color:var(--accent3);border-color:var(--accent3)" disabled>飛行完成！ 🏁</button>
+  </div>
+</section>
+
+</div>
+
+<!-- Mobile bottom navigation -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0">
+      <span class="tab-icon">🔍</span>
+      <span class="tab-label">飛前</span>
+      <div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div>
+    </button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1">
+      <span class="tab-icon">🔋</span>
+      <span class="tab-label">啟動</span>
+      <div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div>
+    </button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2">
+      <span class="tab-icon">🛞</span>
+      <span class="tab-label">滑行</span>
+      <div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div>
+    </button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3">
+      <span class="tab-icon">✈️</span>
+      <span class="tab-label">起飛</span>
+      <div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div>
+    </button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4">
+      <span class="tab-icon">🌤️</span>
+      <span class="tab-label">巡航</span>
+      <div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div>
+    </button>
+    <button class="mobile-tab" onclick="showPhase(5)" id="mtab-5">
+      <span class="tab-icon">📡</span>
+      <span class="tab-label">進場</span>
+      <div class="tab-bar"><div class="tab-bar-fill" id="tbar-5"></div></div>
+    </button>
+    <button class="mobile-tab" onclick="showPhase(6)" id="mtab-6">
+      <span class="tab-icon">🏁</span>
+      <span class="tab-label">降落</span>
+      <div class="tab-bar"><div class="tab-bar-fill" id="tbar-6"></div></div>
+    </button>
+  </div>
+</nav>
+
+<footer>
+  MSFS 2024 · Pilatus PC-12 NGX · 飛行教學 · 僅供模擬參考使用
+  <div class="swipe-hint">← 滑動底部標籤切換階段 →</div>
+</footer>
+
+<script>
+  let currentPhase = 0;
+  let deferredPrompt = null;
+
+  // PWA install prompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('install-banner').classList.add('show');
+  });
+  document.getElementById('install-btn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('install-banner').classList.remove('show');
+  });
+
+  function getStepCards(phaseIndex) {
+    const section = document.getElementById('phase-' + phaseIndex);
+    return section.querySelectorAll('.step-card');
+  }
+
+  function showPhase(index) {
+    document.querySelectorAll('.phase-section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.mobile-tab').forEach(b => b.classList.remove('active'));
+
+    document.getElementById('phase-' + index).classList.add('visible');
+    const desktopBtns = document.querySelectorAll('.phase-btn');
+    if (desktopBtns[index]) desktopBtns[index].classList.add('active');
+    const mTab = document.getElementById('mtab-' + index);
+    if (mTab) {
+      mTab.classList.add('active');
+      // scroll tab into view
+      mTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+    currentPhase = index;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleStep(card, phaseIndex) {
+    card.classList.toggle('done');
+    updateProgress(phaseIndex);
+  }
+
+  function updateProgress(phaseIndex) {
+    const cards = getStepCards(phaseIndex);
+    const done = [...cards].filter(c => c.classList.contains('done')).length;
+    const pct = Math.round((done / cards.length) * 100);
+    // desktop progress bar
+    const fill = document.getElementById('prog-' + phaseIndex);
+    const label = document.getElementById('pct-' + phaseIndex);
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = pct + '%';
+    // mobile tab bar
+    const tbar = document.getElementById('tbar-' + phaseIndex);
+    if (tbar) tbar.style.width = pct + '%';
+  }
+
+  function resetPhase(phaseIndex) {
+    getStepCards(phaseIndex).forEach(c => c.classList.remove('done'));
+    updateProgress(phaseIndex);
+  }
+
+  // Touch swipe support
+  let touchStartX = 0;
+  let touchStartY = 0;
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 60) {
+      if (dx < 0 && currentPhase < 6) showPhase(currentPhase + 1);
+      else if (dx > 0 && currentPhase > 0) showPhase(currentPhase - 1);
+    }
+  }, { passive: true });
+
+  // Init
+  for (let i = 0; i < 7; i++) updateProgress(i);
+</script>
+</body>
+</html>

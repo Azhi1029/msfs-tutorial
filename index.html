@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MSFS 教學">
+<meta name="theme-color" content="#04060e">
+<meta name="description" content="MSFS 2024 飛行教學 - PC-12、SF50 Vision Jet、Boeing 737 MAX 完整程序教學">
+<title>MSFS 2024 飛行教學中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #04060e;
+    --panel: #080c18;
+    --border: #0e1c38;
+    --text: #a8c4e0;
+    --text-dim: #344a68;
+    --text-bright: #ddeeff;
+    /* per-card accent colors */
+    --c-pc12: #00d4ff;
+    --c-sf50: #4d9fff;
+    --c-b737: #1a7aff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── STARFIELD BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 92% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 50%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 78% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(ellipse at 20% 0%, rgba(20,60,180,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,100,180,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .page { position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    text-align: center;
+    padding: 70px 20px 50px;
+    position: relative;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 80%; max-width: 600px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #4d9fff;
+    background: rgba(77,159,255,0.07);
+    border: 1px solid rgba(77,159,255,0.2);
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    text-transform: uppercase;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4d9fff;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .hero h1 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(28px, 6vw, 64px);
+    color: #fff;
+    letter-spacing: 3px;
+    line-height: 1.05;
+    text-shadow: 0 0 60px rgba(77,159,255,0.4);
+    margin-bottom: 8px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: #4d9fff;
+  }
+  .hero-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-top: 14px;
+    text-transform: uppercase;
+  }
+  .hero-desc {
+    max-width: 540px;
+    margin: 20px auto 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* ── AIRCRAFT SILHOUETTE DIVIDER ── */
+  .silhouette-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 30px 20px;
+    opacity: 0.15;
+  }
+  .silhouette-row svg { width: 80px; height: 40px; }
+
+  /* ── CARDS GRID ── */
+  .cards-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── AIRCRAFT CARD ── */
+  .aircraft-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .aircraft-card:hover {
+    transform: translateY(-6px);
+  }
+  .aircraft-card:active { transform: scale(0.98); }
+
+  /* accent line at top */
+  .aircraft-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-color, #4d9fff);
+    opacity: 0.8;
+  }
+  /* glow on hover */
+  .aircraft-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(77,159,255,0.06) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .aircraft-card:hover::after { opacity: 1; }
+
+  /* SVG illustration area */
+  .card-illustration {
+    width: 100%;
+    height: 160px;
+    background: linear-gradient(180deg, rgba(4,6,14,0) 0%, rgba(8,12,24,0.6) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+  }
+  .card-illustration svg {
+    width: 100%;
+    max-width: 280px;
+    height: 120px;
+    filter: drop-shadow(0 0 20px var(--card-color, #4d9fff));
+    transition: transform 0.4s ease, filter 0.4s ease;
+  }
+  .aircraft-card:hover .card-illustration svg {
+    transform: scale(1.05) translateY(-3px);
+    filter: drop-shadow(0 0 30px var(--card-color, #4d9fff));
+  }
+
+  /* grid glow bg */
+  .card-illustration::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(77,159,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77,159,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .card-body { padding: 20px 22px 24px; }
+
+  .card-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--card-color, #4d9fff);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-tag::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--card-color, #4d9fff);
+    opacity: 0.6;
+  }
+
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: clamp(18px, 2.5vw, 22px);
+    color: #fff;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+  .card-subtitle {
+    font-size: 13px;
+    color: var(--card-color, #4d9fff);
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+
+  /* STATS ROW */
+  .card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stat {
+    background: var(--panel);
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--card-color, #4d9fff);
+    display: block;
+    font-weight: 500;
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* PHASES PREVIEW */
+  .card-phases {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .phase-pill {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  /* CTA BUTTON */
+  .card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px;
+    background: rgba(77,159,255,0.07);
+    border: 1px solid var(--card-color, #4d9fff);
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--card-color, #4d9fff);
+    text-transform: uppercase;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .card-btn:hover {
+    background: rgba(77,159,255,0.14);
+    box-shadow: 0 0 20px rgba(77,159,255,0.2);
+  }
+  .card-btn .arrow {
+    transition: transform 0.2s;
+  }
+  .aircraft-card:hover .arrow { transform: translateX(4px); }
+
+  /* ── FEATURES SECTION ── */
+  .features {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 20px 60px;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .feature-item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .feature-icon { font-size: 20px; flex-shrink: 0; }
+  .feature-title { font-size: 13px; font-weight: 500; color: var(--text-bright); margin-bottom: 3px; }
+  .feature-desc { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 30px 20px;
+    border-top: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  footer a { color: #4d9fff; text-decoration: none; }
+
+  /* ── MOBILE ── */
+  @media(max-width: 600px) {
+    .hero { padding: 50px 16px 36px; }
+    .hero h1 { font-size: 28px; letter-spacing: 1px; }
+    .hero-sub { font-size: 10px; letter-spacing: 2px; }
+    .silhouette-row { gap: 20px; }
+    .silhouette-row svg { width: 60px; }
+    .cards-section { padding: 24px 14px 60px; }
+    .card-body { padding: 16px 16px 20px; }
+    .card-illustration { height: 130px; }
+    .card-stats { margin-bottom: 14px; }
+    .features { padding: 10px 14px 50px; }
+  }
+
+  /* ── ANIMATE ON LOAD ── */
+  .aircraft-card {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: cardIn 0.6s ease forwards;
+  }
+  .aircraft-card:nth-child(1) { animation-delay: 0.1s; }
+  .aircraft-card:nth-child(2) { animation-delay: 0.25s; }
+  .aircraft-card:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-badge, .hero h1, .hero-sub, .hero-desc {
+    opacity: 0;
+    animation: heroIn 0.7s ease forwards;
+  }
+  .hero-badge { animation-delay: 0s; }
+  .hero h1 { animation-delay: 0.15s; }
+  .hero-sub { animation-delay: 0.25s; }
+  .hero-desc { animation-delay: 0.35s; }
+  @keyframes heroIn {
+    from { opacity:0; transform: translateY(12px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    MSFS 2024 · Flight Tutorial Hub
+  </div>
+  <h1>FLIGHT<br><em>ACADEMY</em></h1>
+  <p class="hero-sub">Microsoft Flight Simulator 2024</p>
+  <p class="hero-desc">從冷倉啟動到完美降落，完整的逐步操作教學。<br>支援手機隨飛隨查，可加入主畫面離線使用。</p>
+</section>
+
+<!-- ── SILHOUETTES ── -->
+<div class="silhouette-row">
+  <!-- PC-12 silhouette -->
+  <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 28 Q40 20 110 25 L110 28 Q40 26 10 32 Z" fill="white"/>
+    <path d="M30 28 L10 18 L14 20 L30 26 Z" fill="white"/>
+    <path d="M30 28 L10 38 L14 36 L30 30 Z" fill="white"/>
+    <path d="M95 26 L80 22 L82 24 L95 24 Z" fill="white"/>
+  </svg>
+  <!-- SF50 silhouette -->
+  <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 28 Q50 22 105 26 L105 29 Q50 26 15 32 Z" fill="white"/>
+    <path d="M35 28 L8 16 L13 19 L35 26 Z" fill="white"/>
+    <path d="M35 28 L8 40 L13 37 L35 30 Z" fill="white"/>
+    <path d="M85 24 L95 20 L95 22 L85 26 Z" fill="white" transform="rotate(5,90,23)"/>
+    <ellipse cx="100" cy="24" rx="8" ry="4" fill="white"/>
+  </svg>
+  <!-- 737 silhouette -->
+  <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 27 Q50 20 112 25 L112 28 Q50 25 8 31 Z" fill="white"/>
+    <path d="M30 27 L5 12 L10 16 L30 25 Z" fill="white"/>
+    <path d="M30 27 L5 42 L10 38 L30 29 Z" fill="white"/>
+    <path d="M95 23 L85 19 L87 21 L95 21 Z" fill="white"/>
+    <path d="M95 27 L85 31 L87 29 L95 29 Z" fill="white"/>
+    <ellipse cx="28" cy="28" rx="5" ry="3" fill="white" transform="translate(0,6)"/>
+    <ellipse cx="70" cy="28" rx="5" ry="3" fill="white" transform="translate(0,6)"/>
+  </svg>
+</div>
+
+<!-- ── CARDS ── -->
+<section class="cards-section">
+  <p class="section-label">選擇飛機開始教學</p>
+  <div class="cards-grid">
+
+    <!-- PC-12 CARD -->
+    <a class="aircraft-card" href="PC12_Tutorial_mobile.html" style="--card-color: #00d4ff;">
+      <div class="card-illustration">
+        <svg viewBox="0 0 280 110" xmlns="http://www.w3.org/2000/svg">
+          <!-- PC-12 detailed side view -->
+          <!-- fuselage -->
+          <path d="M20 58 Q60 44 230 52 L235 55 Q60 58 22 64 Z" fill="#00d4ff" opacity="0.7"/>
+          <!-- nose -->
+          <path d="M20 58 Q10 56 5 55 Q10 54 20 54 Z" fill="#00d4ff" opacity="0.5"/>
+          <!-- wing -->
+          <path d="M80 56 L20 30 L30 36 L80 50 Z" fill="#00d4ff" opacity="0.9"/>
+          <path d="M80 56 L20 82 L30 76 L80 62 Z" fill="#00d4ff" opacity="0.5"/>
+          <!-- tail H-stab -->
+          <path d="M210 53 L190 42 L194 45 L210 51 Z" fill="#00d4ff" opacity="0.8"/>
+          <path d="M210 53 L190 64 L194 61 L210 55 Z" fill="#00d4ff" opacity="0.5"/>
+          <!-- prop -->
+          <circle cx="240" cy="55" r="3" fill="#00d4ff"/>
+          <line x1="240" y1="55" x2="240" y2="38" stroke="#00d4ff" stroke-width="2" opacity="0.8"/>
+          <line x1="240" y1="55" x2="240" y2="72" stroke="#00d4ff" stroke-width="2" opacity="0.8"/>
+          <line x1="240" y1="55" x2="255" y2="48" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+          <line x1="240" y1="55" x2="225" y2="62" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+          <!-- windows -->
+          <ellipse cx="110" cy="52" rx="5" ry="4" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.5"/>
+          <ellipse cx="130" cy="51" rx="5" ry="4" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+          <ellipse cx="150" cy="51" rx="5" ry="4" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+          <ellipse cx="170" cy="51" rx="5" ry="4" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+          <!-- landing gear -->
+          <line x1="90" y1="62" x2="90" y2="72" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="160" y1="62" x2="160" y2="72" stroke="#00d4ff" stroke-width="1.5" opacity="0.5"/>
+          <ellipse cx="90" cy="73" rx="7" ry="3" fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.5"/>
+          <ellipse cx="160" cy="73" rx="7" ry="3" fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.5"/>
+          <!-- glow -->
+          <ellipse cx="140" cy="55" rx="100" ry="30" fill="#00d4ff" opacity="0.04"/>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag">渦輪螺旋槳 · 單發</div>
+        <div class="card-title">Pilatus PC-12 NGX</div>
+        <div class="card-subtitle">PT6A-67P 渦槳引擎</div>
+        <div class="card-desc">瑞士製造的高性能渦輪螺旋槳飛機，FADEC 引擎管理，適合商務及短途飛行。</div>
+        <div class="card-stats">
+          <div class="stat">
+            <span class="stat-val">FL250</span>
+            <div class="stat-label">最大高度</div>
+          </div>
+          <div class="stat">
+            <span class="stat-val">260 kt</span>
+            <div class="stat-label">巡航速度</div>
+          </div>
+          <div class="stat">
+            <span class="stat-val">7 階段</span>
+            <div class="stat-label">教學步驟</div>
+          </div>
+        </div>
+        <div class="card-phases">
+          <span class="phase-pill">飛前檢查</span>
+          <span class="phase-pill">冷倉啟動</span>
+          <span class="phase-pill">滑行</span>
+          <span class="phase-pill">起飛</span>
+          <span class="phase-pill">爬升巡航</span>
+          <span class="phase-pill">進場</span>
+          <span class="phase-pill">降落關機</span>
+        </div>
+        <div class="card-btn">
+          開始教學 <span class="arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- SF50 CARD -->
+    <a class="aircraft-card" href="SF50_Vision_Jet_Tutorial.html" style="--card-color: #4d9fff;">
+      <div class="card-illustration">
+        <svg viewBox="0 0 280 110" xmlns="http://www.w3.org/2000/svg">
+          <!-- SF50 side view - pusher jet -->
+          <!-- fuselage -->
+          <path d="M25 56 Q70 46 220 53 L222 56 Q70 59 25 62 Z" fill="#4d9fff" opacity="0.7"/>
+          <!-- nose cone -->
+          <path d="M25 56 Q12 55 5 55 Q12 55 25 55 Z" fill="#4d9fff" opacity="0.6"/>
+          <!-- wings (shoulder-mounted) -->
+          <path d="M90 54 L25 28 L34 33 L90 52 Z" fill="#4d9fff" opacity="0.9"/>
+          <path d="M90 54 L25 82 L34 77 L90 56 Z" fill="#4d9fff" opacity="0.5"/>
+          <!-- rear engine pod -->
+          <ellipse cx="225" cy="44" rx="18" ry="7" fill="#4d9fff" opacity="0.6"/>
+          <ellipse cx="238" cy="44" rx="5" ry="4" fill="#4d9fff" opacity="0.8"/>
+          <!-- V-tail -->
+          <path d="M205 53 L188 38 L193 42 L205 51 Z" fill="#4d9fff" opacity="0.8"/>
+          <path d="M205 55 L188 68 L193 65 L205 57 Z" fill="#4d9fff" opacity="0.6"/>
+          <!-- windows -->
+          <ellipse cx="100" cy="52" rx="6" ry="4" fill="none" stroke="#4d9fff" stroke-width="1" opacity="0.5"/>
+          <ellipse cx="122" cy="51" rx="6" ry="4" fill="none" stroke="#4d9fff" stroke-width="1" opacity="0.4"/>
+          <ellipse cx="144" cy="51" rx="6" ry="4" fill="none" stroke="#4d9fff" stroke-width="1" opacity="0.4"/>
+          <ellipse cx="166" cy="51" rx="6" ry="4" fill="none" stroke="#4d9fff" stroke-width="1" opacity="0.4"/>
+          <!-- gear -->
+          <line x1="95" y1="58" x2="95" y2="70" stroke="#4d9fff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="155" y1="58" x2="155" y2="70" stroke="#4d9fff" stroke-width="1.5" opacity="0.5"/>
+          <ellipse cx="95" cy="71" rx="7" ry="3" fill="none" stroke="#4d9fff" stroke-width="1.2" opacity="0.5"/>
+          <ellipse cx="155" cy="71" rx="7" ry="3" fill="none" stroke="#4d9fff" stroke-width="1.2" opacity="0.5"/>
+          <!-- CAPS label -->
+          <rect x="60" y="42" width="24" height="8" rx="1" fill="none" stroke="#4d9fff" stroke-width="0.8" opacity="0.3"/>
+          <text x="72" y="48.5" fill="#4d9fff" font-size="5" font-family="monospace" text-anchor="middle" opacity="0.5">CAPS</text>
+          <!-- glow -->
+          <ellipse cx="140" cy="55" rx="100" ry="28" fill="#4d9fff" opacity="0.04"/>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag">渦扇噴射 · 單發後置</div>
+        <div class="card-title">Cirrus SF50 Vision Jet</div>
+        <div class="card-subtitle">Williams FJ33-5A 渦扇引擎</div>
+        <div class="card-desc">世界首款配備 CAPS 整機降落傘的噴射機，FADEC 全自動引擎管理，操作極為簡便。</div>
+        <div class="card-stats">
+          <div class="stat">
+            <span class="stat-val">FL310</span>
+            <div class="stat-label">最大高度</div>
+          </div>
+          <div class="stat">
+            <span class="stat-val">311 kt</span>
+            <div class="stat-label">巡航速度</div>
+          </div>
+          <div class="stat">
+            <span class="stat-val">7 階段</span>
+            <div class="stat-label">教學步驟</div>
+          </div>
+        </div>
+        <div class="card-phases">
+          <span class="phase-pill">飛前檢查</span>
+          <span class="phase-pill">冷倉啟動</span>
+          <span class="phase-pill">滑行</span>
+          <span class="phase-pill">起飛</span>
+          <span class="phase-pill">爬升巡航</span>
+          <span class="phase-pill">進場</span>
+          <span class="phase-pill">降落關機</span>
+        </div>
+        <div class="card-btn">
+          開始教學 <span class="arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 737 MAX CARD -->
+    <a class="aircraft-card" href="B737MAX_Tutorial.html" style="--card-color: #1a7aff;">
+      <div class="card-illustration">
+        <svg viewBox="0 0 280 110" xmlns="http://www.w3.org/2000/svg">
+          <!-- 737 MAX detailed side view -->
+          <!-- fuselage -->
+          <path d="M18 55 Q60 44 240 51 L242 55 Q60 58 20 62 Z" fill="#1a7aff" opacity="0.7"/>
+          <!-- nose -->
+          <path d="M18 55 Q8 54 3 55 Q8 56 18 56 Z" fill="#1a7aff" opacity="0.6"/>
+          <!-- wing -->
+          <path d="M95 53 L22 22 L32 28 L95 51 Z" fill="#1a7aff" opacity="0.9"/>
+          <path d="M95 55 L22 86 L32 80 L95 57 Z" fill="#1a7aff" opacity="0.5"/>
+          <!-- winglets -->
+          <path d="M22 22 L18 14 L22 18 Z" fill="#1a7aff" opacity="0.7"/>
+          <!-- engines (under wings) -->
+          <ellipse cx="62" cy="61" rx="16" ry="6" fill="#1a7aff" opacity="0.5"/>
+          <ellipse cx="50" cy="61" rx="6" ry="4.5" fill="#1a7aff" opacity="0.7"/>
+          <ellipse cx="128" cy="61" rx="16" ry="6" fill="#1a7aff" opacity="0.4"/>
+          <ellipse cx="116" cy="61" rx="6" ry="4.5" fill="#1a7aff" opacity="0.6"/>
+          <!-- H-tail -->
+          <path d="M225 52 L205 40 L210 43 L225 50 Z" fill="#1a7aff" opacity="0.8"/>
+          <path d="M225 54 L205 66 L210 63 L225 56 Z" fill="#1a7aff" opacity="0.5"/>
+          <!-- vertical tail -->
+          <path d="M232 52 L220 30 L224 34 L232 50 Z" fill="#1a7aff" opacity="0.7"/>
+          <!-- windows row -->
+          <rect x="85" y="48" width="7" height="5" rx="2" fill="none" stroke="#1a7aff" stroke-width="0.8" opacity="0.5"/>
+          <rect x="100" y="48" width="7" height="5" rx="2" fill="none" stroke="#1a7aff" stroke-width="0.8" opacity="0.4"/>
+          <rect x="115" y="48" width="7" height="5" rx="2" fill="none" stroke="#1a7aff" stroke-width="0.8" opacity="0.4"/>
+          <rect x="130" y="48" width="7" height="5" rx="2" fill="none" stroke="#1a7aff" stroke-width="0.8" opacity="0.4"/>
+          <rect x="145" y="48" width="7" height="5" rx="2" fill="none" stroke="#1a7aff" stroke-width="0.8" opacity="0.4"/>
+          <rect x="160" y="48" width="7" height="5" rx="2" fill="none" stroke="#1a7aff" stroke-width="0.8" opacity="0.4"/>
+          <rect x="175" y="49" width="7" height="5" rx="2" fill="none" stroke="#1a7aff" stroke-width="0.8" opacity="0.3"/>
+          <!-- gear -->
+          <line x1="90" y1="57" x2="90" y2="72" stroke="#1a7aff" stroke-width="1.5" opacity="0.4"/>
+          <line x1="155" y1="57" x2="155" y2="72" stroke="#1a7aff" stroke-width="1.5" opacity="0.4"/>
+          <ellipse cx="90" cy="73" rx="8" ry="3" fill="none" stroke="#1a7aff" stroke-width="1.2" opacity="0.4"/>
+          <ellipse cx="155" cy="73" rx="8" ry="3" fill="none" stroke="#1a7aff" stroke-width="1.2" opacity="0.4"/>
+          <!-- glow -->
+          <ellipse cx="140" cy="55" rx="110" ry="30" fill="#1a7aff" opacity="0.04"/>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-tag">窄體客機 · 雙發</div>
+        <div class="card-title">Boeing 737 MAX</div>
+        <div class="card-subtitle">CFM LEAP-1B 渦扇引擎 ×2</div>
+        <div class="card-desc">全球最暢銷的短中程窄體客機，完整 FMC 航路規劃、APU 啟動及雙發引擎操作程序。</div>
+        <div class="card-stats">
+          <div class="stat">
+            <span class="stat-val">FL410</span>
+            <div class="stat-label">最大高度</div>
+          </div>
+          <div class="stat">
+            <span class="stat-val">M0.79</span>
+            <div class="stat-label">巡航速度</div>
+          </div>
+          <div class="stat">
+            <span class="stat-val">7 階段</span>
+            <div class="stat-label">教學步驟</div>
+          </div>
+        </div>
+        <div class="card-phases">
+          <span class="phase-pill">飛前準備</span>
+          <span class="phase-pill">APU啟動</span>
+          <span class="phase-pill">引擎啟動</span>
+          <span class="phase-pill">滑行起飛</span>
+          <span class="phase-pill">爬升巡航</span>
+          <span class="phase-pill">進場</span>
+          <span class="phase-pill">降落關機</span>
+        </div>
+        <div class="card-btn">
+          開始教學 <span class="arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="features">
+  <p class="section-label">教學特色</p>
+  <div class="features-grid">
+    <div class="feature-item">
+      <span class="feature-icon">✅</span>
+      <div>
+        <div class="feature-title">逐步打勾確認</div>
+        <div class="feature-desc">每個步驟點擊即可打勾，不怕跳過任何程序</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">📊</span>
+      <div>
+        <div class="feature-title">即時進度追蹤</div>
+        <div class="feature-desc">每個飛行階段顯示完成百分比進度條</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">📱</span>
+      <div>
+        <div class="feature-title">手機優化設計</div>
+        <div class="feature-desc">底部導航列、左右滑動切換階段，飛行中輕鬆查閱</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">🎛️</span>
+      <div>
+        <div class="feature-title">SVG 駕駛艙圖示</div>
+        <div class="feature-desc">每個步驟配有精確的駕駛艙控制面板向量圖示</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">📲</span>
+      <div>
+        <div class="feature-title">加入主畫面</div>
+        <div class="feature-desc">支援 PWA，加入手機主畫面像 App 一樣使用</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">⚠️</span>
+      <div>
+        <div class="feature-title">重點警示提醒</div>
+        <div class="feature-desc">關鍵步驟以顏色標示，避免錯誤操作</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  MSFS 2024 · Flight Tutorial Hub · 僅供模擬參考使用 · 非真實飛行程序<br><br>
+  <span style="opacity:0.4">Built with ❤️ for Flight Simmers</span>
+</footer>
+
+</div>
+</body>
+</html>
