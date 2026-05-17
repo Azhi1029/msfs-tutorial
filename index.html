@@ -7,20 +7,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MSFS 教學">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#06080f">
 <meta name="description" content="MSFS 2024 飛行教學 - PC-12、SF50、737 MAX、A320neo 完整程序教學">
 <title>MSFS 2024 飛行教學中心</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0a;
-    --panel: #111111;
-    --border: #222222;
-    --red: #cc0000;
-    --blue: #0044bb;
-    --white: #ffffff;
-    --text: #cccccc;
-    --text-dim: #555555;
+    --bg: #06080f;
+    --panel: #090c16;
+    --border: #0e1428;
+    --text: #8aa8c8;
+    --text-dim: #2a3a50;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -36,177 +33,168 @@
     content: '';
     position: fixed; inset: 0; z-index: 0;
     background:
-      radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 28% 65%, rgba(255,255,255,0.35) 0%, transparent 100%),
-      radial-gradient(1px 1px at 45% 8%, rgba(255,255,255,0.45) 0%, transparent 100%),
-      radial-gradient(1px 1px at 62% 82%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 75% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 88% 55%, rgba(255,255,255,0.35) 0%, transparent 100%),
-      radial-gradient(1px 1px at 95% 12%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 18% 88%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 52% 45%, rgba(255,255,255,0.2) 0%, transparent 100%),
-      radial-gradient(ellipse at 20% 0%, rgba(0,68,187,0.12) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(204,0,0,0.08) 0%, transparent 50%);
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 42% 8%,  rgba(255,255,255,0.45) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 74% 28%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 52%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 95% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 16% 88%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(ellipse at 20% 0%,   rgba(0,80,200,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(180,0,0,0.08) 0%, transparent 50%);
     pointer-events: none;
   }
   .page { position: relative; z-index: 1; }
 
   /* ── HERO ── */
   .hero {
-    text-align: center;
-    padding: 64px 20px 48px;
-    border-bottom: 1px solid #1a1a1a;
-    position: relative;
+    text-align: center; padding: 64px 20px 48px;
+    border-bottom: 1px solid #0e1428; position: relative;
   }
   .hero-badge {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: 'Share Tech Mono', monospace; font-size: 11px;
     letter-spacing: 4px; color: #4488ff;
-    background: rgba(0,68,187,0.08);
-    border: 1px solid rgba(0,68,187,0.25);
+    background: rgba(0,68,187,0.08); border: 1px solid rgba(0,68,187,0.2);
     padding: 6px 18px; border-radius: 2px; margin-bottom: 28px;
     text-transform: uppercase;
   }
-  .hero-badge .dot {
-    width: 6px; height: 6px; border-radius: 50%; background: #cc0000;
-    animation: pulse 2s infinite;
-  }
+  .hero-badge .dot { width:6px; height:6px; border-radius:50%; background:#cc0000; animation:pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-
   .hero h1 {
     font-family: 'Orbitron', monospace; font-weight: 900;
-    font-size: clamp(26px, 6vw, 60px); color: #fff;
+    font-size: clamp(26px,6vw,58px); color: #fff;
     letter-spacing: 3px; line-height: 1.05;
-    text-shadow: 0 0 40px rgba(0,68,187,0.35); margin-bottom: 8px;
+    text-shadow: 0 0 40px rgba(0,80,200,0.3); margin-bottom: 8px;
   }
-  .hero h1 em { font-style: normal; color: #cc0000; }
-  .hero-sub {
-    font-family: 'Share Tech Mono', monospace; font-size: 12px;
-    color: var(--text-dim); letter-spacing: 3px; margin-top: 14px; text-transform: uppercase;
-  }
-  .hero-desc { max-width: 520px; margin: 18px auto 0; font-size: 14px; color: #666; line-height: 1.8; }
+  .hero h1 em { font-style: normal; color: #cc2200; }
+  .hero-sub { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text-dim); letter-spacing:3px; margin-top:14px; text-transform:uppercase; }
+  .hero-desc { max-width:520px; margin:18px auto 0; font-size:14px; color:#344a68; line-height:1.8; }
 
-  /* ── CARDS ── */
-  .cards-section { max-width: 1140px; margin: 0 auto; padding: 44px 20px 80px; }
+  /* ── CARDS SECTION ── */
+  .cards-section { max-width:1160px; margin:0 auto; padding:48px 20px 80px; }
   .section-label {
-    font-family: 'Share Tech Mono', monospace; font-size: 11px;
-    letter-spacing: 4px; color: #444; text-transform: uppercase;
-    text-align: center; margin-bottom: 40px;
+    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:4px;
+    color:var(--text-dim); text-transform:uppercase; text-align:center; margin-bottom:44px;
   }
   .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
+    gap: 28px;
   }
 
-  /* ── AIRCRAFT CARD ── */
+  /* ── CARD ── */
   .aircraft-card {
-    background: #111; border: 1px solid #1e1e1e; border-radius: 6px;
-    overflow: hidden; position: relative; cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-decoration: none; display: block;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; overflow: hidden; position: relative;
+    cursor: pointer; text-decoration: none; display: block;
+    transition: transform 0.3s, box-shadow 0.3s;
     -webkit-tap-highlight-color: transparent;
   }
-  .aircraft-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.6); }
+  .aircraft-card:hover { transform: translateY(-8px); }
   .aircraft-card:active { transform: scale(0.98); }
 
-  /* badge illustration area */
+  /* badge glow area */
   .card-badge-wrap {
-    width: 100%; padding: 30px 20px 20px;
-    display: flex; align-items: center; justify-content: center;
-    background: #0d0d0d;
-    border-bottom: 1px solid #1a1a1a;
+    width:100%; padding:28px 16px 20px;
+    display:flex; align-items:center; justify-content:center;
+    background: #06080f;
+    border-bottom: 1px solid var(--border);
+    position: relative;
   }
-  .card-badge-wrap svg { width: 160px; height: 185px; }
+  /* radial glow behind badge */
+  .card-badge-wrap::before {
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 60%, var(--glow-color,rgba(0,180,255,0.12)) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .card-badge-wrap svg { width:150px; height:172px; position:relative; z-index:1; }
 
-  .card-body { padding: 18px 20px 22px; }
+  .card-body { padding:18px 20px 22px; }
   .card-tag {
-    font-family: 'Share Tech Mono', monospace; font-size: 10px;
-    letter-spacing: 3px; color: #555; text-transform: uppercase;
-    margin-bottom: 7px; display: flex; align-items: center; gap: 8px;
+    font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px;
+    color:var(--text-dim); text-transform:uppercase; margin-bottom:7px;
+    display:flex; align-items:center; gap:8px;
   }
-  .card-tag::before { content:''; width:16px; height:1px; background:#333; }
-  .card-title {
-    font-family: 'Orbitron', monospace; font-weight: 700;
-    font-size: clamp(16px,2.5vw,20px); color: #fff;
-    margin-bottom: 4px; line-height: 1.2;
-  }
-  .card-subtitle { font-size: 12px; color: #555; margin-bottom: 12px; }
-  .card-desc { font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 16px; }
+  .card-tag::before { content:''; width:16px; height:1px; background:var(--border); }
+  .card-title { font-family:'Orbitron',monospace; font-weight:700; font-size:clamp(15px,2.5vw,19px); color:#fff; margin-bottom:3px; line-height:1.2; }
+  .card-subtitle { font-size:12px; color:var(--text-dim); margin-bottom:12px; }
+  .card-desc { font-size:13px; color:#2e4464; line-height:1.7; margin-bottom:16px; }
 
   .card-stats {
-    display: grid; grid-template-columns: repeat(3,1fr);
-    gap: 1px; background: #1a1a1a;
-    border: 1px solid #1a1a1a; border-radius: 3px;
-    overflow: hidden; margin-bottom: 16px;
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:1px; background:var(--border); border:1px solid var(--border);
+    border-radius:3px; overflow:hidden; margin-bottom:16px;
   }
-  .stat { background: #111; padding: 9px 6px; text-align: center; }
-  .stat-val {
-    font-family: 'Share Tech Mono', monospace; font-size: 12px;
-    display: block; font-weight: 500;
-  }
-  .stat-label { font-size: 9px; color: #444; margin-top: 2px; }
+  .stat { background:var(--panel); padding:9px 6px; text-align:center; }
+  .stat-val { font-family:'Share Tech Mono',monospace; font-size:12px; display:block; font-weight:500; }
+  .stat-label { font-size:9px; color:var(--text-dim); margin-top:2px; }
 
   .card-btn {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    width: 100%; padding: 12px;
-    background: transparent; border: 1px solid #333;
-    border-radius: 3px; font-family: 'Share Tech Mono', monospace;
-    font-size: 11px; letter-spacing: 2px; color: #666;
-    text-transform: uppercase; transition: all 0.2s; text-decoration: none;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; padding:12px; background:transparent;
+    border:1px solid var(--border); border-radius:3px;
+    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px;
+    color:var(--text-dim); text-transform:uppercase; transition:all 0.2s;
   }
-  .aircraft-card:hover .card-btn { color: #fff; border-color: #555; }
-  .arrow { transition: transform 0.2s; }
-  .aircraft-card:hover .arrow { transform: translateX(4px); }
+  .aircraft-card:hover .card-btn { background:rgba(255,255,255,0.03); }
+  .arrow { transition:transform 0.2s; }
+  .aircraft-card:hover .arrow { transform:translateX(4px); }
 
-  /* per-card accent colors */
-  .card-pc12 .stat-val { color: #00ccff; }
-  .card-pc12 .card-btn:hover, .card-pc12:hover .card-btn { border-color: #00ccff; color: #00ccff; }
-  .card-sf50 .stat-val { color: #ffffff; }
-  .card-sf50 .card-btn:hover, .card-sf50:hover .card-btn { border-color: #ffffff; color: #ffffff; }
-  .card-737 .stat-val { color: #4488ff; }
-  .card-737 .card-btn:hover, .card-737:hover .card-btn { border-color: #4488ff; color: #4488ff; }
-  .card-a320 .stat-val { color: #cc0000; }
-  .card-a320 .card-btn:hover, .card-a320:hover .card-btn { border-color: #cc0000; color: #cc0000; }
+  /* per-card colors */
+  .card-pc12  { --c:#00ccff; --glow-color:rgba(0,200,255,0.14); }
+  .card-sf50  { --c:#ff4422; --glow-color:rgba(255,60,30,0.13); }
+  .card-737   { --c:#4488ff; --glow-color:rgba(50,120,255,0.14); }
+  .card-a320  { --c:#cc2200; --glow-color:rgba(200,30,0,0.14); }
+
+  .card-pc12 .stat-val  { color:#00ccff; }
+  .card-sf50 .stat-val  { color:#ff6644; }
+  .card-737  .stat-val  { color:#4488ff; }
+  .card-a320 .stat-val  { color:#ff4422; }
+
+  .card-pc12:hover  { box-shadow:0 16px 40px rgba(0,180,255,0.15), 0 0 0 1px rgba(0,180,255,0.2); }
+  .card-sf50:hover  { box-shadow:0 16px 40px rgba(255,60,30,0.15), 0 0 0 1px rgba(255,60,30,0.2); }
+  .card-737:hover   { box-shadow:0 16px 40px rgba(50,120,255,0.15), 0 0 0 1px rgba(50,120,255,0.2); }
+  .card-a320:hover  { box-shadow:0 16px 40px rgba(200,30,0,0.15),   0 0 0 1px rgba(200,30,0,0.2);  }
+
+  .card-pc12:hover .card-btn  { border-color:rgba(0,200,255,0.4);  color:#00ccff; }
+  .card-sf50:hover .card-btn  { border-color:rgba(255,60,30,0.4);  color:#ff6644; }
+  .card-737:hover  .card-btn  { border-color:rgba(50,120,255,0.4); color:#4488ff; }
+  .card-a320:hover .card-btn  { border-color:rgba(200,30,0,0.4);   color:#ff4422; }
 
   /* ── FEATURES ── */
-  .features { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
-  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-top: 28px; }
+  .features { max-width:900px; margin:0 auto; padding:0 20px 60px; }
+  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:28px; }
   .feature-item {
-    background: #111; border: 1px solid #1e1e1e; border-radius: 4px;
-    padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;
+    background:var(--panel); border:1px solid var(--border); border-radius:4px;
+    padding:14px 16px; display:flex; gap:12px; align-items:flex-start;
   }
-  .feature-icon { font-size: 18px; flex-shrink: 0; }
-  .feature-title { font-size: 13px; font-weight: 500; color: #ccc; margin-bottom: 3px; }
-  .feature-desc { font-size: 12px; color: #555; line-height: 1.6; }
+  .feature-icon { font-size:18px; flex-shrink:0; }
+  .feature-title { font-size:13px; font-weight:500; color:#8aa8c8; margin-bottom:3px; }
+  .feature-desc { font-size:12px; color:var(--text-dim); line-height:1.6; }
 
-  footer {
-    text-align: center; padding: 28px 20px;
-    border-top: 1px solid #1a1a1a;
-    font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #333; letter-spacing: 2px;
-  }
+  footer { text-align:center; padding:28px 20px; border-top:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:2px; }
 
-  /* ── MOBILE ── */
+  /* mobile */
   @media(max-width:600px){
-    .hero { padding: 46px 16px 34px; }
-    .hero h1 { font-size: 26px; letter-spacing: 1px; }
-    .cards-section { padding: 28px 14px 60px; }
-    .card-badge-wrap svg { width: 130px; height: 150px; }
-    .card-body { padding: 14px 16px 18px; }
-    .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .hero { padding:46px 16px 34px; }
+    .hero h1 { font-size:26px; letter-spacing:1px; }
+    .cards-section { padding:28px 14px 60px; }
+    .card-badge-wrap svg { width:120px; height:138px; }
+    .cards-grid { grid-template-columns:repeat(2,1fr); gap:14px; }
+    .card-body { padding:12px 14px 16px; }
+    .card-desc { display:none; }
   }
-  @media(max-width:400px){
-    .cards-grid { grid-template-columns: 1fr; }
-  }
+  @media(max-width:380px){ .cards-grid { grid-template-columns:1fr; } }
 
-  /* animate in */
-  .aircraft-card { opacity:0; transform:translateY(20px); animation: cardIn 0.5s ease forwards; }
+  /* animate */
+  .aircraft-card { opacity:0; transform:translateY(20px); animation:cardIn 0.5s ease forwards; }
   .aircraft-card:nth-child(1){animation-delay:0.05s}
   .aircraft-card:nth-child(2){animation-delay:0.15s}
   .aircraft-card:nth-child(3){animation-delay:0.25s}
   .aircraft-card:nth-child(4){animation-delay:0.35s}
   @keyframes cardIn { to{opacity:1;transform:translateY(0)} }
-
   .hero-badge,.hero h1,.hero-sub,.hero-desc{opacity:0;animation:heroIn 0.6s ease forwards}
   .hero-badge{animation-delay:0s}.hero h1{animation-delay:0.1s}.hero-sub{animation-delay:0.2s}.hero-desc{animation-delay:0.3s}
   @keyframes heroIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -226,68 +214,66 @@
   <p class="section-label">選擇飛機開始教學</p>
   <div class="cards-grid">
 
-    <!-- ══ PC-12 ══ RED THEME ══ -->
+    <!-- ══════════ PC-12 — CYAN ══════════ -->
     <a class="aircraft-card card-pc12" href="PC12_Tutorial_mobile.html">
       <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 185" xmlns="http://www.w3.org/2000/svg">
-          <!-- shield bg -->
-          <path d="M80 4 L152 28 L152 104 Q152 154 80 178 Q8 154 8 104 L8 28 Z" fill="#fff" stroke="#111" stroke-width="2.5"/>
-          <!-- top red band -->
-          <path d="M80 4 L152 28 L134 28 L80 10 L26 28 L8 28 Z" fill="#cc0000"/>
+        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow-c"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- shield -->
+          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
+                fill="#060d16" stroke="#00ccff" stroke-width="1.8" filter="url(#glow-c)"/>
+          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
+                fill="#060d16" stroke="#00aadd" stroke-width="0.7" opacity="0.5"/>
           <!-- top label -->
-          <text x="80" y="24" font-family="monospace" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="3">PILATUS</text>
-          <!-- left black triangle -->
-          <path d="M8 28 L8 104 Q8 128 30 148 L8 148 Z" fill="#111" opacity="0.08"/>
-          <!-- red center stripe -->
-          <rect x="8" y="92" width="144" height="14" fill="#cc0000"/>
-          <text x="80" y="102.5" font-family="monospace" font-size="7.5" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">PC-12 NGX</text>
-          <!-- blue accent line -->
-          <rect x="8" y="106" width="144" height="3" fill="#0044bb" opacity="0.6"/>
-          <!-- bottom red -->
-          <path d="M8 148 Q8 154 80 178 Q152 154 152 148 Z" fill="#cc0000"/>
-          <text x="80" y="165" font-family="monospace" font-size="7.5" fill="#fff" text-anchor="middle" letter-spacing="1">PT6A-67P</text>
-          <text x="80" y="175" font-family="monospace" font-size="6.5" fill="#ffaaaa" text-anchor="middle" opacity="0.85">TURBOPROP</text>
-
-          <!-- PC-12 silhouette (black on white area) -->
-          <g transform="translate(80, 68) scale(0.52)">
+          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#00ccff" text-anchor="middle" letter-spacing="4" opacity="0.85">TURBOPROP</text>
+          <!-- star -->
+          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#00ccff" filter="url(#glow-c)" opacity="0.9"/>
+          <!-- PC-12 plane -->
+          <g transform="translate(80,95) scale(0.48)">
             <!-- fuselage -->
-            <path d="M-88 0 Q-55 -10 96 -5 L100 0 L96 5 Q-55 10 -88 0Z" fill="#111"/>
-            <!-- nose -->
-            <path d="M-88 0 Q-102 0 -112 0 Q-102 -2 -88 -2Z" fill="#333"/>
-            <!-- cockpit -->
-            <path d="M-68 -6 Q-42 -20 34 -14 Q8 -12 -68 -6Z" fill="#111" opacity="0.3"/>
-            <ellipse cx="-30" cy="-10" rx="15" ry="8" fill="#cc0000" stroke="#111" stroke-width="0.8"/>
-            <ellipse cx="-6" cy="-9" rx="13" ry="7" fill="#cc0000" stroke="#111" stroke-width="0.8"/>
+            <path d="M-92 0 Q-58 -10 98 -5 L102 0 L98 5 Q-58 10 -92 0Z" fill="#00ccff" opacity="0.9"/>
+            <path d="M-92 0 Q-108 0 -118 0 Q-108-2 -92-2Z" fill="#00eeff" opacity="0.7"/>
+            <!-- belly shade -->
+            <path d="M-40 2 Q20 6 86 4 Q20 8 -40 5Z" fill="#004466" opacity="0.5"/>
+            <!-- cockpit windows -->
+            <ellipse cx="-34" cy="-10" rx="16" ry="8" fill="#003344" stroke="#00ccff" stroke-width="0.9" opacity="0.95"/>
+            <ellipse cx="-10" cy="-9" rx="14" ry="7" fill="#003344" stroke="#00ccff" stroke-width="0.9" opacity="0.88"/>
             <!-- wing -->
-            <path d="M-10 -4 L-90 -38 L-75 -28 L-6 -6Z" fill="#111"/>
-            <path d="M-10 4 L-90 38 L-75 28 L-6 6Z" fill="#444" opacity="0.6"/>
+            <path d="M-12 -4 L-96 -40 L-80 -30 L-8 -6Z" fill="#00aadd" opacity="0.95"/>
+            <path d="M-12  4 L-96  40 L-80  30 L-8  6Z" fill="#006688" opacity="0.55"/>
             <!-- winglet -->
-            <path d="M-90 -38 L-98 -47 L-90 -43Z" fill="#cc0000"/>
+            <path d="M-96 -40 L-104-50 L-96-46Z" fill="#00eeff" opacity="0.9"/>
             <!-- h-stab -->
-            <path d="M74 -3 L53 -13 L57 -10 L74 -5Z" fill="#111"/>
-            <path d="M74 3 L53 13 L57 10 L74 5Z" fill="#555" opacity="0.55"/>
-            <!-- v-tail (blue) -->
-            <path d="M80 -4 Q73 -22 75 -30 Q79 -20 82 -4Z" fill="#0044bb"/>
-            <!-- engine red -->
-            <ellipse cx="98" cy="0" rx="12" ry="8" fill="#cc0000" stroke="#111" stroke-width="0.8"/>
-            <ellipse cx="103" cy="0" rx="5" ry="5.5" fill="#1a0000"/>
-            <!-- prop black -->
-            <line x1="104" y1="0" x2="104" y2="-22" stroke="#111" stroke-width="4" stroke-linecap="round"/>
-            <line x1="104" y1="0" x2="104" y2="22" stroke="#111" stroke-width="4" stroke-linecap="round"/>
-            <line x1="104" y1="0" x2="120" y2="-9" stroke="#111" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-            <circle cx="104" cy="0" r="4" fill="#cc0000"/>
-            <!-- windows white -->
-            <rect x="8" y="-8" width="10" height="7" rx="2" fill="#fff" stroke="#111" stroke-width="0.8"/>
-            <rect x="23" y="-8" width="10" height="7" rx="2" fill="#fff" stroke="#111" stroke-width="0.8" opacity="0.85"/>
-            <rect x="38" y="-8" width="10" height="7" rx="2" fill="#fff" stroke="#111" stroke-width="0.8" opacity="0.75"/>
+            <path d="M76-3 L55-13 L59-10 L76-5Z" fill="#00aadd" opacity="0.9"/>
+            <path d="M76 3 L55 13 L59 10 L76 5Z" fill="#006688" opacity="0.55"/>
+            <!-- v-tail -->
+            <path d="M82-4 Q75-22 77-30 Q81-20 84-4Z" fill="#00ccff" opacity="0.85"/>
+            <!-- engine cowl -->
+            <ellipse cx="104" cy="0" rx="13" ry="9" fill="#004466" stroke="#00ccff" stroke-width="1"/>
+            <ellipse cx="109" cy="0" rx="5.5" ry="6" fill="#001a2a"/>
+            <!-- prop -->
+            <line x1="110" y1="0" x2="110" y2="-24" stroke="#00ddff" stroke-width="4" stroke-linecap="round"/>
+            <line x1="110" y1="0" x2="110" y2=" 24" stroke="#00ddff" stroke-width="4" stroke-linecap="round"/>
+            <line x1="110" y1="0" x2="126" y2="-10" stroke="#00ddff" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
+            <circle cx="110" cy="0" r="4.5" fill="#00aacc"/>
+            <!-- windows -->
+            <rect x="8"  y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9"/>
+            <rect x="25" y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9" opacity="0.8"/>
+            <rect x="42" y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9" opacity="0.7"/>
+            <rect x="59" y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9" opacity="0.6"/>
             <!-- gear -->
-            <line x1="0" y1="5" x2="0" y2="18" stroke="#cc0000" stroke-width="1.8"/>
-            <ellipse cx="0" cy="20" rx="8" ry="4" fill="none" stroke="#cc0000" stroke-width="1.2"/>
-            <line x1="42" y1="5" x2="42" y2="18" stroke="#cc0000" stroke-width="1.8"/>
-            <ellipse cx="42" cy="20" rx="8" ry="4" fill="none" stroke="#cc0000" stroke-width="1.2"/>
+            <line x1="0"  y1="5" x2="0"  y2="19" stroke="#00aacc" stroke-width="2"/>
+            <ellipse cx="0"  cy="21" rx="9" ry="4.5" fill="none" stroke="#00aacc" stroke-width="1.2"/>
+            <line x1="46" y1="5" x2="46" y2="19" stroke="#00aacc" stroke-width="2"/>
+            <ellipse cx="46" cy="21" rx="9" ry="4.5" fill="none" stroke="#00aacc" stroke-width="1.2"/>
+            <line x1="-48" y1="5" x2="-48" y2="18" stroke="#00aacc" stroke-width="1.5"/>
+            <ellipse cx="-48" cy="20" rx="7" ry="3.5" fill="none" stroke="#00aacc" stroke-width="1"/>
           </g>
-          <!-- star top -->
-          <polygon points="80,6 82.5,12 89,12 84,16 86,22 80,18 74,22 76,16 71,12 77.5,12" fill="#fff"/>
+          <!-- bottom labels -->
+          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="12" font-weight="700" fill="#00ccff" text-anchor="middle" filter="url(#glow-c)">PC-12 NGX</text>
+          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#00aadd" text-anchor="middle" letter-spacing="2" opacity="0.7">PILATUS</text>
         </svg>
       </div>
       <div class="card-body">
@@ -304,58 +290,57 @@
       </div>
     </a>
 
-    <!-- ══ SF50 ══ BLACK THEME ══ -->
+    <!-- ══════════ SF50 — ORANGE/RED ══════════ -->
     <a class="aircraft-card card-sf50" href="SF50_Vision_Jet_Tutorial.html">
       <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 185" xmlns="http://www.w3.org/2000/svg">
-          <path d="M80 4 L152 28 L152 104 Q152 154 80 178 Q8 154 8 104 L8 28 Z" fill="#fff" stroke="#111" stroke-width="2.5"/>
-          <!-- top BLACK band -->
-          <path d="M80 4 L152 28 L134 28 L80 10 L26 28 L8 28 Z" fill="#111"/>
-          <text x="80" y="24" font-family="monospace" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="3">CIRRUS</text>
-          <!-- black center stripe -->
-          <rect x="8" y="92" width="144" height="14" fill="#111"/>
-          <text x="80" y="102.5" font-family="monospace" font-size="7" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1.5">SF50 VISION JET</text>
-          <!-- red accent line -->
-          <rect x="8" y="106" width="144" height="3" fill="#cc0000"/>
-          <!-- CAPS red badge -->
-          <rect x="30" y="38" width="28" height="11" rx="2.5" fill="#cc0000" stroke="#111" stroke-width="0.5"/>
-          <text x="44" y="46.5" font-family="monospace" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">CAPS</text>
-          <!-- bottom black -->
-          <path d="M8 148 Q8 154 80 178 Q152 154 152 148 Z" fill="#111"/>
-          <text x="80" y="165" font-family="monospace" font-size="7.5" fill="#fff" text-anchor="middle" letter-spacing="1">WILLIAMS FJ33</text>
-          <text x="80" y="175" font-family="monospace" font-size="6.5" fill="#aaa" text-anchor="middle" opacity="0.85">PUSHER JET</text>
-
-          <!-- SF50 silhouette -->
-          <g transform="translate(80, 68) scale(0.52)">
-            <path d="M-90 0 Q-58 -12 102 -6 L106 0 L102 6 Q-58 12 -90 0Z" fill="#111"/>
-            <path d="M-90 0 Q-105 0 -116 0 Q-105 -2 -90 -2Z" fill="#333"/>
+        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow-o"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
+                fill="#110800" stroke="#ff4422" stroke-width="1.8" filter="url(#glow-o)"/>
+          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
+                fill="#110800" stroke="#cc3310" stroke-width="0.7" opacity="0.5"/>
+          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#ff6644" text-anchor="middle" letter-spacing="4" opacity="0.85">SINGLE JET</text>
+          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#ff4422" filter="url(#glow-o)" opacity="0.9"/>
+          <!-- SF50 plane -->
+          <g transform="translate(80,94) scale(0.47)">
+            <path d="M-90 0 Q-56-12 102-6 L106 0 L102 6 Q-56 12 -90 0Z" fill="#ff5533" opacity="0.9"/>
+            <path d="M-90 0 Q-106 0 -118 0 Q-106-2 -90-2Z" fill="#ff7755" opacity="0.7"/>
+            <path d="M-50 2 Q20 6 88 4 Q20 8 -50 5Z" fill="#661100" opacity="0.45"/>
             <!-- big cockpit -->
-            <path d="M-70 -7 Q-38 -28 44 -18 Q14 -16 -70 -7Z" fill="#111" opacity="0.2"/>
-            <ellipse cx="-30" cy="-13" rx="18" ry="9" fill="#fff" stroke="#111" stroke-width="1"/>
-            <ellipse cx="2" cy="-12" rx="16" ry="8" fill="#fff" stroke="#111" stroke-width="1" opacity="0.9"/>
+            <path d="M-70-7 Q-38-28 44-18 Q14-16 -70-7Z" fill="#ff5533" opacity="0.2"/>
+            <ellipse cx="-28" cy="-13" rx="18" ry="9" fill="#220800" stroke="#ff5533" stroke-width="1"/>
+            <ellipse cx="2"  cy="-12" rx="16" ry="8" fill="#220800" stroke="#ff5533" stroke-width="1" opacity="0.9"/>
             <!-- shoulder wing -->
-            <path d="M-12 -6 L-104 -50 L-87 -39 L-8 -8Z" fill="#111"/>
-            <path d="M-12 6 L-104 50 L-87 39 L-8 8Z" fill="#444" opacity="0.6"/>
-            <!-- winglet red -->
-            <path d="M-104 -50 L-113 -62 L-104 -56Z" fill="#cc0000"/>
-            <!-- rear engine black -->
-            <path d="M88 -24 Q103 -30 116 -26 Q124 -20 122 -13 Q110 -9 94 -11 Q83 -16 85 -22Z" fill="#333" stroke="#111" stroke-width="1"/>
-            <ellipse cx="89" cy="-19" rx="10" ry="12" fill="#111"/>
-            <!-- v-tail blue left -->
-            <path d="M94 -8 Q72 -28 64 -40 Q75 -27 96 -10Z" fill="#0044bb"/>
-            <!-- v-tail right -->
-            <path d="M94 8 Q72 28 64 40 Q75 27 96 10Z" fill="#555" opacity="0.6"/>
+            <path d="M-12-6 L-104-50 L-86-38 L-8-8Z" fill="#dd3311" opacity="0.95"/>
+            <path d="M-12 6 L-104 50 L-86 38 L-8 8Z"  fill="#882200" opacity="0.55"/>
+            <path d="M-104-50 L-114-62 L-104-56Z" fill="#ff6644" opacity="0.9"/>
+            <!-- rear engine -->
+            <path d="M86-24 Q102-30 116-26 Q124-20 122-13 Q110-9 92-11 Q82-16 84-22Z" fill="#441100" stroke="#ff4422" stroke-width="0.9"/>
+            <ellipse cx="88" cy="-19" rx="11" ry="12" fill="#220800" stroke="#ff5533" stroke-width="1"/>
+            <ellipse cx="88" cy="-19" rx="5" ry="6" fill="#ff4422" opacity="0.1"/>
+            <path d="M120-22 Q128-16 126-10 Q122-14 120-18Z" fill="#331100" stroke="#ff4422" stroke-width="0.5"/>
+            <!-- V-tails -->
+            <path d="M92-8 Q70-28 62-40 Q74-26 94-10Z" fill="#ff4422" opacity="0.85"/>
+            <path d="M92 8 Q70 28 62 40 Q74 26 94 10Z"  fill="#882200" opacity="0.6"/>
+            <!-- CAPS badge -->
+            <rect x="-66" y="-27" width="34" height="13" rx="3" fill="#cc2200" stroke="#ff4422" stroke-width="0.8"/>
+            <text x="-49" y="-17.5" font-size="8.5" font-family="'Share Tech Mono',monospace" fill="#fff" text-anchor="middle" font-weight="bold">CAPS</text>
             <!-- windows -->
-            <rect x="16" y="-11" width="13" height="9" rx="3" fill="#fff" stroke="#111" stroke-width="0.9"/>
-            <rect x="35" y="-11" width="13" height="9" rx="3" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.85"/>
-            <rect x="54" y="-11" width="13" height="9" rx="3" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.75"/>
-            <!-- gear red -->
-            <line x1="6" y1="7" x2="6" y2="22" stroke="#cc0000" stroke-width="2"/>
-            <ellipse cx="6" cy="24" rx="8" ry="4.5" fill="none" stroke="#cc0000" stroke-width="1.2"/>
-            <line x1="52" y1="6" x2="52" y2="21" stroke="#cc0000" stroke-width="2"/>
-            <ellipse cx="52" cy="23" rx="8" ry="4.5" fill="none" stroke="#cc0000" stroke-width="1.2"/>
+            <rect x="16" y="-11" width="14" height="9" rx="3" fill="#220800" stroke="#ff5533" stroke-width="0.9"/>
+            <rect x="36" y="-11" width="14" height="9" rx="3" fill="#220800" stroke="#ff5533" stroke-width="0.9" opacity="0.82"/>
+            <rect x="56" y="-11" width="14" height="9" rx="3" fill="#220800" stroke="#ff5533" stroke-width="0.9" opacity="0.72"/>
+            <!-- gear -->
+            <line x1="6"  y1="7" x2="6"  y2="22" stroke="#ff4422" stroke-width="2"/>
+            <ellipse cx="6"  cy="24" rx="9" ry="4.5" fill="none" stroke="#ff4422" stroke-width="1.2"/>
+            <line x1="52" y1="6" x2="52" y2="21" stroke="#ff4422" stroke-width="2"/>
+            <ellipse cx="52" cy="23" rx="9" ry="4.5" fill="none" stroke="#ff4422" stroke-width="1.2"/>
+            <line x1="-52" y1="6" x2="-52" y2="19" stroke="#ff4422" stroke-width="1.5"/>
+            <ellipse cx="-52" cy="21" rx="7" ry="3.5" fill="none" stroke="#ff4422" stroke-width="1"/>
           </g>
-          <polygon points="80,6 82.5,12 89,12 84,16 86,22 80,18 74,22 76,16 71,12 77.5,12" fill="#111"/>
+          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="11" font-weight="700" fill="#ff5533" text-anchor="middle" filter="url(#glow-o)">VISION JET</text>
+          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#cc4422" text-anchor="middle" letter-spacing="2" opacity="0.7">CIRRUS SF50</text>
         </svg>
       </div>
       <div class="card-body">
@@ -372,69 +357,64 @@
       </div>
     </a>
 
-    <!-- ══ 737 MAX ══ BLUE THEME ══ -->
+    <!-- ══════════ 737 MAX — BLUE ══════════ -->
     <a class="aircraft-card card-737" href="B737MAX_Tutorial.html">
       <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 185" xmlns="http://www.w3.org/2000/svg">
-          <path d="M80 4 L152 28 L152 104 Q152 154 80 178 Q8 154 8 104 L8 28 Z" fill="#fff" stroke="#111" stroke-width="2.5"/>
-          <!-- split top: left blue / right red -->
-          <path d="M80 4 L152 28 L134 28 L80 10 Z" fill="#cc0000"/>
-          <path d="M80 4 L8 28 L26 28 L80 10 Z" fill="#0044bb"/>
-          <text x="46" y="24" font-family="monospace" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">737</text>
-          <text x="114" y="24" font-family="monospace" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">MAX</text>
-          <!-- split center stripe: left black / right blue -->
-          <rect x="8" y="92" width="72" height="14" fill="#111"/>
-          <rect x="80" y="92" width="72" height="14" fill="#0044bb"/>
-          <text x="44" y="102.5" font-family="monospace" font-size="7.5" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">BOEING</text>
-          <text x="116" y="102.5" font-family="monospace" font-size="7.5" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="1">737 MAX</text>
-          <!-- white divider line -->
-          <line x1="8" y1="106" x2="152" y2="106" stroke="#fff" stroke-width="1.5"/>
-          <!-- split bottom: left blue / right red -->
-          <path d="M8 148 Q8 154 80 178 L80 148 Z" fill="#0044bb"/>
-          <path d="M152 148 Q152 154 80 178 L80 148 Z" fill="#cc0000"/>
-          <text x="44" y="167" font-family="monospace" font-size="7" fill="#fff" text-anchor="middle">CFM</text>
-          <text x="116" y="167" font-family="monospace" font-size="7" fill="#fff" text-anchor="middle">LEAP</text>
-          <text x="80" y="176" font-family="monospace" font-size="6.5" fill="#aaddff" text-anchor="middle" opacity="0.9">TWIN JET</text>
-
-          <!-- 737 silhouette -->
-          <g transform="translate(80, 68) scale(0.5)">
-            <path d="M-104 0 Q-66 -14 128 -7 L132 0 L128 7 Q-66 14 -104 0Z" fill="#111"/>
-            <path d="M-104 0 Q-120 0 -130 0 Q-120 -2 -104 -2Z" fill="#333"/>
-            <!-- cockpit white -->
-            <ellipse cx="-50" cy="-13" rx="17" ry="9" fill="#fff" stroke="#111" stroke-width="0.9"/>
-            <ellipse cx="-26" cy="-12" rx="15" ry="8" fill="#fff" stroke="#111" stroke-width="0.9"/>
-            <ellipse cx="-2" cy="-11" rx="12" ry="7" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.85"/>
+        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow-b"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
+                fill="#030814" stroke="#3366ff" stroke-width="1.8" filter="url(#glow-b)"/>
+          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
+                fill="#030814" stroke="#2255cc" stroke-width="0.7" opacity="0.5"/>
+          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#4488ff" text-anchor="middle" letter-spacing="4" opacity="0.85">TWIN JET</text>
+          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#3366ff" filter="url(#glow-b)" opacity="0.9"/>
+          <!-- 737 plane -->
+          <g transform="translate(80,96) scale(0.46)">
+            <path d="M-106 0 Q-68-15 130-7 L134 0 L130 7 Q-68 15 -106 0Z" fill="#2255cc" opacity="0.9"/>
+            <path d="M-106 0 Q-122 0 -132 0 Q-122-2 -106-2Z" fill="#4488ff" opacity="0.7"/>
+            <path d="M-55 2 Q25 7 114 5 Q25 9 -55 6Z" fill="#001144" opacity="0.45"/>
+            <!-- cockpit -->
+            <ellipse cx="-50" cy="-13" rx="17" ry="9" fill="#001133" stroke="#3366ff" stroke-width="0.9"/>
+            <ellipse cx="-26" cy="-12" rx="15" ry="8" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.9"/>
+            <ellipse cx="-2"  cy="-11" rx="12" ry="7" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.8"/>
             <!-- wing -->
-            <path d="M-6 -7 L-118 -54 L-99 -42 L-2 -9Z" fill="#111"/>
-            <path d="M-6 7 L-118 54 L-99 42 L-2 9Z" fill="#444" opacity="0.6"/>
-            <!-- winglets red -->
-            <path d="M-118 -54 L-128 -66 L-118 -60Z" fill="#cc0000"/>
-            <path d="M-118 54 L-128 66 L-118 60Z" fill="#cc0000" opacity="0.7"/>
+            <path d="M-6-7 L-120-54 L-100-42 L-2-9Z" fill="#1a44bb" opacity="0.95"/>
+            <path d="M-6 7 L-120 54 L-100 42 L-2 9Z"  fill="#0a2266" opacity="0.55"/>
+            <!-- winglets -->
+            <path d="M-120-54 L-130-66 L-120-60Z" fill="#4488ff" opacity="0.9"/>
+            <path d="M-120 54 L-130 66 L-120 60Z"  fill="#2255cc" opacity="0.7"/>
             <!-- LEAP eng 1 -->
-            <ellipse cx="-78" cy="-20" rx="12" ry="14" fill="#111" stroke="#0044bb" stroke-width="1.2"/>
-            <ellipse cx="-78" cy="-20" rx="5.5" ry="7" fill="#0044bb" opacity="0.15"/>
+            <path d="M-58-14 Q-72-20 -80-25 Q-64-31 -48-25 Q-38-17 -40-11 Q-48-9 -58-14Z" fill="#112255" stroke="#3366ff" stroke-width="1"/>
+            <ellipse cx="-78" cy="-19" rx="12" ry="14" fill="#001133" stroke="#3366ff" stroke-width="1.2"/>
+            <ellipse cx="-78" cy="-19" rx="5.5" ry="7" fill="#3366ff" opacity="0.15"/>
             <!-- LEAP eng 2 -->
-            <ellipse cx="-33" cy="-15" rx="10" ry="12" fill="#111" stroke="#0044bb" stroke-width="1"/>
+            <path d="M-20-11 Q-30-15 -34-19 Q-22-23 -12-19 Q-5-13 -7-8 Q-12-6 -20-11Z" fill="#0a1a44" stroke="#3366ff" stroke-width="0.9"/>
+            <ellipse cx="-32" cy="-15" rx="10" ry="12" fill="#001133" stroke="#3366ff" stroke-width="1"/>
             <!-- h-stab -->
-            <path d="M114 -5 L87 -19 L92 -15 L114 -7Z" fill="#111"/>
-            <path d="M114 5 L87 19 L92 15 L114 7Z" fill="#555" opacity="0.6"/>
-            <!-- v-tail blue -->
-            <path d="M122 -6 Q112 -32 114 -48 Q118 -32 124 -6Z" fill="#0044bb"/>
+            <path d="M112-5 L84-19 L89-15 L112-7Z" fill="#1a44bb" opacity="0.9"/>
+            <path d="M112 5 L84 19 L89 15 L112 7Z"  fill="#0a2266" opacity="0.55"/>
+            <!-- v-tail -->
+            <path d="M120-6 Q110-32 112-48 Q116-32 122-6Z" fill="#3366ff" opacity="0.85"/>
             <!-- windows -->
-            <rect x="18" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9"/>
-            <rect x="35" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.88"/>
-            <rect x="52" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.8"/>
-            <rect x="69" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.72"/>
-            <rect x="86" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.65"/>
-            <!-- gear red -->
-            <line x1="12" y1="8" x2="12" y2="24" stroke="#cc0000" stroke-width="2.2"/>
-            <ellipse cx="4" cy="26" rx="9" ry="5" fill="none" stroke="#cc0000" stroke-width="1.2"/>
-            <ellipse cx="20" cy="26" rx="9" ry="5" fill="none" stroke="#cc0000" stroke-width="1.2"/>
-            <line x1="76" y1="8" x2="76" y2="24" stroke="#cc0000" stroke-width="2.2"/>
-            <ellipse cx="68" cy="26" rx="9" ry="5" fill="none" stroke="#cc0000" stroke-width="1.2"/>
-            <ellipse cx="84" cy="26" rx="9" ry="5" fill="none" stroke="#cc0000" stroke-width="1.2"/>
+            <rect x="18" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9"/>
+            <rect x="35" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.85"/>
+            <rect x="52" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.78"/>
+            <rect x="69" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.70"/>
+            <rect x="86" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.62"/>
+            <!-- gear -->
+            <line x1="12" y1="8" x2="12" y2="24" stroke="#3366ff" stroke-width="2.2"/>
+            <ellipse cx="4"  cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
+            <ellipse cx="20" cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
+            <line x1="76" y1="8" x2="76" y2="24" stroke="#3366ff" stroke-width="2.2"/>
+            <ellipse cx="68" cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
+            <ellipse cx="84" cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
+            <line x1="-64" y1="8" x2="-64" y2="22" stroke="#3366ff" stroke-width="1.8"/>
+            <ellipse cx="-64" cy="24" rx="7" ry="4" fill="none" stroke="#3366ff" stroke-width="1"/>
           </g>
-          <polygon points="80,6 82.5,12 89,12 84,16 86,22 80,18 74,22 76,16 71,12 77.5,12" fill="#fff"/>
+          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="12" font-weight="700" fill="#4488ff" text-anchor="middle" filter="url(#glow-b)">737 MAX</text>
+          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#3366cc" text-anchor="middle" letter-spacing="2" opacity="0.7">BOEING</text>
         </svg>
       </div>
       <div class="card-body">
@@ -451,67 +431,65 @@
       </div>
     </a>
 
-    <!-- ══ A320neo ══ RED+BLUE THEME ══ -->
+    <!-- ══════════ A320neo — RED ══════════ -->
     <a class="aircraft-card card-a320" href="A320neo_Tutorial.html">
       <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 185" xmlns="http://www.w3.org/2000/svg">
-          <path d="M80 4 L152 28 L152 104 Q152 154 80 178 Q8 154 8 104 L8 28 Z" fill="#fff" stroke="#111" stroke-width="2.5"/>
-          <!-- top red band -->
-          <path d="M80 4 L152 28 L134 28 L80 10 L26 28 L8 28 Z" fill="#cc0000"/>
-          <text x="80" y="24" font-family="monospace" font-size="9" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="3">AIRBUS</text>
-          <!-- blue center stripe -->
-          <rect x="8" y="92" width="144" height="14" fill="#0044bb"/>
-          <text x="80" y="102.5" font-family="monospace" font-size="7.5" font-weight="bold" fill="#fff" text-anchor="middle" letter-spacing="2">A320neo</text>
-          <!-- red accent line top of stripe -->
-          <rect x="8" y="92" width="144" height="2.5" fill="#cc0000"/>
-          <!-- bottom blue -->
-          <path d="M8 148 Q8 154 80 178 Q152 154 152 148 Z" fill="#0044bb"/>
-          <text x="80" y="165" font-family="monospace" font-size="7.5" fill="#fff" text-anchor="middle" letter-spacing="1">CFM LEAP-1A</text>
-          <text x="80" y="175" font-family="monospace" font-size="6.5" fill="#aaccff" text-anchor="middle" opacity="0.9">FLY-BY-WIRE</text>
-
-          <!-- A320 silhouette -->
-          <g transform="translate(80, 68) scale(0.5)">
-            <!-- fuselage wide -->
-            <path d="M-106 0 Q-68 -15 130 -7 L134 0 L130 7 Q-68 15 -106 0Z" fill="#111"/>
-            <path d="M-106 0 Q-122 0 -132 0 Q-122 -2 -106 -2Z" fill="#333"/>
-            <!-- cockpit white -->
-            <path d="M-86 -8 Q-56 -24 32 -16 Q4 -14 -86 -8Z" fill="#111" opacity="0.2"/>
-            <ellipse cx="-48" cy="-13" rx="17" ry="9" fill="#fff" stroke="#111" stroke-width="0.9"/>
-            <ellipse cx="-24" cy="-12" rx="15" ry="8" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.9"/>
-            <ellipse cx="0" cy="-12" rx="12" ry="7" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.82"/>
+        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow-r"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
+                fill="#0e0000" stroke="#cc2200" stroke-width="1.8" filter="url(#glow-r)"/>
+          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
+                fill="#0e0000" stroke="#aa1a00" stroke-width="0.7" opacity="0.5"/>
+          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#ff4422" text-anchor="middle" letter-spacing="4" opacity="0.85">FLY-BY-WIRE</text>
+          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#cc2200" filter="url(#glow-r)" opacity="0.9"/>
+          <!-- A320 plane -->
+          <g transform="translate(80,96) scale(0.46)">
+            <path d="M-108 0 Q-70-15 132-7 L136 0 L132 7 Q-70 15 -108 0Z" fill="#cc2200" opacity="0.9"/>
+            <path d="M-108 0 Q-124 0 -135 0 Q-124-2 -108-2Z" fill="#ff4422" opacity="0.7"/>
+            <path d="M-58 2 Q26 7 116 5 Q26 9 -58 6Z" fill="#440000" opacity="0.45"/>
+            <!-- cockpit -->
+            <path d="M-88-8 Q-58-24 30-16 Q2-14 -88-8Z" fill="#cc2200" opacity="0.2"/>
+            <ellipse cx="-50" cy="-13" rx="17" ry="9" fill="#220000" stroke="#cc2200" stroke-width="0.9"/>
+            <ellipse cx="-26" cy="-12" rx="15" ry="8" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.9"/>
+            <ellipse cx="-2"  cy="-11" rx="12" ry="7" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.8"/>
             <!-- wing -->
-            <path d="M-6 -7 L-120 -54 L-100 -42 L-2 -9Z" fill="#111"/>
-            <path d="M-6 7 L-120 54 L-100 42 L-2 9Z" fill="#444" opacity="0.6"/>
-            <!-- sharklets blue+red -->
-            <path d="M-120 -54 L-130 -66 L-120 -60Z" fill="#0044bb"/>
-            <path d="M-120 54 L-130 66 L-120 60Z" fill="#cc0000" opacity="0.8"/>
-            <!-- LEAP eng 1 (blue ring) -->
-            <ellipse cx="-74" cy="-19" rx="12" ry="14" fill="#111" stroke="#0044bb" stroke-width="1.5"/>
-            <ellipse cx="-74" cy="-19" rx="5.5" ry="7" fill="#0044bb" opacity="0.18"/>
-            <!-- LEAP eng 2 (red ring) -->
-            <ellipse cx="-30" cy="-14" rx="10" ry="12" fill="#111" stroke="#cc0000" stroke-width="1.2"/>
-            <ellipse cx="-30" cy="-14" rx="4" ry="6" fill="#cc0000" opacity="0.12"/>
+            <path d="M-6-7 L-122-55 L-102-43 L-2-9Z" fill="#aa1a00" opacity="0.95"/>
+            <path d="M-6 7 L-122 55 L-102 43 L-2 9Z"  fill="#660000" opacity="0.55"/>
+            <!-- sharklets -->
+            <path d="M-122-55 L-132-68 L-122-62Z" fill="#ff4422" opacity="0.9"/>
+            <path d="M-122 55 L-132 68 L-122 62Z"  fill="#cc2200" opacity="0.7"/>
+            <!-- LEAP eng 1 -->
+            <path d="M-60-14 Q-74-21 -82-26 Q-66-32 -50-26 Q-40-18 -42-11 Q-50-9 -60-14Z" fill="#330000" stroke="#cc2200" stroke-width="1"/>
+            <ellipse cx="-80" cy="-20" rx="12" ry="14" fill="#220000" stroke="#cc2200" stroke-width="1.2"/>
+            <ellipse cx="-80" cy="-20" rx="5.5" ry="7" fill="#cc2200" opacity="0.15"/>
+            <!-- LEAP eng 2 -->
+            <path d="M-22-11 Q-32-16 -36-20 Q-24-24 -14-20 Q-6-13 -8-8 Q-14-6 -22-11Z" fill="#220000" stroke="#cc2200" stroke-width="0.9"/>
+            <ellipse cx="-34" cy="-16" rx="10" ry="12" fill="#220000" stroke="#cc2200" stroke-width="1"/>
             <!-- h-stab -->
-            <path d="M116 -5 L88 -19 L93 -15 L116 -7Z" fill="#111"/>
-            <path d="M116 5 L88 19 L93 15 L116 7Z" fill="#555" opacity="0.6"/>
-            <!-- v-tail split red/blue -->
-            <path d="M124 -6 Q113 -32 116 -48 L120 -48 Q118 -32 126 -6Z" fill="#cc0000"/>
-            <path d="M120 -6 Q113 -32 116 -48 Q113 -32 122 -6Z" fill="#0044bb"/>
+            <path d="M118-5 L90-19 L95-15 L118-7Z" fill="#aa1a00" opacity="0.9"/>
+            <path d="M118 5 L90 19 L95 15 L118 7Z"  fill="#660000" opacity="0.55"/>
+            <!-- v-tail -->
+            <path d="M126-6 Q116-32 118-50 Q122-32 128-6Z" fill="#cc2200" opacity="0.85"/>
             <!-- windows -->
-            <rect x="18" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9"/>
-            <rect x="35" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.88"/>
-            <rect x="52" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.8"/>
-            <rect x="69" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.72"/>
-            <rect x="86" y="-10" width="11" height="7" rx="2.5" fill="#fff" stroke="#111" stroke-width="0.9" opacity="0.65"/>
-            <!-- gear blue -->
-            <line x1="12" y1="8" x2="12" y2="24" stroke="#0044bb" stroke-width="2.2"/>
-            <ellipse cx="4" cy="26" rx="9" ry="5" fill="none" stroke="#0044bb" stroke-width="1.2"/>
-            <ellipse cx="20" cy="26" rx="9" ry="5" fill="none" stroke="#0044bb" stroke-width="1.2"/>
-            <line x1="76" y1="8" x2="76" y2="24" stroke="#0044bb" stroke-width="2.2"/>
-            <ellipse cx="68" cy="26" rx="9" ry="5" fill="none" stroke="#0044bb" stroke-width="1.2"/>
-            <ellipse cx="84" cy="26" rx="9" ry="5" fill="none" stroke="#0044bb" stroke-width="1.2"/>
+            <rect x="18" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9"/>
+            <rect x="35" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.85"/>
+            <rect x="52" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.78"/>
+            <rect x="69" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.70"/>
+            <rect x="86" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.62"/>
+            <!-- gear -->
+            <line x1="12" y1="8" x2="12" y2="24" stroke="#cc2200" stroke-width="2.2"/>
+            <ellipse cx="4"  cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
+            <ellipse cx="20" cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
+            <line x1="76" y1="8" x2="76" y2="24" stroke="#cc2200" stroke-width="2.2"/>
+            <ellipse cx="68" cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
+            <ellipse cx="84" cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
+            <line x1="-66" y1="8" x2="-66" y2="22" stroke="#cc2200" stroke-width="1.8"/>
+            <ellipse cx="-66" cy="24" rx="7" ry="4" fill="none" stroke="#cc2200" stroke-width="1"/>
           </g>
-          <polygon points="80,6 82.5,12 89,12 84,16 86,22 80,18 74,22 76,16 71,12 77.5,12" fill="#fff"/>
+          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="12" font-weight="700" fill="#ff4422" text-anchor="middle" filter="url(#glow-r)">A320neo</text>
+          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#cc3311" text-anchor="middle" letter-spacing="2" opacity="0.7">AIRBUS</text>
         </svg>
       </div>
       <div class="card-body">
@@ -535,30 +513,12 @@
 <section class="features">
   <p class="section-label">教學特色</p>
   <div class="features-grid">
-    <div class="feature-item">
-      <span class="feature-icon">✅</span>
-      <div><div class="feature-title">逐步打勾確認</div><div class="feature-desc">每個步驟點擊打勾，不怕跳過</div></div>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">📊</span>
-      <div><div class="feature-title">即時進度追蹤</div><div class="feature-desc">每階段顯示完成百分比進度條</div></div>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">📱</span>
-      <div><div class="feature-title">手機優化設計</div><div class="feature-desc">底部導航列、左右滑動切換階段</div></div>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">🎛️</span>
-      <div><div class="feature-title">SVG 駕駛艙圖示</div><div class="feature-desc">每步驟配有精確的控制面板圖示</div></div>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">📲</span>
-      <div><div class="feature-title">加入主畫面</div><div class="feature-desc">支援 PWA，像 App 一樣使用</div></div>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">⚠️</span>
-      <div><div class="feature-title">重點警示提醒</div><div class="feature-desc">關鍵步驟顏色標示，避免錯誤</div></div>
-    </div>
+    <div class="feature-item"><span class="feature-icon">✅</span><div><div class="feature-title">逐步打勾確認</div><div class="feature-desc">每個步驟點擊打勾，不怕跳過</div></div></div>
+    <div class="feature-item"><span class="feature-icon">📊</span><div><div class="feature-title">即時進度追蹤</div><div class="feature-desc">每階段顯示完成百分比進度條</div></div></div>
+    <div class="feature-item"><span class="feature-icon">📱</span><div><div class="feature-title">手機優化設計</div><div class="feature-desc">底部導航列、左右滑動切換階段</div></div></div>
+    <div class="feature-item"><span class="feature-icon">🎛️</span><div><div class="feature-title">SVG 駕駛艙圖示</div><div class="feature-desc">每步驟配有精確的控制面板圖示</div></div></div>
+    <div class="feature-item"><span class="feature-icon">📲</span><div><div class="feature-title">加入主畫面</div><div class="feature-desc">支援 PWA，像 App 一樣使用</div></div></div>
+    <div class="feature-item"><span class="feature-icon">⚠️</span><div><div class="feature-title">重點警示提醒</div><div class="feature-desc">關鍵步驟顏色標示，避免錯誤</div></div></div>
   </div>
 </section>
 
