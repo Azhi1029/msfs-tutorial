@@ -8,200 +8,207 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MSFS 教學">
 <meta name="theme-color" content="#06080f">
-<meta name="description" content="MSFS 2024 飛行教學 - PC-12、SF50、737 MAX、A320neo 完整程序教學">
 <title>MSFS 2024 飛行教學中心</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #06080f;
     --panel: #090c16;
-    --border: #0e1428;
-    --text: #c8dff0;
-    --text-dim: #7a9abb;
+    --border: #0e1830;
+    --text: #ddeeff;
+    --text-dim: #4a6888;
+    --text-mid: #8aaccc;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans TC', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background: var(--bg); color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif; font-weight: 300;
+    min-height: 100vh; overflow-x: hidden;
   }
   body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0;
+    content: ''; position: fixed; inset: 0; z-index: 0;
     background:
-      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.35) 0%, transparent 100%),
-      radial-gradient(1px 1px at 42% 8%,  rgba(255,255,255,0.45) 0%, transparent 100%),
-      radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 74% 28%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 88% 52%, rgba(255,255,255,0.35) 0%, transparent 100%),
-      radial-gradient(1px 1px at 95% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 16% 88%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(ellipse at 20% 0%,   rgba(0,80,200,0.14) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 100%, rgba(180,0,0,0.08) 0%, transparent 50%);
+      radial-gradient(1px 1px at 8%  18%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 62%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 38% 9%,  rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 78%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 72% 32%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 86% 54%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 94% 12%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 14% 86%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 63% 44%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(ellipse at 20% 0%,   rgba(0,60,180,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(0,120,80,0.07) 0%, transparent 50%);
     pointer-events: none;
   }
   .page { position: relative; z-index: 1; }
 
   /* ── HERO ── */
   .hero {
-    text-align: center; padding: 64px 20px 48px;
-    border-bottom: 1px solid #0e1428; position: relative;
+    text-align: center; padding: 64px 20px 52px;
+    border-bottom: 1px solid var(--border);
   }
   .hero-badge {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: 'Share Tech Mono', monospace; font-size: 11px;
     letter-spacing: 4px; color: #4488ff;
-    background: rgba(0,68,187,0.08); border: 1px solid rgba(0,68,187,0.2);
+    background: rgba(0,68,187,0.07); border: 1px solid rgba(0,68,187,0.2);
     padding: 6px 18px; border-radius: 2px; margin-bottom: 28px;
     text-transform: uppercase;
   }
-  .hero-badge .dot { width:6px; height:6px; border-radius:50%; background:#cc0000; animation:pulse 2s infinite; }
+  .dot { width:6px; height:6px; border-radius:50%; background:#cc0000; animation:pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
   .hero h1 {
     font-family: 'Orbitron', monospace; font-weight: 900;
-    font-size: clamp(26px,6vw,58px); color: #fff;
+    font-size: clamp(28px,6vw,62px); color: #fff;
     letter-spacing: 3px; line-height: 1.05;
-    text-shadow: 0 0 40px rgba(0,80,200,0.3); margin-bottom: 8px;
+    text-shadow: 0 0 50px rgba(0,68,187,0.3);
   }
-  .hero h1 em { font-style: normal; color: #cc2200; }
-  .hero-sub { font-family:'Share Tech Mono',monospace; font-size:12px; color:var(--text-dim); letter-spacing:3px; margin-top:14px; text-transform:uppercase; }
-  .hero-desc { max-width:520px; margin:18px auto 0; font-size:14px; color:#344a68; line-height:1.8; }
+  .hero h1 em { font-style:normal; color:#cc2200; }
+  .hero-sub {
+    font-family:'Share Tech Mono',monospace; font-size:12px;
+    color:var(--text-dim); letter-spacing:3px; margin-top:14px; text-transform:uppercase;
+  }
+  .hero-desc { max-width:520px; margin:18px auto 0; font-size:14px; color:var(--text-mid); line-height:1.8; }
 
-  /* ── CARDS SECTION ── */
+  /* ── GRID ── */
   .cards-section { max-width:1160px; margin:0 auto; padding:48px 20px 80px; }
   .section-label {
     font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:4px;
-    color:#6a90b0; text-transform:uppercase; text-align:center; margin-bottom:44px;
+    color:var(--text-dim); text-transform:uppercase; text-align:center; margin-bottom:36px;
   }
   .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 28px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
   }
 
   /* ── CARD ── */
   .aircraft-card {
-    background: var(--panel); border: 1px solid var(--border);
-    border-radius: 6px; overflow: hidden; position: relative;
-    cursor: pointer; text-decoration: none; display: block;
-    transition: transform 0.3s, box-shadow 0.3s;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--c, #4488ff);
+    border-radius: 5px;
+    padding: 24px 22px 20px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
     -webkit-tap-highlight-color: transparent;
   }
-  .aircraft-card:hover { transform: translateY(-8px); }
+  .aircraft-card::before {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height:100%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .aircraft-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(0,0,0,0.5); }
   .aircraft-card:active { transform: scale(0.98); }
 
-  /* badge glow area */
-  .card-badge-wrap {
-    width:100%; padding:28px 16px 20px;
-    display:flex; align-items:center; justify-content:center;
-    background: #06080f;
-    border-bottom: 1px solid var(--border);
-    position: relative;
+  /* small plane icon top-right */
+  .plane-icon {
+    position: absolute; top: 18px; right: 18px;
+    font-size: 22px; opacity: 0.18;
+    transition: opacity 0.25s;
   }
-  /* radial glow behind badge */
-  .card-badge-wrap::before {
-    content:''; position:absolute; inset:0;
-    background: radial-gradient(ellipse at 50% 60%, var(--glow-color,rgba(0,180,255,0.12)) 0%, transparent 70%);
-    pointer-events:none;
-  }
-  .card-badge-wrap svg { width:150px; height:172px; position:relative; z-index:1; }
+  .aircraft-card:hover .plane-icon { opacity: 0.35; }
 
-  .card-body { padding:18px 20px 22px; }
-  .card-tag-placeholder {
-    font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px;
-    color:var(--text-dim); text-transform:uppercase; margin-bottom:7px;
-    display:flex; align-items:center; gap:8px;
+  /* category tag */
+  .card-category {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 2.5px;
+    color: var(--c, #4488ff); text-transform: uppercase;
+    margin-bottom: 10px; opacity: 0.8;
   }
-  .card-tag::before { content:''; width:16px; height:1px; background:#4a7090; }
-  .card-title { font-family:'Orbitron',monospace; font-weight:700; font-size:clamp(15px,2.5vw,19px); color:#fff; margin-bottom:3px; line-height:1.2; }
-  .card-subtitle { font-size:12px; color:#8ab0d0; margin-bottom:12px; }
-  .card-desc { font-size:13px; color:#2e4464; line-height:1.7; margin-bottom:16px; }
 
-  .card-stats {
-    display:grid; grid-template-columns:repeat(3,1fr);
-    gap:1px; background:#4a7090; border:1px solid var(--border);
-    border-radius:3px; overflow:hidden; margin-bottom:16px;
+  /* BIG aircraft name */
+  .card-name {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(20px, 3vw, 26px);
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
   }
-  .stat { background:var(--panel); padding:9px 6px; text-align:center; }
-  .stat-val { font-family:'Share Tech Mono',monospace; font-size:12px; display:block; font-weight:500; }
-  .stat-label { font-size:9px; color:#8ab0d0; margin-top:2px; }
+  .card-maker {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    color: var(--text-dim); margin-bottom: 14px;
+  }
 
+  /* divider */
+  .card-divider {
+    height: 1px; background: var(--border);
+    margin: 14px 0;
+  }
+
+  /* info rows */
+  .card-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 16px; }
+  .info-item { }
+  .info-label { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+  .info-val { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--text); }
+
+  /* desc */
+  .card-desc { font-size: 13px; color: var(--text-mid); line-height: 1.7; margin-bottom: 18px; }
+
+  /* CTA */
   .card-btn {
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    width:100%; padding:12px; background:transparent;
-    border:1px solid var(--border); border-radius:3px;
-    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px;
-    color:var(--text-dim); text-transform:uppercase; transition:all 0.2s;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px; letter-spacing: 2px; color: var(--text-dim);
+    text-transform: uppercase; transition: all 0.2s;
   }
-  .aircraft-card:hover .card-btn { background:rgba(255,255,255,0.03); }
-  .arrow { transition:transform 0.2s; }
-  .aircraft-card:hover .arrow { transform:translateX(4px); }
-
-  /* per-card colors */
-  .card-pc12  { --c:#00ccff; --glow-color:rgba(0,200,255,0.14); }
-  .card-sf50  { --c:#ff4422; --glow-color:rgba(255,60,30,0.13); }
-  .card-737   { --c:#4488ff; --glow-color:rgba(50,120,255,0.14); }
-  .card-a320  { --c:#cc2200; --glow-color:rgba(200,30,0,0.14); }
-  .card-fenix { --c:#aa44ff; --glow-color:rgba(170,68,255,0.16); }
-
-  .card-pc12 .stat-val  { color:#00ccff; }
-  .card-sf50 .stat-val  { color:#ff6644; }
-  .card-737  .stat-val  { color:#4488ff; }
-  .card-a320 .stat-val  { color:#ff4422; }
-  .card-fenix .stat-val { color:#bb66ff; }
-
-  .card-pc12:hover  { box-shadow:0 16px 40px rgba(0,180,255,0.15), 0 0 0 1px rgba(0,180,255,0.2); }
-  .card-sf50:hover  { box-shadow:0 16px 40px rgba(255,60,30,0.15), 0 0 0 1px rgba(255,60,30,0.2); }
-  .card-737:hover   { box-shadow:0 16px 40px rgba(50,120,255,0.15), 0 0 0 1px rgba(50,120,255,0.2); }
-  .card-fenix:hover { box-shadow:0 16px 40px rgba(170,68,255,0.18), 0 0 0 1px rgba(170,68,255,0.25); }
-  .card-a320:hover  { box-shadow:0 16px 40px rgba(200,30,0,0.15),   0 0 0 1px rgba(200,30,0,0.2);  }
-
-  .card-pc12:hover .card-btn  { border-color:rgba(0,200,255,0.4);  color:#00ccff; }
-  .card-sf50:hover .card-btn  { border-color:rgba(255,60,30,0.4);  color:#ff6644; }
-  .card-737:hover  .card-btn  { border-color:rgba(50,120,255,0.4); color:#4488ff; }
-  .card-fenix:hover .card-btn { border-color:rgba(170,68,255,0.5); color:#bb66ff; }
-  .card-a320:hover .card-btn  { border-color:rgba(200,30,0,0.4);   color:#ff4422; }
+  .aircraft-card:hover .card-btn {
+    border-color: var(--c, #4488ff);
+    color: var(--c, #4488ff);
+    background: rgba(255,255,255,0.03);
+  }
 
   /* ── FEATURES ── */
-  .features { max-width:900px; margin:0 auto; padding:0 20px 60px; }
-  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:28px; }
-  .feature-item {
+  .features { max-width:960px; margin:0 auto; padding:0 20px 64px; }
+  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-top:24px; }
+  .feat {
     background:var(--panel); border:1px solid var(--border); border-radius:4px;
     padding:14px 16px; display:flex; gap:12px; align-items:flex-start;
   }
-  .feature-icon { font-size:18px; flex-shrink:0; }
-  .feature-title { font-size:13px; font-weight:500; color:#d0e8f8; margin-bottom:3px; }
-  .feature-desc { font-size:12px; color:var(--text-dim); line-height:1.6; }
+  .feat-icon { font-size:17px; flex-shrink:0; margin-top:1px; }
+  .feat-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:2px; }
+  .feat-desc { font-size:12px; color:var(--text-dim); line-height:1.6; }
 
-  footer { text-align:center; padding:28px 20px; border-top:1px solid var(--border); font-family:'Share Tech Mono',monospace; font-size:10px; color:#6090b0; letter-spacing:2px; }
+  footer {
+    text-align:center; padding:28px 20px;
+    border-top:1px solid var(--border);
+    font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:2px;
+  }
 
   /* mobile */
   @media(max-width:600px){
-    .hero { padding:46px 16px 34px; }
-    .hero h1 { font-size:26px; letter-spacing:1px; }
+    .hero { padding:46px 16px 38px; }
+    .hero h1 { font-size:28px; letter-spacing:1px; }
     .cards-section { padding:28px 14px 60px; }
-    .card-badge-wrap svg { width:120px; height:138px; }
-    .cards-grid { grid-template-columns:repeat(2,1fr); gap:14px; }
-    .card-body { padding:12px 14px 16px; }
-    .card-desc { display:none; }
+    .cards-grid { grid-template-columns:1fr; gap:12px; }
+    .aircraft-card { padding:20px 18px 16px; }
+    .card-name { font-size:22px; }
   }
-  @media(max-width:380px){ .cards-grid { grid-template-columns:1fr; } }
 
   /* animate */
-  .aircraft-card { opacity:0; transform:translateY(20px); animation:cardIn 0.5s ease forwards; }
+  .aircraft-card { opacity:0; transform:translateY(18px); animation:cIn 0.5s ease forwards; }
   .aircraft-card:nth-child(1){animation-delay:0.05s}
-  .aircraft-card:nth-child(2){animation-delay:0.15s}
-  .aircraft-card:nth-child(3){animation-delay:0.25s}
-  .aircraft-card:nth-child(4){animation-delay:0.35s}
-  @keyframes cardIn { to{opacity:1;transform:translateY(0)} }
-  .hero-badge,.hero h1,.hero-sub,.hero-desc{opacity:0;animation:heroIn 0.6s ease forwards}
+  .aircraft-card:nth-child(2){animation-delay:0.12s}
+  .aircraft-card:nth-child(3){animation-delay:0.19s}
+  .aircraft-card:nth-child(4){animation-delay:0.26s}
+  .aircraft-card:nth-child(5){animation-delay:0.33s}
+  .aircraft-card:nth-child(6){animation-delay:0.40s}
+  @keyframes cIn { to{opacity:1;transform:translateY(0)} }
+  .hero-badge,.hero h1,.hero-sub,.hero-desc{opacity:0;animation:hIn 0.6s ease forwards}
   .hero-badge{animation-delay:0s}.hero h1{animation-delay:0.1s}.hero-sub{animation-delay:0.2s}.hero-desc{animation-delay:0.3s}
-  @keyframes heroIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes hIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -218,359 +225,106 @@
   <p class="section-label">選擇飛機開始教學</p>
   <div class="cards-grid">
 
-    <!-- ══════════ PC-12 — CYAN ══════════ -->
-    <a class="aircraft-card card-pc12" href="PC12_Tutorial_mobile.html">
-      <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow-c"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <!-- shield -->
-          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
-                fill="#060d16" stroke="#00ccff" stroke-width="1.8" filter="url(#glow-c)"/>
-          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
-                fill="#060d16" stroke="#00aadd" stroke-width="0.7" opacity="0.5"/>
-          <!-- top label -->
-          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#00ccff" text-anchor="middle" letter-spacing="4" opacity="0.85">TURBOPROP</text>
-          <!-- star -->
-          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#00ccff" filter="url(#glow-c)" opacity="0.9"/>
-          <!-- PC-12 plane -->
-          <g transform="translate(80,95) scale(0.48)">
-            <!-- fuselage -->
-            <path d="M-92 0 Q-58 -10 98 -5 L102 0 L98 5 Q-58 10 -92 0Z" fill="#00ccff" opacity="0.9"/>
-            <path d="M-92 0 Q-108 0 -118 0 Q-108-2 -92-2Z" fill="#00eeff" opacity="0.7"/>
-            <!-- belly shade -->
-            <path d="M-40 2 Q20 6 86 4 Q20 8 -40 5Z" fill="#004466" opacity="0.5"/>
-            <!-- cockpit windows -->
-            <ellipse cx="-34" cy="-10" rx="16" ry="8" fill="#003344" stroke="#00ccff" stroke-width="0.9" opacity="0.95"/>
-            <ellipse cx="-10" cy="-9" rx="14" ry="7" fill="#003344" stroke="#00ccff" stroke-width="0.9" opacity="0.88"/>
-            <!-- wing -->
-            <path d="M-12 -4 L-96 -40 L-80 -30 L-8 -6Z" fill="#00aadd" opacity="0.95"/>
-            <path d="M-12  4 L-96  40 L-80  30 L-8  6Z" fill="#006688" opacity="0.55"/>
-            <!-- winglet -->
-            <path d="M-96 -40 L-104-50 L-96-46Z" fill="#00eeff" opacity="0.9"/>
-            <!-- h-stab -->
-            <path d="M76-3 L55-13 L59-10 L76-5Z" fill="#00aadd" opacity="0.9"/>
-            <path d="M76 3 L55 13 L59 10 L76 5Z" fill="#006688" opacity="0.55"/>
-            <!-- v-tail -->
-            <path d="M82-4 Q75-22 77-30 Q81-20 84-4Z" fill="#00ccff" opacity="0.85"/>
-            <!-- engine cowl -->
-            <ellipse cx="104" cy="0" rx="13" ry="9" fill="#004466" stroke="#00ccff" stroke-width="1"/>
-            <ellipse cx="109" cy="0" rx="5.5" ry="6" fill="#001a2a"/>
-            <!-- prop -->
-            <line x1="110" y1="0" x2="110" y2="-24" stroke="#00ddff" stroke-width="4" stroke-linecap="round"/>
-            <line x1="110" y1="0" x2="110" y2=" 24" stroke="#00ddff" stroke-width="4" stroke-linecap="round"/>
-            <line x1="110" y1="0" x2="126" y2="-10" stroke="#00ddff" stroke-width="2.5" stroke-linecap="round" opacity="0.75"/>
-            <circle cx="110" cy="0" r="4.5" fill="#00aacc"/>
-            <!-- windows -->
-            <rect x="8"  y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9"/>
-            <rect x="25" y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9" opacity="0.8"/>
-            <rect x="42" y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9" opacity="0.7"/>
-            <rect x="59" y="-8" width="12" height="7" rx="2.5" fill="#001a28" stroke="#00ccff" stroke-width="0.9" opacity="0.6"/>
-            <!-- gear -->
-            <line x1="0"  y1="5" x2="0"  y2="19" stroke="#00aacc" stroke-width="2"/>
-            <ellipse cx="0"  cy="21" rx="9" ry="4.5" fill="none" stroke="#00aacc" stroke-width="1.2"/>
-            <line x1="46" y1="5" x2="46" y2="19" stroke="#00aacc" stroke-width="2"/>
-            <ellipse cx="46" cy="21" rx="9" ry="4.5" fill="none" stroke="#00aacc" stroke-width="1.2"/>
-            <line x1="-48" y1="5" x2="-48" y2="18" stroke="#00aacc" stroke-width="1.5"/>
-            <ellipse cx="-48" cy="20" rx="7" ry="3.5" fill="none" stroke="#00aacc" stroke-width="1"/>
-          </g>
-          <!-- bottom labels -->
-          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="12" font-weight="700" fill="#00ccff" text-anchor="middle" filter="url(#glow-c)">PC-12 NGX</text>
-          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#00aadd" text-anchor="middle" letter-spacing="2" opacity="0.7">PILATUS</text>
-        </svg>
+    <!-- PC-12 -->
+    <a class="aircraft-card" href="PC12_Tutorial_mobile.html" style="--c:#00ccff">
+      <span class="plane-icon">✈</span>
+      <div class="card-category">渦輪螺旋槳 · 單發</div>
+      <div class="card-name">PC-12 NGX</div>
+      <div class="card-maker">PILATUS AIRCRAFT</div>
+      <div class="card-divider"></div>
+      <div class="card-info">
+        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">PT6A-67P</div></div>
+        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL250</div></div>
+        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">260 kt</div></div>
+        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
       </div>
-      <div class="card-body">
-        <div class="card-tag">渦輪螺旋槳 · 單發</div>
-        <div class="card-title">Pilatus PC-12 NGX</div>
-        <div class="card-subtitle">PT6A-67P 渦槳引擎</div>
-        <div class="card-desc">瑞士製造高性能渦輪螺旋槳飛機，適合商務及短途飛行。</div>
-        <div class="card-stats">
-          <div class="stat"><span class="stat-val">FL250</span><div class="stat-label">最大高度</div></div>
-          <div class="stat"><span class="stat-val">260kt</span><div class="stat-label">巡航速度</div></div>
-          <div class="stat"><span class="stat-val">7段</span><div class="stat-label">教學階段</div></div>
-        </div>
-        <div class="card-btn">開始教學 <span class="arrow">→</span></div>
-      </div>
+      <div class="card-desc">瑞士製造高性能渦輪螺旋槳飛機，FADEC 引擎管理，適合商務及短途飛行。冷啟動含 Condition Lever 及 ITT 監控。</div>
+      <div class="card-btn"><span>開始教學</span><span>→</span></div>
     </a>
 
-    <!-- ══════════ SF50 — ORANGE/RED ══════════ -->
-    <a class="aircraft-card card-sf50" href="SF50_Vision_Jet_Tutorial.html">
-      <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow-o"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
-                fill="#110800" stroke="#ff4422" stroke-width="1.8" filter="url(#glow-o)"/>
-          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
-                fill="#110800" stroke="#cc3310" stroke-width="0.7" opacity="0.5"/>
-          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#ff6644" text-anchor="middle" letter-spacing="4" opacity="0.85">SINGLE JET</text>
-          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#ff4422" filter="url(#glow-o)" opacity="0.9"/>
-          <!-- SF50 plane -->
-          <g transform="translate(80,94) scale(0.47)">
-            <path d="M-90 0 Q-56-12 102-6 L106 0 L102 6 Q-56 12 -90 0Z" fill="#ff5533" opacity="0.9"/>
-            <path d="M-90 0 Q-106 0 -118 0 Q-106-2 -90-2Z" fill="#ff7755" opacity="0.7"/>
-            <path d="M-50 2 Q20 6 88 4 Q20 8 -50 5Z" fill="#661100" opacity="0.45"/>
-            <!-- big cockpit -->
-            <path d="M-70-7 Q-38-28 44-18 Q14-16 -70-7Z" fill="#ff5533" opacity="0.2"/>
-            <ellipse cx="-28" cy="-13" rx="18" ry="9" fill="#220800" stroke="#ff5533" stroke-width="1"/>
-            <ellipse cx="2"  cy="-12" rx="16" ry="8" fill="#220800" stroke="#ff5533" stroke-width="1" opacity="0.9"/>
-            <!-- shoulder wing -->
-            <path d="M-12-6 L-104-50 L-86-38 L-8-8Z" fill="#dd3311" opacity="0.95"/>
-            <path d="M-12 6 L-104 50 L-86 38 L-8 8Z"  fill="#882200" opacity="0.55"/>
-            <path d="M-104-50 L-114-62 L-104-56Z" fill="#ff6644" opacity="0.9"/>
-            <!-- rear engine -->
-            <path d="M86-24 Q102-30 116-26 Q124-20 122-13 Q110-9 92-11 Q82-16 84-22Z" fill="#441100" stroke="#ff4422" stroke-width="0.9"/>
-            <ellipse cx="88" cy="-19" rx="11" ry="12" fill="#220800" stroke="#ff5533" stroke-width="1"/>
-            <ellipse cx="88" cy="-19" rx="5" ry="6" fill="#ff4422" opacity="0.1"/>
-            <path d="M120-22 Q128-16 126-10 Q122-14 120-18Z" fill="#331100" stroke="#ff4422" stroke-width="0.5"/>
-            <!-- V-tails -->
-            <path d="M92-8 Q70-28 62-40 Q74-26 94-10Z" fill="#ff4422" opacity="0.85"/>
-            <path d="M92 8 Q70 28 62 40 Q74 26 94 10Z"  fill="#882200" opacity="0.6"/>
-            <!-- CAPS badge -->
-            <rect x="-66" y="-27" width="34" height="13" rx="3" fill="#cc2200" stroke="#ff4422" stroke-width="0.8"/>
-            <text x="-49" y="-17.5" font-size="8.5" font-family="'Share Tech Mono',monospace" fill="#fff" text-anchor="middle" font-weight="bold">CAPS</text>
-            <!-- windows -->
-            <rect x="16" y="-11" width="14" height="9" rx="3" fill="#220800" stroke="#ff5533" stroke-width="0.9"/>
-            <rect x="36" y="-11" width="14" height="9" rx="3" fill="#220800" stroke="#ff5533" stroke-width="0.9" opacity="0.82"/>
-            <rect x="56" y="-11" width="14" height="9" rx="3" fill="#220800" stroke="#ff5533" stroke-width="0.9" opacity="0.72"/>
-            <!-- gear -->
-            <line x1="6"  y1="7" x2="6"  y2="22" stroke="#ff4422" stroke-width="2"/>
-            <ellipse cx="6"  cy="24" rx="9" ry="4.5" fill="none" stroke="#ff4422" stroke-width="1.2"/>
-            <line x1="52" y1="6" x2="52" y2="21" stroke="#ff4422" stroke-width="2"/>
-            <ellipse cx="52" cy="23" rx="9" ry="4.5" fill="none" stroke="#ff4422" stroke-width="1.2"/>
-            <line x1="-52" y1="6" x2="-52" y2="19" stroke="#ff4422" stroke-width="1.5"/>
-            <ellipse cx="-52" cy="21" rx="7" ry="3.5" fill="none" stroke="#ff4422" stroke-width="1"/>
-          </g>
-          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="11" font-weight="700" fill="#ff5533" text-anchor="middle" filter="url(#glow-o)">VISION JET</text>
-          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#cc4422" text-anchor="middle" letter-spacing="2" opacity="0.7">CIRRUS SF50</text>
-        </svg>
+    <!-- SF50 -->
+    <a class="aircraft-card" href="SF50_Vision_Jet_Tutorial.html" style="--c:#ff6644">
+      <span class="plane-icon">✈</span>
+      <div class="card-category">渦扇噴射 · 後置單發</div>
+      <div class="card-name">SF50 VISION JET</div>
+      <div class="card-maker">CIRRUS AIRCRAFT</div>
+      <div class="card-divider"></div>
+      <div class="card-info">
+        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">Williams FJ33</div></div>
+        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL310</div></div>
+        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">311 kt</div></div>
+        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
       </div>
-      <div class="card-body">
-        <div class="card-tag">渦扇噴射 · 後置單發</div>
-        <div class="card-title">Cirrus SF50 Vision Jet</div>
-        <div class="card-subtitle">Williams FJ33-5A 渦扇引擎</div>
-        <div class="card-desc">世界首款配備 CAPS 整機降落傘的噴射機，操作簡便。</div>
-        <div class="card-stats">
-          <div class="stat"><span class="stat-val">FL310</span><div class="stat-label">最大高度</div></div>
-          <div class="stat"><span class="stat-val">311kt</span><div class="stat-label">巡航速度</div></div>
-          <div class="stat"><span class="stat-val">7段</span><div class="stat-label">教學階段</div></div>
-        </div>
-        <div class="card-btn">開始教學 <span class="arrow">→</span></div>
-      </div>
+      <div class="card-desc">全球首款配備 CAPS 整機降落傘的噴射機，引擎後置單發設計，FADEC 全自動，Safe Return 緊急自動降落功能。</div>
+      <div class="card-btn"><span>開始教學</span><span>→</span></div>
     </a>
 
-    <!-- ══════════ 737 MAX — BLUE ══════════ -->
-    <a class="aircraft-card card-737" href="B737MAX_Tutorial.html">
-      <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow-b"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
-                fill="#030814" stroke="#3366ff" stroke-width="1.8" filter="url(#glow-b)"/>
-          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
-                fill="#030814" stroke="#2255cc" stroke-width="0.7" opacity="0.5"/>
-          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#4488ff" text-anchor="middle" letter-spacing="4" opacity="0.85">TWIN JET</text>
-          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#3366ff" filter="url(#glow-b)" opacity="0.9"/>
-          <!-- 737 plane -->
-          <g transform="translate(80,96) scale(0.46)">
-            <path d="M-106 0 Q-68-15 130-7 L134 0 L130 7 Q-68 15 -106 0Z" fill="#2255cc" opacity="0.9"/>
-            <path d="M-106 0 Q-122 0 -132 0 Q-122-2 -106-2Z" fill="#4488ff" opacity="0.7"/>
-            <path d="M-55 2 Q25 7 114 5 Q25 9 -55 6Z" fill="#001144" opacity="0.45"/>
-            <!-- cockpit -->
-            <ellipse cx="-50" cy="-13" rx="17" ry="9" fill="#001133" stroke="#3366ff" stroke-width="0.9"/>
-            <ellipse cx="-26" cy="-12" rx="15" ry="8" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.9"/>
-            <ellipse cx="-2"  cy="-11" rx="12" ry="7" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.8"/>
-            <!-- wing -->
-            <path d="M-6-7 L-120-54 L-100-42 L-2-9Z" fill="#1a44bb" opacity="0.95"/>
-            <path d="M-6 7 L-120 54 L-100 42 L-2 9Z"  fill="#0a2266" opacity="0.55"/>
-            <!-- winglets -->
-            <path d="M-120-54 L-130-66 L-120-60Z" fill="#4488ff" opacity="0.9"/>
-            <path d="M-120 54 L-130 66 L-120 60Z"  fill="#2255cc" opacity="0.7"/>
-            <!-- LEAP eng 1 -->
-            <path d="M-58-14 Q-72-20 -80-25 Q-64-31 -48-25 Q-38-17 -40-11 Q-48-9 -58-14Z" fill="#112255" stroke="#3366ff" stroke-width="1"/>
-            <ellipse cx="-78" cy="-19" rx="12" ry="14" fill="#001133" stroke="#3366ff" stroke-width="1.2"/>
-            <ellipse cx="-78" cy="-19" rx="5.5" ry="7" fill="#3366ff" opacity="0.15"/>
-            <!-- LEAP eng 2 -->
-            <path d="M-20-11 Q-30-15 -34-19 Q-22-23 -12-19 Q-5-13 -7-8 Q-12-6 -20-11Z" fill="#0a1a44" stroke="#3366ff" stroke-width="0.9"/>
-            <ellipse cx="-32" cy="-15" rx="10" ry="12" fill="#001133" stroke="#3366ff" stroke-width="1"/>
-            <!-- h-stab -->
-            <path d="M112-5 L84-19 L89-15 L112-7Z" fill="#1a44bb" opacity="0.9"/>
-            <path d="M112 5 L84 19 L89 15 L112 7Z"  fill="#0a2266" opacity="0.55"/>
-            <!-- v-tail -->
-            <path d="M120-6 Q110-32 112-48 Q116-32 122-6Z" fill="#3366ff" opacity="0.85"/>
-            <!-- windows -->
-            <rect x="18" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9"/>
-            <rect x="35" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.85"/>
-            <rect x="52" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.78"/>
-            <rect x="69" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.70"/>
-            <rect x="86" y="-10" width="11" height="7" rx="2.5" fill="#001133" stroke="#3366ff" stroke-width="0.9" opacity="0.62"/>
-            <!-- gear -->
-            <line x1="12" y1="8" x2="12" y2="24" stroke="#3366ff" stroke-width="2.2"/>
-            <ellipse cx="4"  cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
-            <ellipse cx="20" cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
-            <line x1="76" y1="8" x2="76" y2="24" stroke="#3366ff" stroke-width="2.2"/>
-            <ellipse cx="68" cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
-            <ellipse cx="84" cy="26" rx="9" ry="5" fill="none" stroke="#3366ff" stroke-width="1.2"/>
-            <line x1="-64" y1="8" x2="-64" y2="22" stroke="#3366ff" stroke-width="1.8"/>
-            <ellipse cx="-64" cy="24" rx="7" ry="4" fill="none" stroke="#3366ff" stroke-width="1"/>
-          </g>
-          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="12" font-weight="700" fill="#4488ff" text-anchor="middle" filter="url(#glow-b)">737 MAX</text>
-          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#3366cc" text-anchor="middle" letter-spacing="2" opacity="0.7">BOEING</text>
-        </svg>
+    <!-- 737 MAX -->
+    <a class="aircraft-card" href="B737MAX_Tutorial.html" style="--c:#3388ff">
+      <span class="plane-icon">✈</span>
+      <div class="card-category">窄體客機 · 雙發</div>
+      <div class="card-name">737 MAX 8</div>
+      <div class="card-maker">BOEING</div>
+      <div class="card-divider"></div>
+      <div class="card-info">
+        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM LEAP-1B ×2</div></div>
+        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.79</div></div>
+        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
       </div>
-      <div class="card-body">
-        <div class="card-tag">窄體客機 · 雙發</div>
-        <div class="card-title">Boeing 737 MAX</div>
-        <div class="card-subtitle">CFM LEAP-1B 渦扇引擎 ×2</div>
-        <div class="card-desc">全球最暢銷短中程客機，完整 FMC 及 APU 雙發啟動程序。</div>
-        <div class="card-stats">
-          <div class="stat"><span class="stat-val">FL410</span><div class="stat-label">最大高度</div></div>
-          <div class="stat"><span class="stat-val">M0.79</span><div class="stat-label">巡航速度</div></div>
-          <div class="stat"><span class="stat-val">7段</span><div class="stat-label">教學階段</div></div>
-        </div>
-        <div class="card-btn">開始教學 <span class="arrow">→</span></div>
-      </div>
+      <div class="card-desc">全球最暢銷短中程客機，完整 FMC 航路規劃、APU 啟動程序及雙發 CFM 引擎操作。含 LNAV / VNAV 自動飛行。</div>
+      <div class="card-btn"><span>開始教學</span><span>→</span></div>
     </a>
 
-    <!-- ══════════ A320neo — RED ══════════ -->
-    <a class="aircraft-card card-a320" href="A320neo_Tutorial.html">
-      <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow-r"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z"
-                fill="#0e0000" stroke="#cc2200" stroke-width="1.8" filter="url(#glow-r)"/>
-          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z"
-                fill="#0e0000" stroke="#aa1a00" stroke-width="0.7" opacity="0.5"/>
-          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#ff4422" text-anchor="middle" letter-spacing="4" opacity="0.85">FLY-BY-WIRE</text>
-          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#cc2200" filter="url(#glow-r)" opacity="0.9"/>
-          <!-- A320 plane -->
-          <g transform="translate(80,96) scale(0.46)">
-            <path d="M-108 0 Q-70-15 132-7 L136 0 L132 7 Q-70 15 -108 0Z" fill="#cc2200" opacity="0.9"/>
-            <path d="M-108 0 Q-124 0 -135 0 Q-124-2 -108-2Z" fill="#ff4422" opacity="0.7"/>
-            <path d="M-58 2 Q26 7 116 5 Q26 9 -58 6Z" fill="#440000" opacity="0.45"/>
-            <!-- cockpit -->
-            <path d="M-88-8 Q-58-24 30-16 Q2-14 -88-8Z" fill="#cc2200" opacity="0.2"/>
-            <ellipse cx="-50" cy="-13" rx="17" ry="9" fill="#220000" stroke="#cc2200" stroke-width="0.9"/>
-            <ellipse cx="-26" cy="-12" rx="15" ry="8" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.9"/>
-            <ellipse cx="-2"  cy="-11" rx="12" ry="7" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.8"/>
-            <!-- wing -->
-            <path d="M-6-7 L-122-55 L-102-43 L-2-9Z" fill="#aa1a00" opacity="0.95"/>
-            <path d="M-6 7 L-122 55 L-102 43 L-2 9Z"  fill="#660000" opacity="0.55"/>
-            <!-- sharklets -->
-            <path d="M-122-55 L-132-68 L-122-62Z" fill="#ff4422" opacity="0.9"/>
-            <path d="M-122 55 L-132 68 L-122 62Z"  fill="#cc2200" opacity="0.7"/>
-            <!-- LEAP eng 1 -->
-            <path d="M-60-14 Q-74-21 -82-26 Q-66-32 -50-26 Q-40-18 -42-11 Q-50-9 -60-14Z" fill="#330000" stroke="#cc2200" stroke-width="1"/>
-            <ellipse cx="-80" cy="-20" rx="12" ry="14" fill="#220000" stroke="#cc2200" stroke-width="1.2"/>
-            <ellipse cx="-80" cy="-20" rx="5.5" ry="7" fill="#cc2200" opacity="0.15"/>
-            <!-- LEAP eng 2 -->
-            <path d="M-22-11 Q-32-16 -36-20 Q-24-24 -14-20 Q-6-13 -8-8 Q-14-6 -22-11Z" fill="#220000" stroke="#cc2200" stroke-width="0.9"/>
-            <ellipse cx="-34" cy="-16" rx="10" ry="12" fill="#220000" stroke="#cc2200" stroke-width="1"/>
-            <!-- h-stab -->
-            <path d="M118-5 L90-19 L95-15 L118-7Z" fill="#aa1a00" opacity="0.9"/>
-            <path d="M118 5 L90 19 L95 15 L118 7Z"  fill="#660000" opacity="0.55"/>
-            <!-- v-tail -->
-            <path d="M126-6 Q116-32 118-50 Q122-32 128-6Z" fill="#cc2200" opacity="0.85"/>
-            <!-- windows -->
-            <rect x="18" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9"/>
-            <rect x="35" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.85"/>
-            <rect x="52" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.78"/>
-            <rect x="69" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.70"/>
-            <rect x="86" y="-10" width="11" height="7" rx="2.5" fill="#220000" stroke="#cc2200" stroke-width="0.9" opacity="0.62"/>
-            <!-- gear -->
-            <line x1="12" y1="8" x2="12" y2="24" stroke="#cc2200" stroke-width="2.2"/>
-            <ellipse cx="4"  cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
-            <ellipse cx="20" cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
-            <line x1="76" y1="8" x2="76" y2="24" stroke="#cc2200" stroke-width="2.2"/>
-            <ellipse cx="68" cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
-            <ellipse cx="84" cy="26" rx="9" ry="5" fill="none" stroke="#cc2200" stroke-width="1.2"/>
-            <line x1="-66" y1="8" x2="-66" y2="22" stroke="#cc2200" stroke-width="1.8"/>
-            <ellipse cx="-66" cy="24" rx="7" ry="4" fill="none" stroke="#cc2200" stroke-width="1"/>
-          </g>
-          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="12" font-weight="700" fill="#ff4422" text-anchor="middle" filter="url(#glow-r)">A320neo</text>
-          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#cc3311" text-anchor="middle" letter-spacing="2" opacity="0.7">AIRBUS</text>
-        </svg>
+    <!-- A320neo (iniBuilds) -->
+    <a class="aircraft-card" href="A320neo_Tutorial.html" style="--c:#ff4422">
+      <span class="plane-icon">✈</span>
+      <div class="card-category">窄體客機 · 雙發 · FBW</div>
+      <div class="card-name">A320neo</div>
+      <div class="card-maker">AIRBUS · iniBuilds V2</div>
+      <div class="card-divider"></div>
+      <div class="card-info">
+        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM LEAP-1A ×2</div></div>
+        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.80</div></div>
+        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
       </div>
-      <div class="card-body">
-        <div class="card-tag">窄體客機 · 雙發 · FBW</div>
-        <div class="card-title">Airbus A320neo</div>
-        <div class="card-subtitle">CFM LEAP-1A 渦扇引擎 ×2</div>
-        <div class="card-desc">全飛線操控空巴，MCDU 飛行管理，iniBuilds V2 完整程序。</div>
-        <div class="card-stats">
-          <div class="stat"><span class="stat-val">FL410</span><div class="stat-label">最大高度</div></div>
-          <div class="stat"><span class="stat-val">M0.80</span><div class="stat-label">巡航速度</div></div>
-          <div class="stat"><span class="stat-val">7段</span><div class="stat-label">教學階段</div></div>
-        </div>
-        <div class="card-btn">開始教學 <span class="arrow">→</span></div>
-      </div>
+      <div class="card-desc">全飛線操控空巴，ADIRS 對齊、MCDU 完整設定含 FLEX 溫度。支援 SimBrief 匯入，iniBuilds V2 精確飛線保護。</div>
+      <div class="card-btn"><span>開始教學</span><span>→</span></div>
     </a>
 
-    <!-- ══════════ FENIX A320 — PURPLE ══════════ -->
-    <a class="aircraft-card card-fenix" href="FenixA320_Tutorial.html">
-      <div class="card-badge-wrap">
-        <svg viewBox="0 0 160 172" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="glow-p"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <path d="M80 4 L150 26 L150 98 Q150 148 80 168 Q10 148 10 98 L10 26 Z" fill="#08030f" stroke="#aa44ff" stroke-width="1.8" filter="url(#glow-p)"/>
-          <path d="M80 10 L144 30 L144 96 Q144 142 80 161 Q16 142 16 96 L16 30 Z" fill="#08030f" stroke="#7722cc" stroke-width="0.7" opacity="0.5"/>
-          <text x="80" y="22" font-family="'Share Tech Mono',monospace" font-size="8.5" fill="#cc66ff" text-anchor="middle" letter-spacing="3" opacity="0.9">FLY-BY-WIRE</text>
-          <polygon points="80,28 82,33 87,33 83,36 85,41 80,38 75,41 77,36 73,33 78,33" fill="#aa44ff" filter="url(#glow-p)" opacity="0.9"/>
-          <rect x="108" y="28" width="32" height="10" rx="2" fill="#aa44ff" opacity="0.85"/>
-          <text x="124" y="35.5" font-family="'Share Tech Mono',monospace" font-size="5.5" font-weight="bold" fill="#fff" text-anchor="middle">FENIXSIM</text>
-          <g transform="translate(80,96) scale(0.46)">
-            <path d="M-108 0 Q-70-15 132-7 L136 0 L132 7 Q-70 15 -108 0Z" fill="#aa44ff" opacity="0.9"/>
-            <path d="M-108 0 Q-124 0 -135 0 Q-124-2 -108-2Z" fill="#cc66ff" opacity="0.7"/>
-            <path d="M-58 2 Q26 7 116 5 Q26 9 -58 6Z" fill="#440066" opacity="0.45"/>
-            <path d="M-88-8 Q-58-24 30-16 Q2-14 -88-8Z" fill="#aa44ff" opacity="0.2"/>
-            <ellipse cx="-50" cy="-13" rx="17" ry="9" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9"/>
-            <ellipse cx="-26" cy="-12" rx="15" ry="8" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9" opacity="0.9"/>
-            <ellipse cx="-2"  cy="-11" rx="12" ry="7" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9" opacity="0.8"/>
-            <path d="M-6-7 L-122-55 L-102-43 L-2-9Z" fill="#8822dd" opacity="0.95"/>
-            <path d="M-6 7 L-122 55 L-102 43 L-2 9Z"  fill="#440088" opacity="0.55"/>
-            <path d="M-122-55 L-132-68 L-122-62Z" fill="#cc44ff" opacity="0.9"/>
-            <path d="M-122 55 L-132 68 L-122 62Z"  fill="#8822aa" opacity="0.7"/>
-            <ellipse cx="-80" cy="-20" rx="12" ry="14" fill="#1a0028" stroke="#aa44ff" stroke-width="1.2"/>
-            <ellipse cx="-80" cy="-20" rx="5.5" ry="7" fill="#aa44ff" opacity="0.18"/>
-            <ellipse cx="-34" cy="-16" rx="10" ry="12" fill="#1a0028" stroke="#aa44ff" stroke-width="1"/>
-            <path d="M118-5 L90-19 L95-15 L118-7Z" fill="#8822dd" opacity="0.9"/>
-            <path d="M118 5 L90 19 L95 15 L118 7Z"  fill="#440088" opacity="0.55"/>
-            <path d="M126-6 Q116-32 118-50 Q122-32 128-6Z" fill="#aa44ff" opacity="0.9" filter="url(#glow-p)"/>
-            <rect x="18" y="-10" width="11" height="7" rx="2.5" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9"/>
-            <rect x="35" y="-10" width="11" height="7" rx="2.5" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9" opacity="0.85"/>
-            <rect x="52" y="-10" width="11" height="7" rx="2.5" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9" opacity="0.78"/>
-            <rect x="69" y="-10" width="11" height="7" rx="2.5" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9" opacity="0.70"/>
-            <rect x="86" y="-10" width="11" height="7" rx="2.5" fill="#1a0028" stroke="#aa44ff" stroke-width="0.9" opacity="0.62"/>
-            <line x1="12" y1="8" x2="12" y2="24" stroke="#aa44ff" stroke-width="2.2"/>
-            <ellipse cx="4"  cy="26" rx="9" ry="5" fill="none" stroke="#aa44ff" stroke-width="1.2"/>
-            <ellipse cx="20" cy="26" rx="9" ry="5" fill="none" stroke="#aa44ff" stroke-width="1.2"/>
-            <line x1="76" y1="8" x2="76" y2="24" stroke="#aa44ff" stroke-width="2.2"/>
-            <ellipse cx="68" cy="26" rx="9" ry="5" fill="none" stroke="#aa44ff" stroke-width="1.2"/>
-            <ellipse cx="84" cy="26" rx="9" ry="5" fill="none" stroke="#aa44ff" stroke-width="1.2"/>
-            <line x1="-66" y1="8" x2="-66" y2="22" stroke="#aa44ff" stroke-width="1.8"/>
-            <ellipse cx="-66" cy="24" rx="7" ry="4" fill="none" stroke="#aa44ff" stroke-width="1"/>
-          </g>
-          <text x="80" y="153" font-family="'Orbitron',monospace" font-size="11" font-weight="700" fill="#bb66ff" text-anchor="middle" filter="url(#glow-p)">FENIX A320</text>
-          <text x="80" y="164" font-family="'Share Tech Mono',monospace" font-size="8" fill="#7733aa" text-anchor="middle" letter-spacing="2" opacity="0.8">CFM56 · FBW</text>
-        </svg>
+    <!-- Fenix A320 -->
+    <a class="aircraft-card" href="FenixA320_Tutorial.html" style="--c:#bb55ff">
+      <span class="plane-icon">✈</span>
+      <div class="card-category">窄體客機 · 雙發 · FBW</div>
+      <div class="card-name">A320 FENIX</div>
+      <div class="card-maker">AIRBUS · FenixSim</div>
+      <div class="card-divider"></div>
+      <div class="card-info">
+        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM56-5B ×2</div></div>
+        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.80</div></div>
+        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
       </div>
-      <div class="card-body">
-        <div class="card-tag">窄體客機 · 雙發 · FBW</div>
-        <div class="card-title">FenixSim A320</div>
-        <div class="card-subtitle">CFM56-5B 渦扇引擎 ×2</div>
-        <div class="card-desc">MSFS 最高精度空巴，200+ 故障系統，EFB 地面服務，完整 FBW 飛線保護。</div>
-        <div class="card-stats">
-          <div class="stat"><span class="stat-val">FL410</span><div class="stat-label">最大高度</div></div>
-          <div class="stat"><span class="stat-val">M0.80</span><div class="stat-label">巡航速度</div></div>
-          <div class="stat"><span class="stat-val">7段</span><div class="stat-label">教學階段</div></div>
-        </div>
-        <div class="card-btn">開始教學 <span class="arrow">→</span></div>
+      <div class="card-desc">MSFS 最高精度空巴模擬，200+ 故障系統，EFB 平板地面服務，SimBrief ACARS，精確 RETARD 語音提示。</div>
+      <div class="card-btn"><span>開始教學</span><span>→</span></div>
+    </a>
+
+    <!-- PMDG 737-800 -->
+    <a class="aircraft-card" href="PMDG737_Tutorial.html" style="--c:#ff9900">
+      <span class="plane-icon">✈</span>
+      <div class="card-category">窄體客機 · 雙發</div>
+      <div class="card-name">737-800</div>
+      <div class="card-maker">BOEING · PMDG</div>
+      <div class="card-divider"></div>
+      <div class="card-info">
+        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM56-7B ×2</div></div>
+        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.79</div></div>
+        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
       </div>
+      <div class="card-desc">MSFS 最精確波音窄體機，電路板層級系統模擬，PMDG Ops Centre 載重設定，IRS 10 分鐘對齊，ACARS SimBrief。</div>
+      <div class="card-btn"><span>開始教學</span><span>→</span></div>
     </a>
 
   </div>
@@ -580,12 +334,12 @@
 <section class="features">
   <p class="section-label">教學特色</p>
   <div class="features-grid">
-    <div class="feature-item"><span class="feature-icon">✅</span><div><div class="feature-title">逐步打勾確認</div><div class="feature-desc">每個步驟點擊打勾，不怕跳過</div></div></div>
-    <div class="feature-item"><span class="feature-icon">📊</span><div><div class="feature-title">即時進度追蹤</div><div class="feature-desc">每階段顯示完成百分比進度條</div></div></div>
-    <div class="feature-item"><span class="feature-icon">📱</span><div><div class="feature-title">手機優化設計</div><div class="feature-desc">底部導航列、左右滑動切換階段</div></div></div>
-    <div class="feature-item"><span class="feature-icon">🎛️</span><div><div class="feature-title">SVG 駕駛艙圖示</div><div class="feature-desc">每步驟配有精確的控制面板圖示</div></div></div>
-    <div class="feature-item"><span class="feature-icon">📲</span><div><div class="feature-title">加入主畫面</div><div class="feature-desc">支援 PWA，像 App 一樣使用</div></div></div>
-    <div class="feature-item"><span class="feature-icon">⚠️</span><div><div class="feature-title">重點警示提醒</div><div class="feature-desc">關鍵步驟顏色標示，避免錯誤</div></div></div>
+    <div class="feat"><span class="feat-icon">✅</span><div><div class="feat-title">逐步打勾確認</div><div class="feat-desc">每個步驟點擊打勾，不怕跳過</div></div></div>
+    <div class="feat"><span class="feat-icon">📊</span><div><div class="feat-title">即時進度追蹤</div><div class="feat-desc">每階段顯示完成百分比</div></div></div>
+    <div class="feat"><span class="feat-icon">📱</span><div><div class="feat-title">手機優化設計</div><div class="feat-desc">底部導航列、左右滑動切換</div></div></div>
+    <div class="feat"><span class="feat-icon">🎛️</span><div><div class="feat-title">SVG 駕駛艙圖示</div><div class="feat-desc">每步驟配有控制面板圖示</div></div></div>
+    <div class="feat"><span class="feat-icon">📲</span><div><div class="feat-title">加入主畫面</div><div class="feat-desc">支援 PWA，像 App 一樣使用</div></div></div>
+    <div class="feat"><span class="feat-icon">⚠️</span><div><div class="feat-title">重點警示提醒</div><div class="feat-desc">關鍵步驟顏色標示，避免錯誤</div></div></div>
   </div>
 </section>
 
