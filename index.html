@@ -6,363 +6,332 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MSFS 教學">
+<meta name="apple-mobile-web-app-title" content="飛行教學">
 <meta name="theme-color" content="#06080f">
-<title>MSFS 2024 飛行教學中心</title>
+<title>飛行教學中心 | MSFS 2024 & DCS World</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #06080f;
-    --panel: #090c16;
-    --border: #0e1830;
-    --text: #ddeeff;
-    --text-dim: #4a6888;
-    --text-mid: #8aaccc;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: 'Noto Sans TC', sans-serif; font-weight: 300;
-    min-height: 100vh; overflow-x: hidden;
-  }
-  body::before {
-    content: ''; position: fixed; inset: 0; z-index: 0;
-    background:
-      radial-gradient(1px 1px at 8%  18%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 22% 62%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 38% 9%,  rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 55% 78%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 72% 32%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 86% 54%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 94% 12%, rgba(255,255,255,0.35) 0%, transparent 100%),
-      radial-gradient(1px 1px at 14% 86%, rgba(255,255,255,0.25) 0%, transparent 100%),
-      radial-gradient(1px 1px at 63% 44%, rgba(255,255,255,0.2) 0%, transparent 100%),
-      radial-gradient(ellipse at 20% 0%,   rgba(0,60,180,0.12) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 100%, rgba(0,120,80,0.07) 0%, transparent 50%);
-    pointer-events: none;
-  }
-  .page { position: relative; z-index: 1; }
+:root{--bg:#06080f;--panel:#090c16;--border:#0e1830;--text:#ddeeff;--text-dim:#4a6888;--text-mid:#8aaccc;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+background:radial-gradient(1px 1px at 8% 18%,rgba(255,255,255,.5) 0%,transparent 100%),
+radial-gradient(1px 1px at 22% 62%,rgba(255,255,255,.3) 0%,transparent 100%),
+radial-gradient(1px 1px at 38% 9%,rgba(255,255,255,.4) 0%,transparent 100%),
+radial-gradient(1px 1px at 55% 78%,rgba(255,255,255,.3) 0%,transparent 100%),
+radial-gradient(1px 1px at 72% 32%,rgba(255,255,255,.4) 0%,transparent 100%),
+radial-gradient(1px 1px at 86% 54%,rgba(255,255,255,.3) 0%,transparent 100%),
+radial-gradient(ellipse at 20% 0%,rgba(0,60,180,.12) 0%,transparent 55%),
+radial-gradient(ellipse at 80% 100%,rgba(0,120,80,.07) 0%,transparent 50%);
+pointer-events:none;}
+.page{position:relative;z-index:1;}
 
-  /* ── HERO ── */
-  .hero {
-    text-align: center; padding: 64px 20px 52px;
-    border-bottom: 1px solid var(--border);
-  }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'Share Tech Mono', monospace; font-size: 11px;
-    letter-spacing: 4px; color: #4488ff;
-    background: rgba(0,68,187,0.07); border: 1px solid rgba(0,68,187,0.2);
-    padding: 6px 18px; border-radius: 2px; margin-bottom: 28px;
-    text-transform: uppercase;
-  }
-  .dot { width:6px; height:6px; border-radius:50%; background:#cc0000; animation:pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-  .hero h1 {
-    font-family: 'Orbitron', monospace; font-weight: 900;
-    font-size: clamp(28px,6vw,62px); color: #fff;
-    letter-spacing: 3px; line-height: 1.05;
-    text-shadow: 0 0 50px rgba(0,68,187,0.3);
-  }
-  .hero h1 em { font-style:normal; color:#cc2200; }
-  .hero-sub {
-    font-family:'Share Tech Mono',monospace; font-size:12px;
-    color:var(--text-dim); letter-spacing:3px; margin-top:14px; text-transform:uppercase;
-  }
-  .hero-desc { max-width:520px; margin:18px auto 0; font-size:14px; color:var(--text-mid); line-height:1.8; }
+/* HERO */
+.hero{text-align:center;padding:56px 20px 44px;border-bottom:1px solid var(--border);}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:#4488ff;background:rgba(0,68,187,.07);border:1px solid rgba(0,68,187,.2);padding:6px 18px;border-radius:2px;margin-bottom:24px;text-transform:uppercase;}
+.dot{width:6px;height:6px;border-radius:50%;background:#cc0000;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(26px,6vw,56px);color:#fff;letter-spacing:3px;line-height:1.05;text-shadow:0 0 50px rgba(0,68,187,.3);}
+.hero h1 em{font-style:normal;color:#cc2200;}
+.hero-sub{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);letter-spacing:3px;margin-top:12px;text-transform:uppercase;}
+.hero-desc{max-width:520px;margin:14px auto 0;font-size:14px;color:var(--text-mid);line-height:1.8;}
 
-  /* ── GRID ── */
-  .cards-section { max-width:1160px; margin:0 auto; padding:48px 20px 80px; }
-  .section-label {
-    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:4px;
-    color:var(--text-dim); text-transform:uppercase; text-align:center; margin-bottom:36px;
-  }
-  .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-  }
+/* SIM TABS */
+.sim-tabs{display:flex;justify-content:center;gap:0;padding:0 20px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(6,8,15,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.sim-tab{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;padding:14px 28px;cursor:pointer;border:none;background:transparent;color:var(--text-dim);text-transform:uppercase;border-bottom:2px solid transparent;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.sim-tab:hover{color:var(--text);}
+.sim-tab.active-msfs{color:#4488ff;border-bottom-color:#4488ff;}
+.sim-tab.active-dcs{color:#33cc44;border-bottom-color:#33cc44;}
 
-  /* ── CARD ── */
-  .aircraft-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-top: 3px solid var(--c, #4488ff);
-    border-radius: 5px;
-    padding: 24px 22px 20px;
-    text-decoration: none;
-    display: block;
-    cursor: pointer;
-    transition: transform 0.25s, box-shadow 0.25s;
-    position: relative;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .aircraft-card::before {
-    content: '';
-    position: absolute; top:0; left:0; right:0; height:100%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, transparent 40%);
-    pointer-events: none;
-  }
-  .aircraft-card:hover { transform: translateY(-5px); box-shadow: 0 12px 36px rgba(0,0,0,0.5); }
-  .aircraft-card:active { transform: scale(0.98); }
+/* SECTIONS */
+.sim-section{display:none;}
+.sim-section.visible{display:block;}
 
-  /* small plane icon top-right */
-  .plane-icon {
-    position: absolute; top: 18px; right: 18px;
-    font-size: 22px; opacity: 0.18;
-    transition: opacity 0.25s;
-  }
-  .aircraft-card:hover .plane-icon { opacity: 0.35; }
+/* SIM HEADER BANNER */
+.sim-banner{padding:20px 20px 0;max-width:1160px;margin:0 auto;}
+.sim-banner-inner{display:flex;align-items:center;gap:16px;padding:14px 20px;border-radius:5px;margin-bottom:0;}
+.sim-banner-inner.msfs-banner{background:rgba(0,68,187,.07);border:1px solid rgba(68,136,255,.2);}
+.sim-banner-inner.dcs-banner{background:rgba(20,100,20,.08);border:1px solid rgba(50,200,70,.2);}
+.sim-badge{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;padding:6px 14px;border-radius:3px;white-space:nowrap;}
+.msfs-badge{color:#4488ff;background:rgba(68,136,255,.1);border:1px solid rgba(68,136,255,.3);}
+.dcs-badge{color:#33cc44;background:rgba(50,200,70,.1);border:1px solid rgba(50,200,70,.3);}
+.sim-banner-desc{font-size:13px;color:var(--text-mid);}
 
-  /* category tag */
-  .card-category {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px; letter-spacing: 2.5px;
-    color: var(--c, #4488ff); text-transform: uppercase;
-    margin-bottom: 10px; opacity: 0.8;
-  }
+/* CARDS */
+.cards-section{max-width:1160px;margin:0 auto;padding:28px 20px 60px;}
+.section-label{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--text-dim);text-transform:uppercase;text-align:center;margin-bottom:28px;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.aircraft-card{background:var(--panel);border:1px solid var(--border);border-top:3px solid var(--c,#4488ff);border-radius:5px;padding:24px 22px 20px;text-decoration:none;display:block;cursor:pointer;transition:transform .25s,box-shadow .25s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.aircraft-card::before{content:'';position:absolute;top:0;left:0;right:0;height:100%;background:linear-gradient(180deg,rgba(255,255,255,.025) 0%,transparent 40%);pointer-events:none;}
+.aircraft-card:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(0,0,0,.5);}
+.aircraft-card:active{transform:scale(.98);}
+.plane-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:.18;transition:opacity .25s;}
+.aircraft-card:hover .plane-icon{opacity:.35;}
+.card-category{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2.5px;color:var(--c,#4488ff);text-transform:uppercase;margin-bottom:10px;opacity:.8;}
+.card-name{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(18px,3vw,24px);color:#fff;line-height:1.1;margin-bottom:4px;letter-spacing:1px;}
+.card-maker{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text-dim);margin-bottom:14px;}
+.card-divider{height:1px;background:var(--border);margin:14px 0;}
+.card-info{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:16px;}
+.info-label{font-size:10px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.info-val{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text);}
+.card-desc{font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:18px;}
+.card-btn{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid rgba(255,255,255,.08);border-radius:3px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;transition:all .2s;}
+.aircraft-card:hover .card-btn{border-color:var(--c,#4488ff);color:var(--c,#4488ff);background:rgba(255,255,255,.03);}
 
-  /* BIG aircraft name */
-  .card-name {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: clamp(20px, 3vw, 26px);
-    color: #fff;
-    line-height: 1.1;
-    margin-bottom: 4px;
-    letter-spacing: 1px;
-  }
-  .card-maker {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px; letter-spacing: 2px;
-    color: var(--text-dim); margin-bottom: 14px;
-  }
+/* FEATURES */
+.features{max-width:960px;margin:0 auto;padding:0 20px 60px;}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:24px;}
+.feat{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+.feat-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+.feat-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.feat-desc{font-size:12px;color:var(--text-dim);line-height:1.6;}
 
-  /* divider */
-  .card-divider {
-    height: 1px; background: var(--border);
-    margin: 14px 0;
-  }
+footer{text-align:center;padding:28px 20px;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
 
-  /* info rows */
-  .card-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 16px; }
-  .info-item { }
-  .info-label { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
-  .info-val { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--text); }
+@media(max-width:600px){
+  .hero{padding:40px 16px 32px;}
+  .hero h1{font-size:26px;letter-spacing:1px;}
+  .sim-tab{font-size:11px;padding:12px 18px;letter-spacing:1px;}
+  .cards-section{padding:20px 14px 48px;}
+  .cards-grid{grid-template-columns:1fr;gap:12px;}
+  .aircraft-card{padding:18px 16px 14px;}
+  .card-name{font-size:20px;}
+  .sim-banner{padding:14px 14px 0;}
+}
 
-  /* desc */
-  .card-desc { font-size: 13px; color: var(--text-mid); line-height: 1.7; margin-bottom: 18px; }
-
-  /* CTA */
-  .card-btn {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 14px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 3px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px; letter-spacing: 2px; color: var(--text-dim);
-    text-transform: uppercase; transition: all 0.2s;
-  }
-  .aircraft-card:hover .card-btn {
-    border-color: var(--c, #4488ff);
-    color: var(--c, #4488ff);
-    background: rgba(255,255,255,0.03);
-  }
-
-  /* ── FEATURES ── */
-  .features { max-width:960px; margin:0 auto; padding:0 20px 64px; }
-  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-top:24px; }
-  .feat {
-    background:var(--panel); border:1px solid var(--border); border-radius:4px;
-    padding:14px 16px; display:flex; gap:12px; align-items:flex-start;
-  }
-  .feat-icon { font-size:17px; flex-shrink:0; margin-top:1px; }
-  .feat-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:2px; }
-  .feat-desc { font-size:12px; color:var(--text-dim); line-height:1.6; }
-
-  footer {
-    text-align:center; padding:28px 20px;
-    border-top:1px solid var(--border);
-    font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:2px;
-  }
-
-  /* mobile */
-  @media(max-width:600px){
-    .hero { padding:46px 16px 38px; }
-    .hero h1 { font-size:28px; letter-spacing:1px; }
-    .cards-section { padding:28px 14px 60px; }
-    .cards-grid { grid-template-columns:1fr; gap:12px; }
-    .aircraft-card { padding:20px 18px 16px; }
-    .card-name { font-size:22px; }
-  }
-
-  /* animate */
-  .aircraft-card { opacity:0; transform:translateY(18px); animation:cIn 0.5s ease forwards; }
-  .aircraft-card:nth-child(1){animation-delay:0.05s}
-  .aircraft-card:nth-child(2){animation-delay:0.12s}
-  .aircraft-card:nth-child(3){animation-delay:0.19s}
-  .aircraft-card:nth-child(4){animation-delay:0.26s}
-  .aircraft-card:nth-child(5){animation-delay:0.33s}
-  .aircraft-card:nth-child(6){animation-delay:0.40s}
-  @keyframes cIn { to{opacity:1;transform:translateY(0)} }
-  .hero-badge,.hero h1,.hero-sub,.hero-desc{opacity:0;animation:hIn 0.6s ease forwards}
-  .hero-badge{animation-delay:0s}.hero h1{animation-delay:0.1s}.hero-sub{animation-delay:0.2s}.hero-desc{animation-delay:0.3s}
-  @keyframes hIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* animate */
+.aircraft-card{opacity:0;transform:translateY(18px);animation:cIn .5s ease forwards;}
+.aircraft-card:nth-child(1){animation-delay:.05s}.aircraft-card:nth-child(2){animation-delay:.12s}
+.aircraft-card:nth-child(3){animation-delay:.19s}.aircraft-card:nth-child(4){animation-delay:.26s}
+.aircraft-card:nth-child(5){animation-delay:.33s}.aircraft-card:nth-child(6){animation-delay:.40s}
+.aircraft-card:nth-child(7){animation-delay:.47s}.aircraft-card:nth-child(8){animation-delay:.54s}
+@keyframes cIn{to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 <div class="page">
 
 <section class="hero">
-  <div class="hero-badge"><span class="dot"></span>MSFS 2024 · Flight Tutorial Hub</div>
+  <div class="hero-badge"><span class="dot"></span>Flight Tutorial Hub</div>
   <h1>FLIGHT<br><em>ACADEMY</em></h1>
-  <p class="hero-sub">Microsoft Flight Simulator 2024</p>
+  <p class="hero-sub">MSFS 2024 · DCS World</p>
   <p class="hero-desc">從冷倉啟動到完美降落，完整逐步操作教學。<br>支援手機隨飛隨查，可加入主畫面離線使用。</p>
 </section>
 
-<section class="cards-section">
-  <p class="section-label">選擇飛機開始教學</p>
-  <div class="cards-grid">
+<!-- SIM TABS -->
+<div class="sim-tabs">
+  <button class="sim-tab active-msfs" id="tab-msfs" onclick="switchSim('msfs')">✈ MSFS 2024</button>
+  <button class="sim-tab" id="tab-dcs" onclick="switchSim('dcs')">🎯 DCS WORLD</button>
+</div>
 
-    <!-- PC-12 -->
-    <a class="aircraft-card" href="PC12_Tutorial_mobile.html" style="--c:#00ccff">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">渦輪螺旋槳 · 單發</div>
-      <div class="card-name">PC-12 NGX</div>
-      <div class="card-maker">PILATUS AIRCRAFT</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">PT6A-67P</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL250</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">260 kt</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">瑞士製造高性能渦輪螺旋槳飛機，FADEC 引擎管理，適合商務及短途飛行。冷啟動含 Condition Lever 及 ITT 監控。</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
-    <!-- SF50 -->
-    <a class="aircraft-card" href="SF50_Vision_Jet_Tutorial.html" style="--c:#ff6644">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">渦扇噴射 · 後置單發</div>
-      <div class="card-name">SF50 VISION JET</div>
-      <div class="card-maker">CIRRUS AIRCRAFT</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">Williams FJ33</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL310</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">311 kt</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">全球首款配備 CAPS 整機降落傘的噴射機，引擎後置單發設計，FADEC 全自動，Safe Return 緊急自動降落功能。</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
-    <!-- 737 MAX -->
-    <a class="aircraft-card" href="B737MAX_Tutorial.html" style="--c:#3388ff">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">窄體客機 · 雙發</div>
-      <div class="card-name">737 MAX 8</div>
-      <div class="card-maker">BOEING</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM LEAP-1B ×2</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.79</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">全球最暢銷短中程客機，完整 FMC 航路規劃、APU 啟動程序及雙發 CFM 引擎操作。含 LNAV / VNAV 自動飛行。</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
-    <!-- A320neo (iniBuilds) -->
-    <a class="aircraft-card" href="A320neo_Tutorial.html" style="--c:#ff4422">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">窄體客機 · 雙發 · FBW</div>
-      <div class="card-name">A320neo</div>
-      <div class="card-maker">AIRBUS · iniBuilds V2</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM LEAP-1A ×2</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.80</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">全飛線操控空巴，ADIRS 對齊、MCDU 完整設定含 FLEX 溫度。支援 SimBrief 匯入，iniBuilds V2 精確飛線保護。</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
-    <!-- Fenix A320 -->
-    <a class="aircraft-card" href="FenixA320_Tutorial.html" style="--c:#bb55ff">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">窄體客機 · 雙發 · FBW</div>
-      <div class="card-name">A320 FENIX</div>
-      <div class="card-maker">AIRBUS · FenixSim</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM56-5B ×2</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.80</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">MSFS 最高精度空巴模擬，200+ 故障系統，EFB 平板地面服務，SimBrief ACARS，精確 RETARD 語音提示。</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
-    <!-- PMDG 737-800 -->
-    <a class="aircraft-card" href="PMDG737_Tutorial.html" style="--c:#ff9900">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">窄體客機 · 雙發</div>
-      <div class="card-name">737-800</div>
-      <div class="card-maker">BOEING · PMDG</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM56-7B ×2</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.79</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">MSFS 最精確波音窄體機，電路板層級系統模擬，PMDG Ops Centre 載重設定，IRS 10 分鐘對齊，ACARS SimBrief。</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
-    <!-- A350 -->
-    <a class="aircraft-card" href="iniA350_Tutorial.html" style="--c:#00ccaa">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">寬體客機 · 雙發 · FBW</div>
-      <div class="card-name">A350-900/1000</div>
-      <div class="card-maker">AIRBUS · iniBuilds</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">Trent XWB ×2</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL430</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.85</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">長程寬體旗艦客機，4 個電池系統，OIS 地面服務平板，最大航程 15,000 km，比 777 省油 25%。</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
-    <!-- PMDG 777-300ER -->
-    <a class="aircraft-card" href="PMDG777_Tutorial.html" style="--c:#4488ff">
-      <span class="plane-icon">✈</span>
-      <div class="card-category">寬體客機 · 雙發 · 長程</div>
-      <div class="card-name">777-300ER</div>
-      <div class="card-maker">BOEING · PMDG</div>
-      <div class="card-divider"></div>
-      <div class="card-info">
-        <div class="info-item"><div class="info-label">引擎</div><div class="info-val">GE90-115B ×2</div></div>
-        <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL430</div></div>
-        <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.84</div></div>
-        <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
-      </div>
-      <div class="card-desc">三套 IRS、三套 AP（CAT III 自動降落），GE90 史上最大推力渦扇，最大航程 13,650 km，機尾離地淨空僅 60cm！</div>
-      <div class="card-btn"><span>開始教學</span><span>→</span></div>
-    </a>
-
+<!-- ══ MSFS 2024 SECTION ══ -->
+<div class="sim-section visible" id="section-msfs">
+  <div class="sim-banner">
+    <div class="sim-banner-inner msfs-banner">
+      <span class="sim-badge msfs-badge">MSFS 2024</span>
+      <span class="sim-banner-desc">Microsoft Flight Simulator 2024 · 民用航空教學 · 從通用航空到長程寬體客機</span>
+    </div>
   </div>
-</section>
+  <section class="cards-section">
+    <p class="section-label">選擇飛機開始教學</p>
+    <div class="cards-grid">
+
+      <a class="aircraft-card" href="PC12_Tutorial_mobile.html" style="--c:#00ccff">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">渦輪螺旋槳 · 單發</div>
+        <div class="card-name">PC-12 NGX</div>
+        <div class="card-maker">PILATUS AIRCRAFT</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">PT6A-67P</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL250</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">260 kt</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">瑞士製造高性能渦輪螺旋槳飛機，FADEC 引擎管理，適合商務及短途飛行。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <a class="aircraft-card" href="SF50_Vision_Jet_Tutorial.html" style="--c:#ff6644">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">渦扇噴射 · 後置單發</div>
+        <div class="card-name">SF50 VISION JET</div>
+        <div class="card-maker">CIRRUS AIRCRAFT</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">Williams FJ33</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL310</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">311 kt</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">全球首款配備 CAPS 整機降落傘噴射機，Safe Return 緊急自動降落功能。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <a class="aircraft-card" href="B737MAX_Tutorial.html" style="--c:#3388ff">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">窄體客機 · 雙發</div>
+        <div class="card-name">737 MAX 8</div>
+        <div class="card-maker">BOEING</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM LEAP-1B ×2</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.79</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">全球最暢銷短中程客機，完整 FMC 航路規劃及 APU 雙發啟動程序。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <a class="aircraft-card" href="A320neo_Tutorial.html" style="--c:#ff4422">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">窄體客機 · 雙發 · FBW</div>
+        <div class="card-name">A320neo</div>
+        <div class="card-maker">AIRBUS · iniBuilds V2</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM LEAP-1A ×2</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.80</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">全飛線操控空巴，ADIRS 對齊、MCDU 設定含 FLEX 溫度，SimBrief 匯入支援。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <a class="aircraft-card" href="FenixA320_Tutorial.html" style="--c:#bb55ff">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">窄體客機 · 雙發 · FBW</div>
+        <div class="card-name">A320 FENIX</div>
+        <div class="card-maker">AIRBUS · FenixSim</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM56-5B ×2</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.80</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">MSFS 最高精度空巴，200+ 故障系統，EFB 地面服務，SimBrief ACARS。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <a class="aircraft-card" href="PMDG737_Tutorial.html" style="--c:#ff9900">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">窄體客機 · 雙發</div>
+        <div class="card-name">737-800</div>
+        <div class="card-maker">BOEING · PMDG</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">CFM56-7B ×2</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL410</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.79</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">MSFS 最精確波音窄體機，電路板級系統模擬，IRS 10 分鐘對齊，ACARS SimBrief。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <a class="aircraft-card" href="iniA350_Tutorial.html" style="--c:#00ccaa">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">寬體客機 · 雙發 · FBW</div>
+        <div class="card-name">A350-900/1000</div>
+        <div class="card-maker">AIRBUS · iniBuilds</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">Trent XWB ×2</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL430</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.85</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">長程寬體旗艦客機，4 個電池，OIS 地面服務平板，最大航程 15,000 km。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <a class="aircraft-card" href="PMDG777_Tutorial.html" style="--c:#4488ff">
+        <span class="plane-icon">✈</span>
+        <div class="card-category">寬體客機 · 雙發 · 長程</div>
+        <div class="card-name">777-300ER</div>
+        <div class="card-maker">BOEING · PMDG</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">GE90-115B ×2</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">FL430</div></div>
+          <div class="info-item"><div class="info-label">巡航速度</div><div class="info-val">M0.84</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">三套 IRS、三套 AP（CAT III），GE90 史上最大推力渦扇，最大航程 13,650 km。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+    </div>
+  </section>
+</div>
+
+<!-- ══ DCS WORLD SECTION ══ -->
+<div class="sim-section" id="section-dcs">
+  <div class="sim-banner">
+    <div class="sim-banner-inner dcs-banner">
+      <span class="sim-badge dcs-badge">DCS WORLD</span>
+      <span class="sim-banner-desc">Digital Combat Simulator · 軍用航空教學 · 戰鬥機冷倉啟動到作戰飛行</span>
+    </div>
+  </div>
+  <section class="cards-section">
+    <p class="section-label">選擇機型開始教學</p>
+    <div class="cards-grid">
+
+      <a class="aircraft-card" href="FA18C_Tutorial.html" style="--c:#33cc44">
+        <span class="plane-icon">🎯</span>
+        <div class="card-category">艦載戰鬥機 · 雙發</div>
+        <div class="card-name">F/A-18C HORNET</div>
+        <div class="card-maker">BOEING · USN / USMC</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">GE F404 ×2</div></div>
+          <div class="info-item"><div class="info-label">最大速度</div><div class="info-val">M1.8</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">50,000 ft</div></div>
+          <div class="info-item"><div class="info-label">教學階段</div><div class="info-val">7 段</div></div>
+        </div>
+        <div class="card-desc">美國海軍主力艦載多用途戰機，APU 啟動、INS 對齊、AoA 進場，基礎版教學。後續延伸武器/雷達。</div>
+        <div class="card-btn"><span>開始教學</span><span>→</span></div>
+      </a>
+
+      <div class="aircraft-card" style="--c:#555;opacity:.5;cursor:not-allowed;">
+        <span class="plane-icon">🔒</span>
+        <div class="card-category">空優戰鬥機 · 單發</div>
+        <div class="card-name">F-16C VIPER</div>
+        <div class="card-maker">LOCKHEED · USAF</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">F110-GE-129</div></div>
+          <div class="info-item"><div class="info-label">最大速度</div><div class="info-val">M2.0</div></div>
+          <div class="info-item"><div class="info-label">最大高度</div><div class="info-val">50,000 ft</div></div>
+          <div class="info-item"><div class="info-label">狀態</div><div class="info-val">即將推出</div></div>
+        </div>
+        <div class="card-desc">即將推出 — 美國空軍主力單發多用途戰機，DTC 資料匣設定，HMCS 頭盔瞄準具。</div>
+        <div class="card-btn"><span>即將推出</span><span>🔒</span></div>
+      </div>
+
+      <div class="aircraft-card" style="--c:#555;opacity:.5;cursor:not-allowed;">
+        <span class="plane-icon">🔒</span>
+        <div class="card-category">近接支援 · 雙發</div>
+        <div class="card-name">A-10C WARTHOG</div>
+        <div class="card-maker">FAIRCHILD · USAF</div>
+        <div class="card-divider"></div>
+        <div class="card-info">
+          <div class="info-item"><div class="info-label">引擎</div><div class="info-val">TF34-GE-100 ×2</div></div>
+          <div class="info-item"><div class="info-label">最大速度</div><div class="info-val">381 kt</div></div>
+          <div class="info-item"><div class="info-label">主武器</div><div class="info-val">GAU-8 30mm</div></div>
+          <div class="info-item"><div class="info-label">狀態</div><div class="info-val">即將推出</div></div>
+        </div>
+        <div class="card-desc">即將推出 — 美國空軍近接支援攻擊機，專為摧毀地面裝甲設計，高度精確武器系統。</div>
+        <div class="card-btn"><span>即將推出</span><span>🔒</span></div>
+      </div>
+
+    </div>
+  </section>
+</div>
 
 <!-- FEATURES -->
 <section class="features">
@@ -378,10 +347,27 @@
 </section>
 
 <footer>
-  MSFS 2024 · Flight Tutorial Hub · 僅供模擬參考使用 · 非真實飛行程序<br><br>
-  <span style="opacity:0.3">Built for Flight Simmers</span>
+  Flight Tutorial Hub · MSFS 2024 & DCS World · 僅供模擬參考使用<br><br>
+  <span style="opacity:.3">Built for Flight & Combat Simmers</span>
 </footer>
 
 </div>
+
+<script>
+function switchSim(sim) {
+  document.getElementById("section-msfs").classList.remove("visible");
+  document.getElementById("section-dcs").classList.remove("visible");
+  document.getElementById("tab-msfs").className = "sim-tab";
+  document.getElementById("tab-dcs").className = "sim-tab";
+  if (sim === "msfs") {
+    document.getElementById("section-msfs").classList.add("visible");
+    document.getElementById("tab-msfs").className = "sim-tab active-msfs";
+  } else {
+    document.getElementById("section-dcs").classList.add("visible");
+    document.getElementById("tab-dcs").className = "sim-tab active-dcs";
+  }
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+</script>
 </body>
 </html>
