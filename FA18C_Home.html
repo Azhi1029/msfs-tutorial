@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C Hornet 教學中心</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--text:#ddeeff;--text-dim:#4a6888;--text-mid:#8aaccc;
+--green:#33cc44;--blue:#4488ff;--orange:#ff8800;--red:#ff3333;--yellow:#ffcc00;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(20,150,30,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(0,100,50,.07) 0%,transparent 50%);}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+background:radial-gradient(1px 1px at 8% 18%,rgba(255,255,255,.5) 0%,transparent 100%),
+radial-gradient(1px 1px at 25% 62%,rgba(255,255,255,.3) 0%,transparent 100%),
+radial-gradient(1px 1px at 55% 8%,rgba(255,255,255,.4) 0%,transparent 100%),
+radial-gradient(1px 1px at 75% 75%,rgba(255,255,255,.3) 0%,transparent 100%),
+radial-gradient(1px 1px at 92% 35%,rgba(255,255,255,.35) 0%,transparent 100%);pointer-events:none;}
+.page{position:relative;z-index:1;}
+
+/* HEADER */
+header{text-align:center;padding:52px 20px 40px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(0,40,10,.6) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:600px;height:200px;
+background:radial-gradient(ellipse,rgba(50,200,70,.12) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:20px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--green);border-color:var(--green);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--green);background:rgba(50,200,70,.08);border:1px solid rgba(50,200,70,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:16px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,5vw,48px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(50,200,70,.4);line-height:1.1;}
+header h1 span{color:var(--green);}
+.header-sub{margin-top:10px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.header-desc{max-width:560px;margin:12px auto 0;font-size:14px;color:var(--text-mid);line-height:1.8;}
+
+/* DIFFICULTY LEGEND */
+.legend{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;padding:16px 20px;border-bottom:1px solid var(--border);}
+.legend-item{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
+
+/* SECTIONS */
+.modules-section{max-width:1160px;margin:0 auto;padding:36px 20px 60px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.section-icon{font-size:22px;}
+.section-title{font-family:'Orbitron',monospace;font-weight:700;font-size:16px;color:#fff;}
+.section-badge{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:3px 10px;border-radius:2px;margin-left:4px;}
+.section-group{margin-bottom:40px;}
+
+/* MODULE CARDS */
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:8px;}
+.module-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--c,#33cc44);
+border-radius:5px;padding:18px 20px;text-decoration:none;display:block;
+transition:transform .2s,box-shadow .2s;position:relative;-webkit-tap-highlight-color:transparent;}
+.module-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.module-card:active{transform:scale(.98);}
+.module-card.locked{opacity:.45;cursor:not-allowed;pointer-events:none;}
+.module-card.done-card{border-left-color:var(--green);}
+
+.module-tag{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;
+color:var(--c,#33cc44);text-transform:uppercase;margin-bottom:8px;opacity:.8;}
+.module-name{font-family:'Orbitron',monospace;font-weight:700;font-size:15px;color:#fff;
+margin-bottom:4px;line-height:1.3;}
+.module-desc{font-size:12px;color:var(--text-mid);line-height:1.65;margin-bottom:12px;}
+.module-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}
+.tag{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+padding:3px 8px;border-radius:2px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text-dim);}
+.module-footer{display:flex;align-items:center;justify-content:space-between;}
+.module-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;}
+.status-ready{color:var(--green);}
+.status-new{color:var(--yellow);}
+.status-wip{color:var(--orange);}
+.status-locked{color:var(--text-dim);}
+.module-arrow{font-size:14px;opacity:.5;transition:all .2s;}
+.module-card:hover .module-arrow{opacity:1;transform:translateX(4px);}
+
+/* DIFFICULTY COLORS */
+.diff-basic .module-card{--c:#33cc44;}
+.diff-nav .module-card{--c:#4488ff;}
+.diff-weapon .module-card{--c:#ff8800;}
+.diff-advanced .module-card{--c:#ff3333;}
+
+/* FOOTER */
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+
+@media(max-width:600px){
+  header{padding:32px 16px 28px;}
+  header h1{font-size:22px;}
+  .modules-section{padding:24px 14px 48px;}
+  .modules-grid{grid-template-columns:1fr;gap:10px;}
+  .legend{gap:8px;padding:12px 16px;}
+  .legend-item{font-size:9px;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <a class="back-btn" href="index.html">← 返回飛行教學中心</a>
+  <div class="header-badge">DCS WORLD · F/A-18C HORNET</div>
+  <h1>HORNET <span>ACADEMY</span></h1>
+  <p class="header-sub">Digital Combat Simulator · F/A-18C Lot 20</p>
+  <p class="header-desc">從基礎冷倉啟動到超視距作戰，完整 F/A-18C 操作教學。<br>每個模組獨立，可依需求選擇學習。</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#33cc44"></div>基礎</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#4488ff"></div>導航</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff8800"></div>武器</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff3333"></div>進階戰術</div>
+</div>
+
+<div class="modules-section">
+
+<!-- 基礎系列 -->
+<div class="section-group diff-basic">
+  <div class="section-header">
+    <span class="section-icon">🟢</span>
+    <div>
+      <div class="section-title">基礎系列 Fundamentals</div>
+    </div>
+    <span class="section-badge" style="background:rgba(50,200,70,.1);border:1px solid rgba(50,200,70,.3);color:#33cc44;">BASIC</span>
+  </div>
+  <div class="modules-grid">
+
+    <a class="module-card" href="FA18C_Tutorial.html">
+      <div class="module-tag">基礎 · 必學</div>
+      <div class="module-name">冷倉啟動 → 降落</div>
+      <div class="module-desc">APU 啟動、INS 對齊、起飛、CASE I/II/III 進場，完整一次飛行流程。</div>
+      <div class="module-tags"><span class="tag">Cold Start</span><span class="tag">APU</span><span class="tag">INS</span><span class="tag">Case I/II/III</span></div>
+      <div class="module-footer"><span class="module-status status-ready">✅ 已完成 · 7 段</span><span class="module-arrow">→</span></div>
+    </a>
+
+    <a class="module-card" href="FA18C_TACAN.html">
+      <div class="module-tag">基礎 · 導航</div>
+      <div class="module-name">TACAN 導航 & 航路點</div>
+      <div class="module-desc">TACAN 設定與導航、HSI 判讀、航路點輸入、序列飛行，任務必備基礎。</div>
+      <div class="module-tags"><span class="tag">TACAN</span><span class="tag">Waypoint</span><span class="tag">HSI</span><span class="tag">Navigation</span></div>
+      <div class="module-footer"><span class="module-status status-new">🆕 最新</span><span class="module-arrow">→</span></div>
+    </a>
+
+  </div>
+</div>
+
+<!-- 導航系列 -->
+<div class="section-group diff-nav">
+  <div class="section-header">
+    <span class="section-icon">🔵</span>
+    <div><div class="section-title">導航系列 Navigation</div></div>
+    <span class="section-badge" style="background:rgba(68,136,255,.1);border:1px solid rgba(68,136,255,.3);color:#4488ff;">NAV</span>
+  </div>
+  <div class="modules-grid">
+
+    <div class="module-card locked">
+      <div class="module-tag">導航 · 中級</div>
+      <div class="module-name">空中加油</div>
+      <div class="module-desc">使用 TACAN 尋找加油機，Probe 展開，對接程序與位置保持。</div>
+      <div class="module-tags"><span class="tag">AAR</span><span class="tag">Probe</span><span class="tag">KC-130</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">導航 · 中級</div>
+      <div class="module-name">Link 16 / MIDS 資料鏈</div>
+      <div class="module-desc">MIDS 設定、SA 畫面判讀、友機標誌與威脅共享。</div>
+      <div class="module-tags"><span class="tag">Link 16</span><span class="tag">MIDS</span><span class="tag">SA Page</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 武器系列 -->
+<div class="section-group diff-weapon">
+  <div class="section-header">
+    <span class="section-icon">🟠</span>
+    <div><div class="section-title">武器系列 Weapons</div></div>
+    <span class="section-badge" style="background:rgba(255,136,0,.1);border:1px solid rgba(255,136,0,.3);color:#ff8800;">WEAPONS</span>
+  </div>
+  <div class="modules-grid">
+
+    <div class="module-card locked">
+      <div class="module-tag">武器 · 空對空</div>
+      <div class="module-name">AIM-9 響尾蛇</div>
+      <div class="module-desc">近程紅外線導引飛彈，Dogfight 模式、SEAM 鎖定、發射條件判斷。</div>
+      <div class="module-tags"><span class="tag">AIM-9X</span><span class="tag">IR Missile</span><span class="tag">WVR</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">武器 · 空對空</div>
+      <div class="module-name">AIM-120 AMRAAM</div>
+      <div class="module-desc">超視距主動雷達導引飛彈，TWS 多目標接戰，Fox 3 戰術。</div>
+      <div class="module-tags"><span class="tag">AIM-120</span><span class="tag">BVR</span><span class="tag">Fox 3</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">武器 · 空對地</div>
+      <div class="module-name">GBU-12 雷射導引炸彈</div>
+      <div class="module-desc">LITENING 莢艙鎖定、雷射指定、CCRP / CCIP 投彈模式。</div>
+      <div class="module-tags"><span class="tag">GBU-12</span><span class="tag">LGB</span><span class="tag">LITENING</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">武器 · 空對地</div>
+      <div class="module-name">AGM-65 Maverick</div>
+      <div class="module-desc">電視導引空對地飛彈，TGP 鎖定、各型彈頭選擇、接戰程序。</div>
+      <div class="module-tags"><span class="tag">AGM-65</span><span class="tag">TV Guided</span><span class="tag">CAS</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">武器 · 空對地</div>
+      <div class="module-name">JDAM 衛星導引炸彈</div>
+      <div class="module-desc">GBU-38/32 JDAM，GPS 座標輸入、全天候精準轟炸程序。</div>
+      <div class="module-tags"><span class="tag">GBU-38</span><span class="tag">GPS</span><span class="tag">JDAM</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">武器 · 對雷達</div>
+      <div class="module-name">AGM-88 HARM</div>
+      <div class="module-desc">反輻射飛彈 SEAD 壓制，HAS / PB / SP 模式，威脅辨識。</div>
+      <div class="module-tags"><span class="tag">AGM-88</span><span class="tag">SEAD</span><span class="tag">HAS Mode</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 進階戰術 -->
+<div class="section-group diff-advanced">
+  <div class="section-header">
+    <span class="section-icon">🔴</span>
+    <div><div class="section-title">進階戰術 Advanced Tactics</div></div>
+    <span class="section-badge" style="background:rgba(255,51,51,.1);border:1px solid rgba(255,51,51,.3);color:#ff3333;">ADVANCED</span>
+  </div>
+  <div class="modules-grid">
+
+    <div class="module-card locked">
+      <div class="module-tag">進階 · 雷達</div>
+      <div class="module-name">空對空雷達 RWS / TWS / STT</div>
+      <div class="module-desc">RWS 搜索、TWS 多目標追蹤、STT 單目標鎖定，雷達操作完整教學。</div>
+      <div class="module-tags"><span class="tag">RWS</span><span class="tag">TWS</span><span class="tag">STT</span><span class="tag">Radar</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">進階 · BVR</div>
+      <div class="module-name">超視距作戰（BVR）</div>
+      <div class="module-desc">TWS 多目標接戰、Cranking、Notch、Pitbull 時機，BVR 戰術思維。</div>
+      <div class="module-tags"><span class="tag">BVR</span><span class="tag">Crank</span><span class="tag">Notch</span><span class="tag">Fox 3</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">進階 · 電戰</div>
+      <div class="module-name">RWR & 電子戰</div>
+      <div class="module-desc">ALR-67 RWR 威脅判讀、箔條/熱焰彈程序、ALQ-99 干擾莢艙。</div>
+      <div class="module-tags"><span class="tag">RWR</span><span class="tag">Chaff/Flare</span><span class="tag">EW</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+    <div class="module-card locked">
+      <div class="module-tag">進階 · 近距纏鬥</div>
+      <div class="module-name">近距空戰（WVR / Dogfight）</div>
+      <div class="module-desc">GACQ / VACQ 雷達模式、HMD 離軸射擊、Guns 機砲接戰戰術。</div>
+      <div class="module-tags"><span class="tag">Dogfight</span><span class="tag">GACQ</span><span class="tag">HMD</span><span class="tag">Guns</span></div>
+      <div class="module-footer"><span class="module-status status-locked">🔒 即將推出</span><span class="module-arrow">→</span></div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<footer>
+  DCS World · F/A-18C Hornet Academy · 僅供模擬參考使用<br><br>
+  <span style="opacity:.3">Built for Combat Simmers</span>
+</footer>
+
+</div>
+</body>
+</html>
