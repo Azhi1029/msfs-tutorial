@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TACAN 教學">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · TACAN 導航 & 航路點</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#4488ff;--accent2:#ff8800;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(20,80,220,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(0,150,220,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(0,30,80,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(68,136,255,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(68,136,255,.08);border:1px solid rgba(68,136,255,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(68,136,255,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(68,136,255,.08);box-shadow:0 0 16px rgba(68,136,255,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(68,136,255,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(68,136,255,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(68,136,255,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--accent3);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#d8eaff;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--accent);}
+.warn-box .alert-text strong{color:var(--warn);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(68,136,255,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(68,136,255,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:46px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 4px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-tacan-panel" viewBox="0 0 48 48"><rect x="3" y="4" width="42" height="36" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><text x="24" y="13" fill="#4488ff" font-size="7" font-family="monospace" font-weight="bold" text-anchor="middle" letter-spacing="1">TACAN</text><rect x="7" y="17" width="34" height="10" rx="2" fill="#040810"/><text x="24" y="25" fill="#00ff44" font-size="9" font-family="monospace" font-weight="bold" text-anchor="middle" letter-spacing="2">071X</text><rect x="7" y="29" width="10" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="12" y="34" fill="#2255aa" font-size="3.5" font-family="monospace" text-anchor="middle">A/A</text><rect x="19" y="29" width="10" height="6" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="24" y="34" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">T/R</text><rect x="31" y="29" width="10" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="36" y="34" fill="#2255aa" font-size="3.5" font-family="monospace" text-anchor="middle">RCV</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">TACAN PANEL</text></symbol>
+<symbol id="ico-hsi" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="24" r="17" fill="#040810"/><circle cx="24" cy="24" r="12" fill="none" stroke="#182040" stroke-width="1"/><line x1="24" y1="7" x2="24" y2="12" stroke="#4488ff" stroke-width="2" stroke-linecap="round"/><line x1="24" y1="36" x2="24" y2="41" stroke="#4488ff" stroke-width="1" stroke-linecap="round" opacity=".4"/><line x1="7" y1="24" x2="12" y2="24" stroke="#4488ff" stroke-width="1" stroke-linecap="round" opacity=".4"/><line x1="36" y1="24" x2="41" y2="24" stroke="#4488ff" stroke-width="1" stroke-linecap="round" opacity=".4"/><text x="24" y="10" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">N</text><path d="M24 14 L21 20 L24 18 L27 20 Z" fill="#4488ff"/><line x1="24" y1="18" x2="24" y2="30" stroke="#4488ff" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><circle cx="36" cy="16" r="3" fill="#00ddff" opacity=".8"/><line x1="24" y1="24" x2="33" y2="17" stroke="#00ddff" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2,1"/><text x="24" y="37" fill="#00ff44" font-size="4.5" font-family="monospace" text-anchor="middle">045 / 28NM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">HSI PAGE</text></symbol>
+<symbol id="ico-ddi-nav" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#4488ff" stroke-width="1.5"/><rect x="6" y="6" width="36" height="22" rx="1" fill="#001208"/><text x="24" y="12" fill="#4488ff" font-size="5" font-family="monospace" text-anchor="middle">HSI · NAV</text><circle cx="24" cy="20" r="8" fill="#001208" stroke="#182040" stroke-width="1"/><path d="M24 13 L22 18 L24 17 L26 18 Z" fill="#4488ff"/><line x1="24" y1="17" x2="24" y2="26" stroke="#4488ff" stroke-width="1" opacity=".4"/><circle cx="30" cy="15" r="2" fill="#00ddff"/><line x1="24" y1="20" x2="29" y2="15" stroke="#00ddff" stroke-width="1.2" stroke-dasharray="1.5,1"/><text x="24" y="33" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">BRG 045 / 28NM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">DDI HSI</text></symbol>
+<symbol id="ico-waypoint" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#4488ff" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#001208"/><text x="24" y="11" fill="#4488ff" font-size="4.5" font-family="monospace" text-anchor="middle">FPAS · WYPT</text><text x="8" y="16" fill="#00ff44" font-size="4" font-family="monospace">WP1: N25°04.2'</text><rect x="6" y="22" width="36" height="8" rx="1" fill="#001010"/><text x="8" y="27.5" fill="#00ddff" font-size="4" font-family="monospace">WP2: E121°33.5'</text><text x="8" y="32.5" fill="#00ff44" font-size="3.5" font-family="monospace">ALT: 15000FT</text><text x="8" y="37.5" fill="#00ff44" font-size="3.5" font-family="monospace">DST: 48.3NM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">WYPT PAGE</text></symbol>
+<symbol id="ico-ufc" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c10" stroke="#4488ff" stroke-width="1.5"/><rect x="6" y="6" width="36" height="10" rx="1" fill="#001208"/><text x="24" y="13" fill="#00ff44" font-size="6" font-family="monospace" text-anchor="middle" letter-spacing="2">_071_</text><rect x="7" y="19" width="7" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="10.5" y="23.5" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">1</text><rect x="16" y="19" width="7" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="19.5" y="23.5" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">2</text><rect x="25" y="19" width="7" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="28.5" y="23.5" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">3</text><rect x="34" y="19" width="7" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="37.5" y="23.5" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">TCN</text><rect x="7" y="27" width="7" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="10.5" y="31.5" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">4</text><rect x="16" y="27" width="7" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="19.5" y="31.5" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">5</text><rect x="25" y="27" width="7" height="6" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="28.5" y="31.5" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">6</text><rect x="34" y="27" width="7" height="6" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="37.5" y="31.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">ENT</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">UFC</text></symbol>
+<symbol id="ico-hud-nav" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#020608" stroke="#4488ff" stroke-width="1.5" opacity=".8"/><text x="8" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">280</text><text x="34" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">15000</text><text x="24" y="11" fill="#4488ff" font-size="4.5" font-family="monospace" text-anchor="middle">045</text><line x1="19" y1="22" x2="29" y2="22" stroke="#4488ff" stroke-width="1.5"/><line x1="24" y1="18" x2="24" y2="26" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="22" r="3" fill="none" stroke="#4488ff" stroke-width="1" opacity=".7"/><text x="24" y="32" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">▶ WP2 · 28NM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">HUD NAV</text></symbol>
+<symbol id="ico-mission-computer" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#4488ff" stroke-width="1.5"/><rect x="6" y="6" width="36" height="16" rx="1" fill="#001010"/><text x="24" y="12" fill="#4488ff" font-size="4.5" font-family="monospace" text-anchor="middle">DATA · WYPT</text><text x="8" y="17.5" fill="#00ff44" font-size="3.8" font-family="monospace">1: INITIAL PT</text><text x="8" y="22.5" fill="#00ff44" font-size="3.8" font-family="monospace">2: TARGET</text><text x="8" y="27.5" fill="#00ddff" font-size="3.8" font-family="monospace">3: EGRESS</text><text x="8" y="32.5" fill="#00ff44" font-size="3.8" font-family="monospace">4: HOME BASE</text><rect x="30" y="35" width="13" height="5" rx="1" fill="#001808" stroke="#003820" stroke-width=".8"/><text x="36.5" y="39" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">SEQ</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">WYPT LIST</text></symbol>
+<symbol id="ico-altimeter" viewBox="0 0 48 48"><circle cx="24" cy="23" r="21" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="23" r="17" fill="#040810"/><text x="24" y="19" fill="#4488ff" font-size="6" font-family="monospace" text-anchor="middle">15,000</text><rect x="13" y="27" width="22" height="8" rx="1" fill="#040810" stroke="#182040" stroke-width=".8"/><text x="24" y="33" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">29.92</text><line x1="24" y1="23" x2="24" y2="8" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="23" r="2" fill="#aaa"/><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">ALTIMETER</text></symbol>
+<symbol id="ico-overhead" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><text x="24" y="10" fill="#4488ff" font-size="5" font-family="monospace" text-anchor="middle">CONSOLE</text><rect x="5" y="13" width="12" height="7" rx="1" fill="#0a1428" stroke="#182040" stroke-width=".5"/><text x="11" y="18.5" fill="#2255aa" font-size="3.5" font-family="monospace" text-anchor="middle">TCN CH</text><rect x="20" y="13" width="12" height="7" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="26" y="18.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">071X</text><rect x="35" y="13" width="9" height="7" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="39.5" y="18.5" fill="#00ddaa" font-size="3" font-family="monospace" text-anchor="middle">T/R</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">CONSOLE</text></symbol>
+<symbol id="ico-bearing" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="24" r="15" fill="#040810"/><line x1="24" y1="9" x2="24" y2="24" stroke="#4488ff" stroke-width="2" stroke-linecap="round" opacity=".3"/><line x1="24" y1="24" x2="34" y2="12" stroke="#00ddff" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="12" r="3" fill="#00ddff" opacity=".8"/><circle cx="24" cy="24" r="3" fill="#182040"/><text x="24" y="36" fill="#00ddff" font-size="5.5" font-family="monospace" text-anchor="middle">BRG 041°</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">BEARING</text></symbol>
+<symbol id="ico-sequence" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><circle cx="12" cy="14" r="5" fill="#001808" stroke="#33cc44" stroke-width="1.5"/><text x="12" y="17" fill="#33cc44" font-size="5" font-family="monospace" text-anchor="middle">1</text><line x1="17" y1="14" x2="21" y2="14" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="26" cy="14" r="5" fill="#001008" stroke="#4488ff" stroke-width="1.5"/><text x="26" y="17" fill="#4488ff" font-size="5" font-family="monospace" text-anchor="middle">2</text><line x1="31" y1="14" x2="35" y2="14" stroke="#182040" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="40" cy="14" r="4" fill="#100008" stroke="#ff3333" stroke-width="1"/><text x="40" y="17" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">T</text><text x="8" y="27" fill="#4488ff" font-size="4" font-family="monospace">1: INITIAL</text><text x="8" y="32" fill="#4488ff" font-size="4" font-family="monospace">2: IP</text><text x="8" y="37" fill="#ff3333" font-size="4" font-family="monospace">T: TARGET</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">SEQ FLIGHT</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 基礎導航</div>
+  <h1><span>TACAN</span> 導航 & 航路點</h1>
+  <p class="subtitle">TACAN 設定 · HSI 判讀 · 航路點輸入 · 序列飛行</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · TACAN 基礎概念</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · TACAN 面板設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · HSI 判讀與導航</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 航路點輸入</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 序列飛行實作</button>
+</nav>
+
+<div class="main">
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">📡</span><div><div class="phase-num">PHASE 01</div><h2>TACAN 基礎概念</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>TACAN 是什麼？</strong>
+TACAN（Tactical Air Navigation）是軍用無線電導航系統，功能類似民用 VOR/DME。F/A-18C 使用 TACAN 獲得：<br>
+· <span style="color:var(--accent)">方位角（Bearing）</span>：飛機相對於 TACAN 站的方向<br>
+· <span style="color:var(--accent)">距離（DME）</span>：飛機到 TACAN 站的距離（海浬）<br>
+TACAN 可指向<span style="color:var(--accent3)">地面站、航母、僚機（A/A 模式）</span>，是 DCS 任務最常用的導航工具。</div></div>
+
+  <div class="alert-box tip-box"><span class="alert-icon">💡</span><div class="alert-text"><strong>TACAN 頻道說明</strong>
+<table class="data-table" style="margin-top:8px">
+<tr><th>頻道範圍</th><th>用途</th><th>例子</th></tr>
+<tr><td>1–126 X/Y</td><td>地面站 / 機場</td><td class="mono">26X（貝魯特）</td></tr>
+<tr><td>1–99 X/Y</td><td>航母（加 63）</td><td class="mono">71X（CVN-74）</td></tr>
+<tr><td>1–63 X/Y</td><td>空對空（A/A 模式）</td><td class="mono">1X（僚機）</td></tr>
+</table>
+X 和 Y 是頻道後綴，任務簡報會指定。最常用的是 <span class="val">X 頻道</span>。</div></div>
+
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-tacan-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">了解 TACAN 的三種模式</div>
+      <div class="step-detail">
+      · <span class="val">T/R（Transmit/Receive）</span>：最常用，收發兼具，獲得方位角和距離<br>
+      · <span class="val">RCV（Receive Only）</span>：只接收，不發送，匿蹤時使用（只有距離，無方位）<br>
+      · <span class="val">A/A T/R</span>：空對空模式，追蹤僚機或加油機位置</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hsi"/></svg></div>
+      <div class="step-content"><div class="step-action">了解 HSI 上的 TACAN 資訊顯示</div>
+      <div class="step-detail">DDI 的 HSI 頁面顯示：<br>
+      · <span class="val">TACAN 針（菱形）</span>：指向 TACAN 站的方向<br>
+      · <span class="val">BRG 數值</span>：方位角（如 BRG 045 = 東北方）<br>
+      · <span class="val">距離數值</span>：到 TACAN 站的距離（如 28NM）<br>
+      · HUD 右下角也會顯示 TACAN 距離</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-bearing"/></svg></div>
+      <div class="step-content"><div class="step-action">了解 Bearing vs Radial 的差異</div>
+      <div class="step-detail">
+      · <span class="val">Bearing（方位）</span>：<span style="color:var(--accent3)">從我飛機到 TACAN 站</span>的方向（HSI 上的針）<br>
+      · <span class="val">Radial（輻射線）</span>：<span style="color:var(--warn)">從 TACAN 站向外</span>的方向（ATC 指定進場方向用）<br>
+      例：在站的正北方，Bearing = 180°（朝南飛向站），Radial = 360°（在站的 360 輻射線上）</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：TACAN 面板設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">🎛️</span><div><div class="phase-num">PHASE 02</div><h2>TACAN 面板設定</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">✅</span><div class="alert-text"><strong>設定位置</strong>
+TACAN 面板在 <span style="color:var(--green)">右側主控台（Right Console）</span>後方區域。UFC（上前方控制面板）也可輸入 TACAN 頻道。兩種方法都會教。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="subsection">方法一：TACAN 實體面板</div>
+  <div class="steps-grid" id="steps-1">
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-tacan-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">右主控台 → 找到 TACAN 面板</div>
+      <div class="step-detail">TACAN 面板在右側主控台後方。有兩個旋鈕（X10 和 X1 數字旋鈕）、X/Y 切換、模式選擇開關（OFF / RCV / T/R / A/A T/R）。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-tacan-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">旋鈕設定頻道數字（如 071）</div>
+      <div class="step-detail">左旋鈕控制 <span class="val">X10 位數</span>（0–12），右旋鈕控制 <span class="val">X1 位數</span>（0–9）。例如設定 <span class="val">071</span>：左旋鈕 → 07，右旋鈕 → 1。DCS 中用滑鼠滾輪或左右點擊旋鈕。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-tacan-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">X/Y 切換 → 設定為 X（通常）</div>
+      <div class="step-detail">TACAN 面板上的 X/Y 切換開關，一般任務使用 <span class="val">X 頻道</span>。任務簡報若指定 Y 則切換。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-tacan-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">模式開關 → T/R（一般飛行）</div>
+      <div class="step-detail">模式開關從 <span class="val">OFF</span> 轉至 <span class="val">T/R</span>。幾秒後 DDI HSI 頁面的 TACAN 針開始作動，顯示方位和距離。若要追蹤僚機，改用 <span class="val">A/A T/R</span>。</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="subsection">方法二：UFC 快速輸入</div>
+  <div class="steps-grid" id="steps-1b">
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-ufc"/></svg></div>
+      <div class="step-content"><div class="step-action">UFC → 按 TCN 按鈕</div>
+      <div class="step-detail">UFC（上前方控制面板，HUD 下方）按下 <span class="val">TCN</span> 按鈕，顯示器出現 TACAN 輸入提示。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-ufc"/></svg></div>
+      <div class="step-content"><div class="step-action">鍵入頻道數字 → 按 ENT 確認</div>
+      <div class="step-detail">用 UFC 數字鍵輸入 <span class="val">071</span>（或任務指定頻道），再按 <span class="val">ENT</span> 確認。UFC 顯示器顯示設定的頻道，TACAN 自動切換。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-ufc"/></svg></div>
+      <div class="step-content"><div class="step-action">確認 DDI HSI 頁面 TACAN 針作動</div>
+      <div class="step-detail">DDI → HSI 頁面，確認 <span class="green-val">TACAN 菱形針</span>出現並指向正確方向，底部顯示 <span class="val">BRG xxx / xxNM</span>。若針不動，確認 TACAN 模式在 T/R 且頻道正確。</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← TACAN 基礎概念</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：HSI 判讀 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🗺️</span><div><div class="phase-num">PHASE 03</div><h2>HSI 判讀與 TACAN 導航</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>HSI = Horizontal Situation Indicator（水平情境顯示器）</strong>
+HSI 是 F/A-18C 最重要的導航頁面，整合 TACAN、航路點、進場資訊。學會看 HSI 是所有導航的基礎。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-ddi-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → MENU → HSI 頁面開啟</div>
+      <div class="step-detail">右 DDI 按 <span class="val">MENU</span>，再按 <span class="val">HSI</span>（或 NAV）。HSI 頁面顯示：中央羅盤、飛機符號（中心）、TACAN 菱形針、航路點指針、課程線（CRS）。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hsi"/></svg></div>
+      <div class="step-content"><div class="step-action">讀取 TACAN 方位角（Bearing）</div>
+      <div class="step-detail">HSI 上的 <span class="val">菱形針（◆）</span>尖端指向 TACAN 站方向。<br>
+      · 針尖在正上方 = TACAN 站在正前方<br>
+      · 針尖在右方 = TACAN 站在右側<br>
+      底部顯示 <span class="val">BRG xxx°</span>（絕對方位角）和距離 <span class="val">xx.xNM</span>。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-hsi"/></svg></div>
+      <div class="step-content"><div class="step-action">Course Line（CRS）設定 — 對準航道</div>
+      <div class="step-detail">HSI 上的 <span class="val">Course Line</span> 是你想飛的航道方向。用 DDI 左側的 OSB 按鈕或 UFC 調整 CRS 數值。CRS 線對準 TACAN 菱形針 = 你正沿著最短路徑飛向 TACAN 站。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hud-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">HUD 上的 TACAN 資訊判讀</div>
+      <div class="step-detail">HUD 右下方顯示 TACAN 距離（如 <span class="val">28.3</span>）。HUD 左下方顯示目前導航模式。<span class="warn-val">注意：HUD 顯示的是距離，不顯示方位，需配合 HSI 判斷方向！</span></div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-hsi"/></svg></div>
+      <div class="step-content"><div class="step-action">實際導航：飛向 TACAN 站</div>
+      <div class="step-detail">操作步驟：<br>
+      1. 看 HSI 確認 TACAN 針方向<br>
+      2. 轉向讓 TACAN 針指向正上方（= 飛機朝向 TACAN 站）<br>
+      3. 保持 TACAN 針在正上方飛行<br>
+      4. 距離持續減少 → 表示正確飛向 TACAN 站<br>
+      5. 距離接近 0 → 飛越 TACAN 站上空</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-hsi"/></svg></div>
+      <div class="step-content"><div class="step-action">Offset 導航：不直飛 TACAN 站</div>
+      <div class="step-detail">若不想直飛 TACAN 站（如 TACAN 在敵區），可設定 <span class="val">CRS 偏移</span>飛平行航道。例如 TACAN 在東方 BRG 090°，想在其北方 5NM 飛過，則設 CRS = 090 + 偏移角，在適當距離時轉向。</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← TACAN 面板設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：航路點輸入 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">📍</span><div><div class="phase-num">PHASE 04</div><h2>航路點輸入</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>F/A-18C 航路點系統</strong>
+F/A-18C 最多可儲存 <span style="color:var(--accent)">60 個航路點（Waypoint）</span>，分為：<br>
+· <span style="color:var(--accent)">WP 1–25</span>：一般航路點（任務前在 DCS 任務編輯器或飛行中輸入）<br>
+· <span style="color:var(--accent)">WP 26–29</span>：Mark Points（飛行中標記地面目標用）<br>
+· <span style="color:var(--accent3)">建議：在任務編輯器預先設好航路點，飛行中用 DDI 選擇即可</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="subsection">方法一：DDI 選擇現有航路點</div>
+  <div class="steps-grid" id="steps-3">
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mission-computer"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → MENU → DATA → WYPT</div>
+      <div class="step-detail">右 DDI：<span class="val">MENU → DATA → WYPT</span>，顯示航路點列表。任務編輯器預設的航路點已在此清單，可查看每個點的座標、高度和距離。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-waypoint"/></svg></div>
+      <div class="step-content"><div class="step-action">選擇目標航路點（按 OSB 選擇編號）</div>
+      <div class="step-detail">WYPT 頁面用 OSB（屏幕邊按鈕）選擇想要前往的航路點編號。選中後按 <span class="val">UFC → WYPT</span> 或 DDI 的 <span class="val">SEQ</span> 按鈕啟動序列。HSI 會自動顯示該航路點的指針。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ddi-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">HSI 確認：航路點圓圈指針出現</div>
+      <div class="step-detail">HSI 頁面出現 <span class="val">圓圈指針（○）</span>指向選定的航路點（有別於 TACAN 的菱形針）。底部顯示 <span class="val">WP X · xx.xNM</span>。HUD 也會顯示航路點方向標誌。</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="subsection">方法二：飛行中手動輸入座標</div>
+  <div class="steps-grid" id="steps-3b">
+
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-ufc"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → DATA → WYPT → 選空白點位</div>
+      <div class="step-detail">在 WYPT 頁面選擇一個空白的航路點編號（如 WP5），按 <span class="val">UFC</span> 進入輸入模式。UFC 顯示器出現座標輸入提示：先輸入緯度（LAT）。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-ufc"/></svg></div>
+      <div class="step-content"><div class="step-action">輸入緯度（LAT）→ ENT</div>
+      <div class="step-detail">輸入緯度格式：<span class="warn-val">N/S + 度 + 分（小數）</span><br>
+      例：<span class="val">N25042</span> = 北緯 25° 04.2'<br>
+      · 先按 <span class="val">N</span>（或 S）<br>
+      · 再輸入數字（如 <span class="val">25042</span>）<br>
+      · 按 <span class="val">ENT</span> 確認緯度</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-ufc"/></svg></div>
+      <div class="step-content"><div class="step-action">輸入經度（LON）→ ENT</div>
+      <div class="step-detail">接著輸入經度格式：<span class="warn-val">E/W + 度 + 分（小數）</span><br>
+      例：<span class="val">E121335</span> = 東經 121° 33.5'<br>
+      · 先按 <span class="val">E</span>（或 W）<br>
+      · 再輸入數字（如 <span class="val">121335</span>）<br>
+      · 按 <span class="val">ENT</span> 確認，航路點儲存完成</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-waypoint"/></svg></div>
+      <div class="step-content"><div class="step-action">設定航路點高度（選擇性）</div>
+      <div class="step-detail">WYPT 頁面可進一步設定該點的 <span class="val">目標高度（Altitude）</span>。輸入高度（英尺），FMC 會計算到達該點的 TOD（頂端下降點）。一般飛行可省略。</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="subsection">Mark Point（空中標記地面目標）</div>
+  <div class="steps-grid" id="steps-3c">
+
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">8</div><svg class="cockpit-icon"><use href="#ico-hud-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">飛越目標上空時按 UFC → MARK</div>
+      <div class="step-detail">飛越目標時，按 UFC 的 <span class="val">MARK</span> 鈕，飛機當前位置自動儲存為 Mark Point（WP 26–29）。可用於快速標記地面目標的大概位置，供後續武器攻擊參考。</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← HSI 判讀</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：序列飛行實作 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🛫</span><div><div class="phase-num">PHASE 05</div><h2>序列飛行實作（完整任務導航）</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🎯</span><div class="alert-text"><strong>實際任務導航流程</strong>
+把前面學的整合起來，完整飛一段任務導航：起飛基地 → 航路點 1（Initial Point）→ 航路點 2（目標區）→ 航路點 3（撤退點）→ TACAN 回基地。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-tacan-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">起飛前：TACAN 設基地頻道，確認 HSI 正常</div>
+      <div class="step-detail">起飛前設好 TACAN 頻道（基地或航母）。確認 HSI 的 TACAN 針有作動、顯示距離。這樣萬一迷航，隨時可以用 TACAN 找回基地方向。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sequence"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → DATA → WYPT → 確認航路點清單</div>
+      <div class="step-detail">起飛後爬升至巡航高度途中，確認 WYPT 清單各點正確：<br>
+      · <span class="val">WP1</span>：Initial Point（IP）<br>
+      · <span class="val">WP2</span>：目標區附近<br>
+      · <span class="val">WP3</span>：Egress 撤退點<br>
+      選擇 <span class="val">WP1</span> 為目前導航目標。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ddi-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">HSI 確認航路點指針，轉向飛往 WP1</div>
+      <div class="step-detail">HSI 顯示 <span class="val">WP1 圓圈指針</span>，轉向讓指針朝正上方（飛機朝向 WP1）。HUD 顯示 <span class="val">▶ WP1 · xxNM</span>。保持高度巡航飛往 WP1。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-sequence"/></svg></div>
+      <div class="step-content"><div class="step-action">接近 WP1 → 切換至 WP2</div>
+      <div class="step-detail">距離 WP1 約 <span class="val">2–5 NM</span> 時，UFC 按 <span class="val">WYPT ↑</span>（或 DDI 按 SEQ）切換到下一個航路點 WP2。若有設定 <span class="val">自動序列（AUTO SEQ）</span>，飛越 WP1 後自動切換。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card warn-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-hud-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">目標區附近：切換 TACAN 到目標區地面站（若有）</div>
+      <div class="step-detail">若任務區有 TACAN 地面站，可切換頻道更精確定位。<span class="warn-val">注意：接近目標區時考慮切換到 RCV（只接收）模式，減少發射訊號被敵方偵測的機會。</span></div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-bearing"/></svg></div>
+      <div class="step-content"><div class="step-action">撤退後：切換回基地 TACAN，導航回家</div>
+      <div class="step-detail">完成任務撤退後，UFC 切換 TACAN 回基地或航母頻道，HSI 的 TACAN 針指向基地方向，順著 TACAN 針飛回。距離持續縮小 = 正確回航。</div></div><div class="step-check">✅</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">7</div><svg class="cockpit-icon"><use href="#ico-hsi"/></svg></div>
+      <div class="step-content"><div class="step-action">進場前：確認 TACAN 距離 & 高度，準備 CASE I/II/III</div>
+      <div class="step-detail">接近基地時，TACAN 距離降至 <span class="val">15–20 NM</span>，開始下降。依天氣決定 CASE I（目視）、II（混合）或 III（儀器）進場程序，切換回進場教學頁面的步驟。</div></div><div class="step-check">✅</div>
+    </div>
+
+  </div>
+
+  <div class="alert-box tip-box"><span class="alert-icon">💡</span><div class="alert-text"><strong>TACAN 導航常見問題</strong>
+<table class="data-table" style="margin-top:8px">
+<tr><th>問題</th><th>原因</th><th>解法</th></tr>
+<tr><td>HSI 針不動</td><td>TACAN 模式為 OFF 或 RCV</td><td class="mono">改為 T/R 模式</td></tr>
+<tr><td>只有距離沒有方位</td><td>RCV 模式只有 DME</td><td class="mono">改為 T/R 模式</td></tr>
+<tr><td>距離顯示 000</td><td>超出 TACAN 範圍（>300NM）</td><td class="mono">靠近站台</td></tr>
+<tr><td>A/A 追蹤不到僚機</td><td>僚機 TACAN 頻道不同</td><td class="mono">確認雙方相同頻道</td></tr>
+</table></div></div>
+
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 航路點輸入</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！ ✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">📡</span><span class="tab-label">概念</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">🎛️</span><span class="tab-label">面板</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🗺️</span><span class="tab-label">HSI</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">📍</span><span class="tab-label">航路點</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🛫</span><span class="tab-label">實作</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C Hornet · TACAN 導航 & 航路點教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
