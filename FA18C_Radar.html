@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="雷達教學">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · 空對空雷達教學</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ff3333;--accent2:#ff8800;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(220,30,30,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,0,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(80,0,0,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(255,50,50,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(255,51,51,.08);border:1px solid rgba(255,51,51,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,50,50,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(255,51,51,.08);box-shadow:0 0 16px rgba(255,51,51,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,50,50,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,51,51,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,51,51,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#fff;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#ffd8d8;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.blue-val{color:var(--blue);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.red-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--warn);}
+.red-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(255,51,51,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,51,51,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-radar-scope" viewBox="0 0 48 48"><rect x="2" y="3" width="44" height="38" rx="3" fill="#020608" stroke="#ff3333" stroke-width="1.5"/><rect x="5" y="6" width="38" height="26" rx="1" fill="#000a04"/><circle cx="24" cy="19" r="11" fill="#000a04" stroke="#0a2010" stroke-width="1"/><circle cx="24" cy="19" r="7" fill="#000a04" stroke="#0a2010" stroke-width=".8"/><circle cx="24" cy="19" r="3" fill="#000a04" stroke="#0a2010" stroke-width=".6"/><line x1="24" y1="8" x2="24" y2="19" stroke="#33cc44" stroke-width="1.5" opacity=".5"/><line x1="24" y1="19" x2="33" y2="13" stroke="#33cc44" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="2.5" fill="#ff3333"/><circle cx="20" cy="12" r="2" fill="#ffcc00" opacity=".7"/><text x="24" y="37" fill="#ff3333" font-size="4.5" font-family="monospace" text-anchor="middle">RWS · 40NM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">RADAR SCOPE</text></symbol>
+<symbol id="ico-rws" viewBox="0 0 48 48"><rect x="2" y="3" width="44" height="38" rx="3" fill="#020608" stroke="#ff3333" stroke-width="1.5"/><rect x="5" y="6" width="38" height="20" rx="1" fill="#000a04"/><text x="24" y="12" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">RWS MODE</text><line x1="5" y1="8" x2="43" y2="26" stroke="#33cc44" stroke-width="1.5" opacity=".4"/><circle cx="32" cy="13" r="2.5" fill="#ff3333"/><circle cx="18" cy="20" r="2" fill="#ffcc00" opacity=".8"/><circle cx="38" cy="10" r="1.5" fill="#ff3333" opacity=".6"/><text x="8" y="31" fill="#ff3333" font-size="3.8" font-family="monospace">SCAN: ±40° AZ</text><text x="8" y="35.5" fill="#ffcc00" font-size="3.8" font-family="monospace">RNG: 40NM</text><text x="8" y="40" fill="#33cc44" font-size="3.8" font-family="monospace">BAR: 4BAR</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">RWS</text></symbol>
+<symbol id="ico-tws" viewBox="0 0 48 48"><rect x="2" y="3" width="44" height="38" rx="3" fill="#020608" stroke="#ff3333" stroke-width="1.5"/><rect x="5" y="6" width="38" height="20" rx="1" fill="#000a04"/><text x="24" y="12" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">TWS MODE</text><circle cx="32" cy="13" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><circle cx="32" cy="13" r="1.5" fill="#ff3333"/><line x1="32" y1="10" x2="35" y2="8" stroke="#ff3333" stroke-width="1" opacity=".6"/><circle cx="18" cy="18" r="3" fill="none" stroke="#ffcc00" stroke-width="1.5"/><circle cx="18" cy="18" r="1.5" fill="#ffcc00"/><circle cx="40" cy="16" r="2.5" fill="none" stroke="#ffcc00" stroke-width="1"/><circle cx="40" cy="16" r="1" fill="#ffcc00" opacity=".7"/><text x="8" y="31" fill="#ff3333" font-size="3.8" font-family="monospace">TRACK: 3 TGT</text><text x="8" y="35.5" fill="#ffcc00" font-size="3.8" font-family="monospace">DT1: 032/28NM</text><text x="8" y="40" fill="#4488ff" font-size="3.8" font-family="monospace">DT2: 045/35NM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">TWS</text></symbol>
+<symbol id="ico-stt" viewBox="0 0 48 48"><rect x="2" y="3" width="44" height="38" rx="3" fill="#020608" stroke="#ff3333" stroke-width="1.5"/><rect x="5" y="6" width="38" height="20" rx="1" fill="#000a04"/><text x="24" y="11" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">STT LOCK</text><circle cx="24" cy="18" r="6" fill="none" stroke="#ff3333" stroke-width="2"/><line x1="24" y1="12" x2="24" y2="10" stroke="#ff3333" stroke-width="1.5"/><line x1="24" y1="24" x2="24" y2="26" stroke="#ff3333" stroke-width="1.5"/><line x1="18" y1="18" x2="16" y2="18" stroke="#ff3333" stroke-width="1.5"/><line x1="30" y1="18" x2="32" y2="18" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="18" r="2" fill="#ff3333"/><text x="8" y="31" fill="#ff3333" font-size="3.8" font-family="monospace">HDG: 045°</text><text x="8" y="35.5" fill="#ffcc00" font-size="3.8" font-family="monospace">RNG: 18.5NM</text><text x="8" y="40" fill="#ff3333" font-size="3.8" font-family="monospace">VC: -420kt</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">STT LOCKED</text></symbol>
+<symbol id="ico-radar-control" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#060c08" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="10" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">RADAR CTRL</text><rect x="5" y="13" width="10" height="7" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="10" y="18.5" fill="#22aa33" font-size="3.5" font-family="monospace" text-anchor="middle">RNG</text><rect x="18" y="13" width="10" height="7" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="23" y="18.5" fill="#22aa33" font-size="3.5" font-family="monospace" text-anchor="middle">AZ</text><rect x="31" y="13" width="10" height="7" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="36" y="18.5" fill="#22aa33" font-size="3.5" font-family="monospace" text-anchor="middle">BAR</text><rect x="5" y="23" width="10" height="7" rx="1" fill="#100008" stroke="#280010" stroke-width=".5"/><text x="10" y="28.5" fill="#ff3333" font-size="3.5" font-family="monospace" text-anchor="middle">MODE</text><rect x="18" y="23" width="10" height="7" rx="1" fill="#100008" stroke="#280010" stroke-width=".5"/><text x="23" y="28.5" fill="#ff3333" font-size="3.5" font-family="monospace" text-anchor="middle">EL</text><rect x="31" y="23" width="10" height="7" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="36" y="28.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">TCS</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">RADAR PANEL</text></symbol>
+<symbol id="ico-hud-radar" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#020608" stroke="#ff3333" stroke-width="1.5" opacity=".8"/><text x="8" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">320</text><text x="34" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">18000</text><text x="24" y="11" fill="#4488ff" font-size="4.5" font-family="monospace" text-anchor="middle">045</text><circle cx="24" cy="22" r="5" fill="none" stroke="#ff3333" stroke-width="1.5"/><line x1="24" y1="17" x2="24" y2="15" stroke="#ff3333" stroke-width="1.5"/><line x1="24" y1="27" x2="24" y2="29" stroke="#ff3333" stroke-width="1.5"/><line x1="19" y1="22" x2="17" y2="22" stroke="#ff3333" stroke-width="1.5"/><line x1="29" y1="22" x2="31" y2="22" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="34" fill="#ff3333" font-size="3.8" font-family="monospace" text-anchor="middle">18.5 ▶ 045° -420vc</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">HUD RADAR</text></symbol>
+<symbol id="ico-antenna" viewBox="0 0 48 48"><rect x="3" y="4" width="42" height="36" rx="3" fill="#060c08" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="13" fill="#ff3333" font-size="5.5" font-family="monospace" text-anchor="middle">ANTENNA EL</text><rect x="8" y="17" width="32" height="12" rx="2" fill="#040810"/><line x1="24" y1="23" x2="36" y2="20" stroke="#ff3333" stroke-width="2.5" stroke-linecap="round"/><line x1="24" y1="23" x2="12" y2="26" stroke="#4488ff" stroke-width="1" stroke-linecap="round" opacity=".4"/><circle cx="24" cy="23" r="2.5" fill="#ff8800"/><text x="8" y="35" fill="#ffcc00" font-size="4" font-family="monospace">EL: +2° / BAR: 4</text><text x="8" y="39.5" fill="#33cc44" font-size="4" font-family="monospace">AZ: ±40° SCAN</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">ANT CTRL</text></symbol>
+<symbol id="ico-target-aspect" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#060c08" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="24" r="14" fill="#040810" stroke="#1a0808" stroke-width="1"/><path d="M24 10 L21 18 L24 16 L27 18 Z" fill="#ff3333"/><line x1="24" y1="16" x2="24" y2="34" stroke="#ff3333" stroke-width="1" opacity=".3"/><line x1="10" y1="24" x2="38" y2="24" stroke="#ff3333" stroke-width="1" opacity=".3"/><line x1="24" y1="24" x2="34" y2="18" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/><text x="24" y="37" fill="#ffcc00" font-size="4.5" font-family="monospace" text-anchor="middle">TA: 045°</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">TGT ASPECT</text></symbol>
+<symbol id="ico-mfd-radar" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff3333" stroke-width="1.5"/><rect x="6" y="6" width="36" height="24" rx="1" fill="#000a04"/><text x="7" y="11" fill="#ff3333" font-size="4" font-family="monospace">RWS</text><text x="38" y="11" fill="#ffcc00" font-size="4" font-family="monospace">40</text><line x1="6" y1="12" x2="42" y2="12" stroke="#0a2010" stroke-width=".5"/><circle cx="28" cy="19" r="3" fill="#ff3333"/><circle cx="15" cy="22" r="2.5" fill="#ffcc00" opacity=".8"/><circle cx="36" cy="15" r="2" fill="#ff3333" opacity=".6"/><line x1="6" y1="24" x2="42" y2="24" stroke="#0a2010" stroke-width=".5" opacity=".5"/><line x1="6" y1="18" x2="42" y2="18" stroke="#0a2010" stroke-width=".5" opacity=".3"/><rect x="6" y="32" width="8" height="5" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="10" y="36" fill="#22aa33" font-size="3" font-family="monospace" text-anchor="middle">RNG</text><rect x="16" y="32" width="8" height="5" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="20" y="36" fill="#22aa33" font-size="3" font-family="monospace" text-anchor="middle">CNTL</text><rect x="26" y="32" width="8" height="5" rx="1" fill="#100008" stroke="#280010" stroke-width=".5"/><text x="30" y="36" fill="#ff3333" font-size="3" font-family="monospace" text-anchor="middle">TWS</text><rect x="36" y="32" width="8" height="5" rx="1" fill="#100008" stroke="#280010" stroke-width=".5"/><text x="40" y="36" fill="#ff3333" font-size="3" font-family="monospace" text-anchor="middle">STT</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">DDI RADAR</text></symbol>
+<symbol id="ico-vc-closure" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c08" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="12" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">CLOSURE</text><path d="M8 30 L40 30" stroke="#0a2010" stroke-width="1"/><path d="M8 30 Q15 15 24 20 Q33 25 40 10" fill="none" stroke="#ff3333" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="10" r="3" fill="#ff3333"/><text x="8" y="38" fill="#ffcc00" font-size="4" font-family="monospace">Vc: -420 kt</text><text x="28" y="38" fill="#ff3333" font-size="4" font-family="monospace">HOT</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">VC / CLOSURE</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 進階戰術</div>
+  <h1>空對空 <span>雷達</span> 教學</h1>
+  <p class="subtitle">APG-73 · RWS / TWS / STT · 目標追蹤與鎖定</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · 雷達基礎概念</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 雷達開機設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · RWS 搜索模式</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · TWS 多目標追蹤</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · STT 單目標鎖定</button>
+  <button class="phase-btn" onclick="showPhase(5)">06 · 實戰判讀技巧</button>
+</nav>
+
+<div class="main">
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">📡</span><div><div class="phase-num">PHASE 01</div><h2>雷達基礎概念</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>F/A-18C APG-73 雷達簡介</strong>
+F/A-18C 裝備 <span style="color:var(--accent)">AN/APG-73 脈衝都卜勒雷達</span>，可在 ±70° 方位角、±60° 仰角範圍內搜索目標。三種主要空對空模式：<br>
+· <span style="color:var(--accent)">RWS（Range While Search）</span>：搜索模式，找目標<br>
+· <span style="color:var(--accent2)">TWS（Track While Scan）</span>：同時追蹤多目標<br>
+· <span style="color:var(--accent3)">STT（Single Target Track）</span>：鎖定單一目標，提供武器瞄準</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-radar-scope"/></svg></div>
+      <div class="step-content"><div class="step-action">了解雷達螢幕顯示</div>
+      <div class="step-detail">DDI 雷達頁面由上到下代表<span class="val">近到遠</span>（B-Scope 顯示）：<br>
+      · 螢幕<span class="val">上方</span> = 遠距離（如 40NM）<br>
+      · 螢幕<span class="val">下方</span> = 近距離（如 0NM）<br>
+      · 螢幕<span class="val">左右</span> = 方位角（左右各 ±20° 或 ±40°）<br>
+      · <span class="val">亮點</span> = 偵測到的目標回波</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-vc-closure"/></svg></div>
+      <div class="step-content"><div class="step-action">了解關鍵雷達術語</div>
+      <div class="step-detail">
+      · <span class="val">Vc（Closure Rate）</span>：接近速率，負值（-）= 目標靠近，正值（+）= 目標遠離<br>
+      · <span class="val">TA（Target Aspect）</span>：目標機頭相對你的角度，0° = 目標朝你飛來（熱機頭），180° = 目標背對你<br>
+      · <span class="val">ATA（Antenna Train Angle）</span>：雷達天線相對機頭的偏轉角<br>
+      · <span class="val">Notch</span>：目標以 90° 角飛行使都卜勒雷達失去追蹤</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-antenna"/></svg></div>
+      <div class="step-content"><div class="step-action">了解雷達掃描參數</div>
+      <div class="step-detail">
+      · <span class="val">Range（距離）</span>：搜索範圍，可選 10 / 20 / 40 / 80 / 160 NM<br>
+      · <span class="val">Azimuth（方位角）</span>：掃描寬度，±10° / ±20° / ±40° / ±60°<br>
+      · <span class="val">Bar（掃描層數）</span>：上下掃描幾層，1B / 2B / 4B（層數越多覆蓋越廣但更新越慢）<br>
+      · 距離越遠、方位角越寬、Bar 越多 → 更新率越慢</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：雷達開機設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚡</span><div><div class="phase-num">PHASE 02</div><h2>雷達開機 & 基本設定</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>雷達開機位置</strong>
+F/A-18C 雷達控制在 <span style="color:var(--blue)">左側主控台（Left Console）的 RADAR 面板</span>，以及 DDI 的雷達頁面（用 OSB 按鈕控制各參數）。引擎啟動後雷達需要約 <span style="color:var(--warn)">3–4 分鐘暖機</span>，起飛前務必提早開機！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-radar-control"/></svg></div>
+      <div class="step-content"><div class="step-action">左主控台 → RADAR 面板 → RADAR SW → OPR</div>
+      <div class="step-detail">左側主控台 RADAR 面板，將雷達開關從 <span class="val">OFF</span> 撥至 <span class="val">OPR（Operate）</span>。雷達開始暖機，DDI 顯示 <span class="warn-val">STBY（待機）</span> 約 3–4 分鐘後切換為 <span class="green-val">OPR</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-mfd-radar"/></svg></div>
+      <div class="step-content"><div class="step-action">左 DDI → MENU → RADAR 頁面</div>
+      <div class="step-detail">左 DDI 按 <span class="val">MENU</span>，再按 <span class="val">RADAR</span>，進入雷達主頁面。螢幕中央是雷達顯示區（B-Scope），四周 OSB 按鈕控制各參數。確認右上角顯示 <span class="green-val">RWS</span> 模式。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mfd-radar"/></svg></div>
+      <div class="step-content"><div class="step-action">設定搜索距離（RNG）→ 40NM（初始建議）</div>
+      <div class="step-detail">DDI 左側 OSB 按 <span class="val">RNG</span>，調整搜索距離。初始建議設為 <span class="val">40NM</span>（平衡覆蓋和更新率）。近距離纏鬥改為 <span class="val">10–20NM</span>，長程 BVR 改為 <span class="val">80–160NM</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-antenna"/></svg></div>
+      <div class="step-content"><div class="step-action">設定方位角（AZ）→ ±40°（初始建議）</div>
+      <div class="step-detail">DDI OSB 按 <span class="val">AZ</span>，切換方位角掃描寬度。<span class="val">±40°</span> 是一般空戰的均衡設定。若已知敵機大概方向，縮小至 <span class="val">±20°</span> 加快更新率。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-antenna"/></svg></div>
+      <div class="step-content"><div class="step-action">設定掃描層數（BAR）→ 4B（初始建議）</div>
+      <div class="step-detail">DDI OSB 按 <span class="val">BAR</span>，切換掃描層數。<span class="val">4B（4層）</span> 覆蓋較廣的仰角範圍，適合搜索。鎖定目標後可改 <span class="val">2B</span> 加快更新。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← 雷達基礎概念</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：RWS 搜索模式 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🔍</span><div><div class="phase-num">PHASE 03</div><h2>RWS — 搜索模式</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">📡</span><div class="alert-text"><strong>RWS（Range While Search）特性</strong>
+RWS 是 <span style="color:var(--accent)">最基本的搜索模式</span>，雷達掃描整個搜索區域找目標。回波顯示為亮點，但不持續追蹤（每次掃描才更新一次位置）。偵測到目標後可按 TDC（目標標定控制）游標移到目標上，進入 TWS 或直接 STT 鎖定。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-rws"/></svg></div>
+      <div class="step-content"><div class="step-action">確認 DDI 雷達頁顯示 RWS 模式</div>
+      <div class="step-detail">DDI 雷達頁右上角顯示 <span class="green-val">RWS</span>。若不是，按 DDI 右側 OSB 的 <span class="val">MODE</span> 按鈕切換回 RWS。螢幕開始掃描，偵測到的目標顯示為亮點。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-rws"/></svg></div>
+      <div class="step-content"><div class="step-action">識別目標回波：位置、距離、方位</div>
+      <div class="step-detail">看到亮點時判讀：<br>
+      · <span class="val">左右位置</span> = 方位角（中間 = 正前方）<br>
+      · <span class="val">上下位置</span> = 距離（上方 = 遠，下方 = 近）<br>
+      · 回波旁的小數字 = 高度差（ft，正 = 目標在你上方）<br>
+      <span class="warn-val">RWS 只顯示位置，不顯示速度或航向！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-radar-control"/></svg></div>
+      <div class="step-content"><div class="step-action">TDC（目標標定游標）移至目標上</div>
+      <div class="step-detail">用 <span class="warn-val">HOTAS 上的 TDC（通常是右拇指搖桿）</span> 將游標（十字線）移至目標回波上。游標對準目標後：<br>
+      · 按壓 TDC = 進入 <span class="val">STT 鎖定</span>（直接鎖定）<br>
+      · 或先讓雷達自動切換 TWS 累積追蹤資料</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mfd-radar"/></svg></div>
+      <div class="step-content"><div class="step-action">RWS 搜索技巧：調整天線仰角（EL）</div>
+      <div class="step-detail">若在 RWS 找不到目標，嘗試調整天線仰角：<br>
+      · DDI OSB 按 <span class="cyan-val">CNTL</span> 進入雷達控制頁<br>
+      · 調整 <span class="val">EL（Elevation）</span> 上下掃描角度<br>
+      · 目標低空飛行時 EL 往下調，目標高空時往上調<br>
+      · 也可用 HOTAS 天線仰角控制實時調整</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 雷達開機設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：TWS 多目標追蹤 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🎯</span><div><div class="phase-num">PHASE 04</div><h2>TWS — 多目標追蹤模式</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>TWS（Track While Scan）特性</strong>
+TWS 在繼續搜索的同時持續追蹤最多 <span style="color:var(--warn)">8 個目標</span>。每個被追蹤的目標顯示為圓圈符號，並提供速度和航向資訊。TWS 是 <span style="color:var(--accent)">AIM-120 AMRAAM 超視距作戰的核心模式</span>，可同時對多個目標射擊。注意：TWS 不是完整鎖定，目標不一定知道被追蹤！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-tws"/></svg></div>
+      <div class="step-content"><div class="step-action">切換至 TWS 模式</div>
+      <div class="step-detail">DDI 雷達頁，按右側 OSB 的 <span class="val">TWS</span> 按鈕，或按 <span class="val">MODE</span> 切換。DDI 右上角顯示 <span class="warn-val">TWS</span>。雷達開始累積目標航跡資料，需要 2–3 次掃描才能建立追蹤（顯示圓圈）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-tws"/></svg></div>
+      <div class="step-content"><div class="step-action">識別 TWS 目標符號</div>
+      <div class="step-detail">TWS 頁面的目標符號：<br>
+      · <span class="val">空心圓圈（○）</span>= 被追蹤的目標（System Track）<br>
+      · <span class="val">實心圓（●）+ 線</span>= DT1（主要目標，Designated Target 1）<br>
+      · <span class="val">空心圓 + 線</span>= DT2（次要目標）<br>
+      · 旁邊的線條方向 = 目標飛行方向<br>
+      · 數字 = 高度（千英尺）</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-tws"/></svg></div>
+      <div class="step-content"><div class="step-action">指定 DT1（主要目標）</div>
+      <div class="step-detail">TDC 游標移至想攻擊的目標圓圈上，<span class="warn-val">按壓 TDC</span>，該目標變為 <span class="val">DT1（Designated Target 1）</span>。DT1 資訊出現在 DDI 右側：距離、方位、Vc（接近速率）、高度。HUD 出現目標符號和瞄準資訊。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-tws"/></svg></div>
+      <div class="step-content"><div class="step-action">指定 DT2（次要目標）</div>
+      <div class="step-detail">TDC 移至第二個目標，按 <span class="val">TDC 側按（Castle Switch 短按）</span> 指定為 DT2。同時有 DT1 和 DT2 時，可對兩個目標分別射擊 AIM-120（稍後武器教學詳述）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-tws"/></svg></div>
+      <div class="step-content"><div class="step-action">TWS 優缺點評估</div>
+      <div class="step-detail">
+      ✅ 優點：可追蹤多目標、目標 RWR 不一定有警告、仍可繼續搜索<br>
+      ❌ 缺點：追蹤精度較 STT 低（更新率慢）、目標做 Notch 動作易丟失<br>
+      <span class="cyan-val">建議：BVR 遠距用 TWS，近距 10NM 內改 STT 確保鎖定精度</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← RWS 搜索模式</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：STT 單目標鎖定 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🔒</span><div><div class="phase-num">PHASE 05</div><h2>STT — 單目標鎖定模式</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>STT（Single Target Track）特性</strong>
+STT 是<span style="color:var(--accent)">完整鎖定</span>，雷達停止搜索、全力追蹤單一目標，提供最精確的目標資訊。<span style="color:var(--warn)">代價：目標的 RWR 會收到強烈警告訊號，知道被鎖定！</span>STT 是 AIM-7 麻雀、Guns 機砲攻擊的必要條件，AIM-120 也可在 STT 模式下射擊。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-stt"/></svg></div>
+      <div class="step-content"><div class="step-action">從 RWS/TWS 進入 STT：TDC 對準目標按壓</div>
+      <div class="step-detail">RWS 或 TWS 模式下，TDC 游標移至目標回波/圓圈上，<span class="val">按壓 TDC（Depress）</span>，雷達鎖定目標進入 STT。DDI 右上角切換為 <span class="val">STT</span>，目標符號變為十字準心（◎）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-stt"/></svg></div>
+      <div class="step-content"><div class="step-action">STT 鎖定後 DDI 資訊判讀</div>
+      <div class="step-detail">STT 鎖定後 DDI 顯示：<br>
+      · <span class="val">距離（RNG）</span>：目標距離（NM）<br>
+      · <span class="val">Vc（接近速率）</span>：負值 = 目標靠近<br>
+      · <span class="val">方位（BRG）</span>：目標方向<br>
+      · <span class="val">高度（ALT）</span>：目標高度<br>
+      · <span class="val">目標機頭角（TA）</span>：目標相對我的方向</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-hud-radar"/></svg></div>
+      <div class="step-content"><div class="step-action">HUD 鎖定後顯示瞄準資訊</div>
+      <div class="step-detail">STT 鎖定後 HUD 顯示：<br>
+      · <span class="val">目標符號（◎）</span>：目標在 HUD 視野內的位置<br>
+      · <span class="val">ASE 圓（Allowable Steering Error）</span>：瞄準允許誤差圈<br>
+      · <span class="val">距離條</span>：左側縱線顯示目前距離與武器射程<br>
+      · <span class="val">DLZ（Dynamic Launch Zone）</span>：武器射程指示</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-radar-control"/></svg></div>
+      <div class="step-content"><div class="step-action">丟失鎖定：目標 Notch / 地雜波 / 干擾</div>
+      <div class="step-detail">以下情況會導致 STT 丟失鎖定（BREAK LOCK）：<br>
+      · <span class="warn-val">目標 Notch（以 90° 橫切）</span>：都卜勒效應消失<br>
+      · 目標飛入地形遮蔽（地雜波）<br>
+      · 目標投放箔條干擾（Chaff）<br>
+      丟失後自動退回 RWS，需重新搜索鎖定。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-stt"/></svg></div>
+      <div class="step-content"><div class="step-action">手動解除鎖定（Break Lock）</div>
+      <div class="step-detail">主動解除 STT 鎖定：按 <span class="cyan-val">Sensor Control Switch（SCS）後方</span> 或 DDI 上的 <span class="val">BSGT（Break STT）</span> 按鈕。解除後退回 RWS 繼續搜索，或切換至 TWS 追蹤多目標。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← TWS 多目標追蹤</button><button class="nav-arrow-btn" onclick="showPhase(5)">下一單元：實戰判讀技巧 →</button></div>
+</section>
+
+<!-- PHASE 5 -->
+<section class="phase-section" id="phase-5">
+  <div class="phase-title"><span class="phase-icon-wrap">⚔️</span><div><div class="phase-num">PHASE 06</div><h2>實戰判讀技巧</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🎯</span><div class="alert-text"><strong>雷達戰術整合</strong>
+把前面的雷達知識整合成實戰流程：<span style="color:var(--green)">搜索 → 發現 → 識別 → 追蹤 → 鎖定 → 攻擊</span>。每個步驟使用正確的雷達模式是存活的關鍵。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-5" style="width:0%"></div></div><span class="progress-pct" id="pct-5">0%</span><button class="reset-btn" onclick="resetPhase(5)">重置</button></div>
+  <div class="steps-grid" id="steps-5">
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-rws"/></svg></div>
+      <div class="step-content"><div class="step-action">標準 BVR 接戰流程</div>
+      <div class="step-detail">
+      1. <span class="val">RWS 搜索</span>（80NM，4Bar）→ 發現目標<br>
+      2. 目標進入 <span class="val">60NM</span> → 切換 TWS，建立多目標追蹤<br>
+      3. 指定 DT1 / DT2，<span class="val">40NM</span> 射 AIM-120<br>
+      4. 射擊後 Crank（轉向 ±60° 延遲 STT 鎖定）<br>
+      5. AIM-120 Pitbull（自導）後可脫離或再攻</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-target-aspect"/></svg></div>
+      <div class="step-content"><div class="step-action">目標機頭角（TA）判讀</div>
+      <div class="step-detail">
+      · <span class="val">TA 0°（Hot）</span>：目標正朝你飛來，Vc 最大（最危險！）<br>
+      · <span class="val">TA 90°（Beam）</span>：目標橫飛，Notch 可能，Vc 接近 0<br>
+      · <span class="val">TA 180°（Cold）</span>：目標背對你飛走，需追趕<br>
+      <span class="cyan-val">目標 Hot（TA ≈ 0°）= 雙方都在靠近，AIM-120 最有效！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-vc-closure"/></svg></div>
+      <div class="step-content"><div class="step-action">Vc（接近速率）判讀與策略</div>
+      <div class="step-detail">
+      · <span class="warn-val">Vc -800 kt</span>：雙方迎頭高速接近，射擊窗口短，需早射<br>
+      · <span class="val">Vc -400 kt</span>：一般接近速率，正常 BVR 接戰<br>
+      · <span class="warn-val">Vc 接近 0</span>：目標可能在 Notch，考慮改變航向或切換模式<br>
+      · <span class="val">Vc 正值</span>：目標在逃跑，需加速或用 AMRAAM 追射</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mfd-radar"/></svg></div>
+      <div class="step-content"><div class="step-action">雷達模式快速切換建議</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>距離</th><th>建議模式</th><th>原因</th></tr>
+      <tr><td>&gt; 40NM</td><td class="mono">RWS 80NM</td><td>廣域搜索</td></tr>
+      <tr><td>20–40NM</td><td class="mono">TWS</td><td>多目標追蹤準備射擊</td></tr>
+      <tr><td>10–20NM</td><td class="mono">STT</td><td>精確鎖定</td></tr>
+      <tr><td>&lt; 10NM</td><td class="mono">VACQ/GACQ</td><td>近距纏鬥自動截獲</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-radar-scope"/></svg></div>
+      <div class="step-content"><div class="step-action">常見雷達問題排解</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>問題</th><th>原因</th><th>解法</th></tr>
+      <tr><td>找不到目標</td><td>仰角偏差</td><td class="mono">調整 EL 上下掃描</td></tr>
+      <tr><td>鎖定一直丟失</td><td>目標在 Notch</td><td class="mono">轉向改變幾何關係</td></tr>
+      <tr><td>TWS 建不起來</td><td>距離太遠 / 太近</td><td class="mono">調整 RNG 參數</td></tr>
+      <tr><td>雷達不動作</td><td>未暖機完成</td><td class="mono">等待 STBY→OPR</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(4)">← STT 單目標鎖定</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！ ✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">📡</span><span class="tab-label">概念</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚡</span><span class="tab-label">開機</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🔍</span><span class="tab-label">RWS</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🎯</span><span class="tab-label">TWS</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🔒</span><span class="tab-label">STT</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(5)" id="mtab-5"><span class="tab-icon">⚔️</span><span class="tab-label">實戰</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-5"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · AN/APG-73 空對空雷達教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<5)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<6;i++)updateProgress(i);
+</script>
+</body>
+</html>
