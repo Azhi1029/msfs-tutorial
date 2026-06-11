@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="近距纏鬥">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · 近距纏鬥教學</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ffcc00;--accent2:#ff8800;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--red:#ff3333;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(200,150,0,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,100,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(60,40,0,.6) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(255,200,0,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,200,0,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(255,200,0,.08);box-shadow:0 0 16px rgba(255,200,0,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,200,0,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,200,0,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,200,0,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--red);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#fff8d8;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--red);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.blue-val{color:var(--blue);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-box.yellow-box{background:rgba(255,200,0,.07);border:1px solid rgba(255,200,0,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--red);}
+.yellow-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(255,200,0,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,200,0,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-energy" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ffcc00" stroke-width="1.5"/><text x="24" y="13" fill="#ffcc00" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">ENERGY</text><rect x="6" y="17" width="8" height="20" rx="2" fill="#040810"/><rect x="6" y="25" width="8" height="12" rx="1" fill="#ff3333" opacity=".7"/><rect x="6" y="20" width="8" height="5" rx="1" fill="#ffcc00" opacity=".8"/><rect x="6" y="17" width="8" height="3" rx="1" fill="#33cc44" opacity=".8"/><text x="10" y="41" fill="#ffcc00" font-size="3.5" font-family="monospace" text-anchor="middle">E</text><path d="M20 37 Q28 20 36 15" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/><path d="M20 37 Q30 30 38 32" fill="none" stroke="#4488ff" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2,1"/><text x="38" y="14" fill="#ffcc00" font-size="3.5" font-family="monospace">Hi-E</text><text x="38" y="33" fill="#4488ff" font-size="3.5" font-family="monospace">Lo-E</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">ENERGY MGT</text></symbol>
+<symbol id="ico-gacq" viewBox="0 0 48 48"><rect x="2" y="3" width="44" height="38" rx="3" fill="#020608" stroke="#ffcc00" stroke-width="1.5"/><rect x="5" y="6" width="38" height="22" rx="1" fill="#080600"/><text x="24" y="12" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">GACQ MODE</text><rect x="10" y="14" width="28" height="12" rx="2" fill="#040400" stroke="#332200" stroke-width="1"/><circle cx="24" cy="20" r="5" fill="none" stroke="#ffcc00" stroke-width="2"/><line x1="24" y1="15" x2="24" y2="13" stroke="#ffcc00" stroke-width="1.5"/><line x1="24" y1="25" x2="24" y2="27" stroke="#ffcc00" stroke-width="1.5"/><line x1="19" y1="20" x2="17" y2="20" stroke="#ffcc00" stroke-width="1.5"/><line x1="29" y1="20" x2="31" y2="20" stroke="#ffcc00" stroke-width="1.5"/><circle cx="24" cy="20" r="1.5" fill="#ffcc00"/><text x="8" y="33" fill="#ffcc00" font-size="3.8" font-family="monospace">GUN ACQ SCAN</text><text x="8" y="37" fill="#33cc44" font-size="3.8" font-family="monospace">±20° AZ · 8° EL</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">GACQ</text></symbol>
+<symbol id="ico-vacq" viewBox="0 0 48 48"><rect x="2" y="3" width="44" height="38" rx="3" fill="#020608" stroke="#ffcc00" stroke-width="1.5"/><rect x="5" y="6" width="38" height="22" rx="1" fill="#080600"/><text x="24" y="12" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">VACQ MODE</text><rect x="18" y="13" width="12" height="14" rx="2" fill="#040400" stroke="#332200" stroke-width="1"/><circle cx="24" cy="20" r="5" fill="none" stroke="#ffcc00" stroke-width="2"/><line x1="24" y1="15" x2="24" y2="13" stroke="#ffcc00" stroke-width="1.5"/><line x1="24" y1="25" x2="24" y2="27" stroke="#ffcc00" stroke-width="1.5"/><circle cx="24" cy="20" r="1.5" fill="#ffcc00"/><text x="8" y="33" fill="#ffcc00" font-size="3.8" font-family="monospace">VERT ACQ SCAN</text><text x="8" y="37" fill="#33cc44" font-size="3.8" font-family="monospace">±5° AZ · ±45° EL</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">VACQ</text></symbol>
+<symbol id="ico-dogfight" viewBox="0 0 48 48"><rect x="2" y="3" width="44" height="38" rx="3" fill="#020608" stroke="#ffcc00" stroke-width="1.5"/><rect x="5" y="6" width="38" height="22" rx="1" fill="#080600"/><text x="24" y="12" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">DOGFIGHT</text><circle cx="24" cy="20" r="8" fill="none" stroke="#ffcc00" stroke-width="1.5"/><circle cx="24" cy="20" r="4" fill="none" stroke="#ff8800" stroke-width="1"/><line x1="16" y1="20" x2="32" y2="20" stroke="#ffcc00" stroke-width="1"/><line x1="24" y1="12" x2="24" y2="28" stroke="#ffcc00" stroke-width="1"/><circle cx="24" cy="20" r="1.5" fill="#ffcc00"/><text x="8" y="33" fill="#ffcc00" font-size="3.8" font-family="monospace">GACQ + VACQ</text><text x="8" y="37" fill="#ff8800" font-size="3.8" font-family="monospace">AIM-9 SLAVE</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">DFM</text></symbol>
+<symbol id="ico-hmd" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#080600" stroke="#ffcc00" stroke-width="1.5"/><ellipse cx="24" cy="16" rx="14" ry="8" fill="#040400" stroke="#332200" stroke-width="1"/><circle cx="32" cy="18" r="5" fill="none" stroke="#ffcc00" stroke-width="1.8"/><line x1="32" y1="13" x2="32" y2="11" stroke="#ffcc00" stroke-width="1.5"/><line x1="32" y1="23" x2="32" y2="25" stroke="#ffcc00" stroke-width="1.5"/><line x1="27" y1="18" x2="25" y2="18" stroke="#ffcc00" stroke-width="1.5"/><line x1="37" y1="18" x2="39" y2="18" stroke="#ffcc00" stroke-width="1.5"/><circle cx="32" cy="18" r="1.5" fill="#ffcc00"/><line x1="24" y1="16" x2="32" y2="18" stroke="#ffcc00" stroke-width="1" stroke-dasharray="2,1" opacity=".6"/><text x="24" y="32" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">HMD · OFF AXIS</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">HMD</text></symbol>
+<symbol id="ico-guns" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ffcc00" stroke-width="1.5"/><rect x="6" y="18" width="36" height="8" rx="2" fill="#040400" stroke="#332200" stroke-width="1"/><rect x="30" y="16" width="14" height="12" rx="2" fill="#0a0800" stroke="#332200" stroke-width=".8"/><line x1="6" y1="22" x2="4" y2="22" stroke="#ffcc00" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="22" r="3" fill="#ffcc00" opacity=".6"/><circle cx="38" cy="22" r="3" fill="#ffcc00" opacity=".4"/><text x="18" y="25" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">M61A2</text><text x="24" y="35" fill="#ff8800" font-size="4" font-family="monospace" text-anchor="middle">578 RDS · 6000RPM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">GUNS</text></symbol>
+<symbol id="ico-gun-cross" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#020608" stroke="#ffcc00" stroke-width="1.5" opacity=".8"/><text x="8" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">320</text><text x="34" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">8000</text><circle cx="24" cy="22" r="6" fill="none" stroke="#ffcc00" stroke-width="1.5"/><line x1="24" y1="16" x2="24" y2="12" stroke="#ffcc00" stroke-width="1.5"/><line x1="24" y1="28" x2="24" y2="32" stroke="#ffcc00" stroke-width="1.5"/><line x1="18" y1="22" x2="14" y2="22" stroke="#ffcc00" stroke-width="1.5"/><line x1="30" y1="22" x2="34" y2="22" stroke="#ffcc00" stroke-width="1.5"/><circle cx="24" cy="22" r="2" fill="#ffcc00"/><text x="24" y="38" fill="#ffcc00" font-size="3.8" font-family="monospace" text-anchor="middle">GUNS · 0.5NM · IN RNG</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">GUN HUD</text></symbol>
+<symbol id="ico-aoa-turn" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#080600" stroke="#ffcc00" stroke-width="1.5"/><path d="M24 4 A20 20 0 0 1 44 24" fill="none" stroke="#33cc44" stroke-width="3" stroke-linecap="round"/><path d="M44 24 A20 20 0 0 1 24 44" fill="none" stroke="#ffcc00" stroke-width="3" stroke-linecap="round"/><path d="M24 44 A20 20 0 0 1 4 24" fill="none" stroke="#ff8800" stroke-width="3" stroke-linecap="round"/><path d="M4 24 A20 20 0 0 1 24 4" fill="none" stroke="#ff3333" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="5" fill="#080600" stroke="#ffcc00" stroke-width="1"/><text x="24" y="27" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">AoA</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">TURN RATE</text></symbol>
+<symbol id="ico-break" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff3333" stroke-width="1.5"/><path d="M8 36 L18 14 L28 14" fill="none" stroke="#4488ff" stroke-width="2.5" stroke-linecap="round"/><path d="M28 14 L44 30" fill="none" stroke="#ff3333" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4,2"/><circle cx="8" cy="36" r="3" fill="#4488ff"/><path d="M40 26 L44 30 L40 34" fill="none" stroke="#ff3333" stroke-width="2" stroke-linecap="round"/><text x="14" y="38" fill="#ff3333" font-size="5.5" font-family="monospace" font-weight="bold">BREAK!</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">BREAK TURN</text></symbol>
+<symbol id="ico-extend" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#33cc44" stroke-width="1.5"/><circle cx="12" cy="24" r="4" fill="#ff3333" opacity=".7"/><path d="M16 24 L40 24" fill="none" stroke="#33cc44" stroke-width="2.5" stroke-linecap="round"/><path d="M36 20 L40 24 L36 28" fill="none" stroke="#33cc44" stroke-width="2" stroke-linecap="round"/><text x="12" y="38" fill="#ff3333" font-size="4" font-family="monospace" text-anchor="middle">BANDIT</text><text x="34" y="38" fill="#33cc44" font-size="4.5" font-family="monospace" text-anchor="middle">YOU</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">EXTEND</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 近距空戰</div>
+  <h1>近距 <span>纏鬥</span> 教學</h1>
+  <p class="subtitle">WVR · GACQ / VACQ · Dogfight 模式 · M61A2 機砲</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · WVR 概念</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · GACQ 模式</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · VACQ 模式</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · Dogfight 模式 & HMD</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · M61A2 機砲</button>
+  <button class="phase-btn" onclick="showPhase(5)">06 · 脫離戰術</button>
+</nav>
+
+<div class="main">
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">⚔️</span><div><div class="phase-num">PHASE 01</div><h2>WVR 近距空戰概念</h2></div></div>
+  <div class="alert-box yellow-box"><span class="alert-icon">🟡</span><div class="alert-text"><strong>WVR（Within Visual Range）近距空戰</strong>
+WVR 是指 <span style="color:var(--accent)">目視範圍內（10 NM 以內）</span> 的空戰。與 BVR 不同，WVR 拚的是飛機機動性和飛行員技術。F/A-18C 的近距纏鬥雷達模式：<span style="color:var(--accent)">GACQ / VACQ / Dogfight</span>，以及最終武器 <span style="color:var(--accent)">M61A2 機砲</span>。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-energy"/></svg></div>
+      <div class="step-content"><div class="step-action">能量管理（Energy Management）基本概念</div>
+      <div class="step-detail">纏鬥中「能量」= 速度 + 高度的組合：<br>
+      · <span class="val">高能量（Hi-E）</span>：高速或高高度，可以換速度換高度<br>
+      · <span class="red-val">低能量（Lo-E）</span>：低速低高度，機動選擇受限，非常危險<br>
+      · <span class="cyan-val">目標</span>：消耗敵機能量，保持自身能量優勢<br>
+      · F/A-18 是能量型戰機，最佳纏鬥速度約 <span class="val">300–350 kt</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-aoa-turn"/></svg></div>
+      <div class="step-content"><div class="step-action">角速率（Turn Rate）vs 轉彎半徑</div>
+      <div class="step-detail">
+      · <span class="val">角速率（°/秒）</span>：每秒轉彎幾度，越高越能快速指向敵機<br>
+      · <span class="val">轉彎半徑</span>：轉彎圓圈大小，越小越好<br>
+      · 速度慢 → 小半徑但低角速率<br>
+      · 速度快 → 高角速率但大半徑<br>
+      · <span class="cyan-val">F/A-18 最佳角速率速度：約 300–320 kt（Corner Speed）</span><br>
+      · 超過 Corner Speed 拉桿只是增加阻力，不增加角速率</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-dogfight"/></svg></div>
+      <div class="step-content"><div class="step-action">F/A-18C 近距纏鬥雷達模式總覽</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>模式</th><th>掃描方式</th><th>適用情況</th></tr>
+      <tr><td class="mono">GACQ</td><td>水平 ±20° 掃描</td><td>目標在前方水平位置</td></tr>
+      <tr><td class="mono">VACQ</td><td>垂直 ±45° 掃描</td><td>目標在上方，追尾時</td></tr>
+      <tr><td class="mono">WACQ</td><td>廣域 ±35° 掃描</td><td>不確定位置時</td></tr>
+      <tr><td class="mono">DFM</td><td>GACQ+VACQ 整合</td><td>Dogfight 模式（一鍵切換）</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-dogfight"/></svg></div>
+      <div class="step-content"><div class="step-action">HOTAS 近距纏鬥快速切換</div>
+      <div class="step-detail">纏鬥時雙手不能離開操縱桿和油門：<br>
+      · <span class="val">Dogfight Switch 前推（DGFT）</span>→ 進入 Dogfight 模式（DFM），同時選 AIM-9<br>
+      · <span class="val">Dogfight Switch 後拉（MSL OVRD）</span>→ 飛彈超控模式<br>
+      · <span class="val">Weapon Select Switch</span>→ 切換 AIM-9 / AIM-120 / GUNS<br>
+      · <span class="cyan-val">記住：Dogfight Switch 是第一反應！進入 WVR 立即前推！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：GACQ 模式 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">🎯</span><div><div class="phase-num">PHASE 02</div><h2>GACQ — 水平截獲模式</h2></div></div>
+  <div class="alert-box yellow-box"><span class="alert-icon">🟡</span><div class="alert-text"><strong>GACQ（Gun Acquisition）</strong>
+GACQ 是 <span style="color:var(--accent)">水平自動截獲模式</span>，雷達在 HUD 前方水平掃描 <span style="color:var(--accent)">±20° 方位角，約 8° 仰角</span> 範圍，自動截獲第一個目標。最適合目標在正前方水平位置時使用，是追尾接戰的主要模式。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-gacq"/></svg></div>
+      <div class="step-content"><div class="step-action">切換至 GACQ 模式</div>
+      <div class="step-detail">從正常雷達模式切換 GACQ：<br>
+      · 方法一：<span class="val">Weapon Select Switch 向前</span>（WSS FWD）→ GACQ<br>
+      · 方法二：DDI 雷達頁按 <span class="val">GACQ OSB</span><br>
+      · DDI 右上角顯示 <span class="val">GACQ</span>，HUD 顯示水平掃描框<br>
+      · 雷達自動在前方 ±20° 水平掃描尋找目標</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-gacq"/></svg></div>
+      <div class="step-content"><div class="step-action">目標進入 GACQ 掃描框 → 自動截獲 STT</div>
+      <div class="step-detail">將飛機對準目標方向，讓目標進入 HUD 的 GACQ 掃描框（±20° 水平範圍）。雷達偵測到目標後 <span class="warn-val">自動進入 STT 鎖定</span>，HUD 出現鎖定符號和 DLZ 條（若選 AIM-9/120）。<span class="cyan-val">不需要手動按 TDC！自動截獲！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-gun-cross"/></svg></div>
+      <div class="step-content"><div class="step-action">GACQ 鎖定後 → 選武器射擊</div>
+      <div class="step-detail">STT 鎖定後依距離選擇武器：<br>
+      · <span class="val">2–8 NM</span>：AIM-9 響尾蛇（若有音調鎖定）<br>
+      · <span class="val">0.2–0.8 NM</span>：M61A2 機砲（GUNS 模式）<br>
+      · 目標在 HUD 掃描框內飛機對準後，射擊視窗開啟</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-gacq"/></svg></div>
+      <div class="step-content"><div class="step-action">GACQ 使用技巧</div>
+      <div class="step-detail">
+      · <span class="cyan-val">追尾時</span>（Lag Pursuit）：目標在前方，GACQ 最有效<br>
+      · 飛機對準目標，稍微領前（Lead）讓目標進入掃描框<br>
+      · GACQ <span class="val">截獲最近的目標</span>，多目標環境小心截獲到友機！<br>
+      · 若截獲失敗，轉 VACQ 或 Dogfight 模式</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← WVR 概念</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：VACQ 模式 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">⬆️</span><div><div class="phase-num">PHASE 03</div><h2>VACQ — 垂直截獲模式</h2></div></div>
+  <div class="alert-box yellow-box"><span class="alert-icon">🟡</span><div class="alert-text"><strong>VACQ（Vertical Acquisition）</strong>
+VACQ 是 <span style="color:var(--accent)">垂直自動截獲模式</span>，雷達在 HUD 正前方上下掃描 <span style="color:var(--accent)">±5° 方位角，±45° 仰角</span> 範圍。最適合目標在你正上方或追尾高角度時使用。纏鬥中目標爬升到你上方時，立即切換 VACQ！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-vacq"/></svg></div>
+      <div class="step-content"><div class="step-action">切換至 VACQ 模式</div>
+      <div class="step-detail">從 GACQ 或其他模式切換 VACQ：<br>
+      · <span class="val">Weapon Select Switch 向後</span>（WSS AFT）→ VACQ<br>
+      · 或 DDI 雷達頁按 <span class="val">VACQ OSB</span><br>
+      · DDI 右上角顯示 <span class="val">VACQ</span>，HUD 顯示垂直掃描框（細長矩形）</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-vacq"/></svg></div>
+      <div class="step-content"><div class="step-action">目標在上方 → 機頭對準目標方向自動截獲</div>
+      <div class="step-detail">目標在你正上方時：<br>
+      1. 機頭拉起對準目標大致方向<br>
+      2. VACQ 垂直掃描框（±45° 仰角）覆蓋目標<br>
+      3. <span class="warn-val">自動 STT 鎖定</span>，HUD 出現目標符號<br>
+      <span class="cyan-val">VACQ 特別適合：Guns 追尾拉垂直時、目標 Egg 機動後在上方</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-vacq"/></svg></div>
+      <div class="step-content"><div class="step-action">GACQ vs VACQ 選擇原則</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>目標位置</th><th>建議模式</th></tr>
+      <tr><td>正前方水平（±20°）</td><td class="mono">GACQ</td></tr>
+      <tr><td>正上方或高仰角</td><td class="mono">VACQ</td></tr>
+      <tr><td>不確定位置</td><td class="mono">Dogfight（DFM）</td></tr>
+      <tr><td>目標在 HMD 視野內</td><td class="mono">Dogfight + HMD</td></tr>
+      </table>
+      <span class="cyan-val">實戰建議：進入 WVR 直接切 Dogfight Switch，DFM 模式整合兩者！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← GACQ 模式</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：Dogfight 模式 & HMD →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🥽</span><div><div class="phase-num">PHASE 04</div><h2>Dogfight 模式 & HMD 離軸射擊</h2></div></div>
+  <div class="alert-box yellow-box"><span class="alert-icon">🟡</span><div class="alert-text"><strong>Dogfight 模式（DFM）是最強近距模式</strong>
+按下 <span style="color:var(--accent)">Dogfight Switch 前推</span>，一鍵進入 DFM：自動選 AIM-9X、啟動 GACQ+VACQ 整合掃描、開啟 HMD（頭盔瞄準具）離軸射擊。目標不需要在機頭前方，<span style="color:var(--accent)">只要頭轉向目標，AIM-9X 就能鎖定！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-dogfight"/></svg></div>
+      <div class="step-content"><div class="step-action">Dogfight Switch 前推 → 進入 DFM</div>
+      <div class="step-detail">油門上的 <span class="warn-val">Dogfight/MSL Override Switch 前推（DGFT）</span>：<br>
+      · 武器自動切換至 <span class="val">AIM-9X</span><br>
+      · 雷達切換 <span class="val">DFM（整合 GACQ+VACQ）</span><br>
+      · <span class="val">HMD 啟動</span>，頭盔顯示目標指向資訊<br>
+      · HUD 右上角顯示 <span class="val">DFM</span><br>
+      <span class="cyan-val">進入 WVR（10NM 以內）立即前推 Dogfight Switch！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hmd"/></svg></div>
+      <div class="step-content"><div class="step-action">HMD 頭盔瞄準具使用</div>
+      <div class="step-detail">DFM 啟動後，HMD（Helmet Mounted Display）顯示：<br>
+      · <span class="val">目標圓圈</span>：AIM-9X 目前指向方向<br>
+      · <span class="val">鎖定環</span>：目標被 IR 導引頭捕捉時出現<br>
+      · 轉頭讓 HMD 圓圈對準目標 → AIM-9X 跟隨頭部轉動<br>
+      · 聽到 <span class="warn-val">持續音調（growl）</span> = AIM-9X 鎖定目標！</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-hmd"/></svg></div>
+      <div class="step-content"><div class="step-action">HMD 離軸射擊 — 不需要對準目標！</div>
+      <div class="step-detail">AIM-9X 配合 HMD 可以 <span class="val">離軸射擊（Off-Boresight）</span>：<br>
+      · 目標在機頭側方甚至後方 45–90° 也能鎖定<br>
+      · 操作流程：<br>
+      　1. Dogfight Switch 前推（DFM）<br>
+      　2. 頭轉向目標方向<br>
+      　3. 等待 AIM-9X 音調鎖定<br>
+      　4. 按 <span class="warn-val">Weapon Release</span> 射擊，「FOX 2！」</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-dogfight"/></svg></div>
+      <div class="step-content"><div class="step-action">DFM 模式雷達自動截獲</div>
+      <div class="step-detail">DFM 模式下，雷達同時執行 GACQ 和 VACQ 掃描：<br>
+      · 目標在前方水平 → GACQ 自動截獲 STT<br>
+      · 目標在上方 → VACQ 自動截獲 STT<br>
+      · STT 鎖定後可射 AIM-9X（HMD）或 AIM-120<br>
+      · 或切換 GUNS 用機砲攻擊<br>
+      <span class="cyan-val">DFM 是 WVR 全能模式，纏鬥中保持在 DFM！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← VACQ 模式</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：M61A2 機砲 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">💥</span><div><div class="phase-num">PHASE 05</div><h2>M61A2 Vulcan 機砲</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>M61A2 Vulcan 20mm 六管機砲</strong>
+F/A-18C 配備 <span style="color:var(--accent)">M61A2 Vulcan 20mm 六管旋轉機砲</span>，射速 <span style="color:var(--accent)">6,000 發/分鐘</span>，備彈 <span style="color:var(--accent)">578 發</span>（約 5–6 秒連射）。機砲是近距最後手段，<span style="color:var(--warn)">必須接近到 0.2–0.5 NM！</span>射擊時間要精準，珍惜每一發！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-guns"/></svg></div>
+      <div class="step-content"><div class="step-action">切換至 GUNS 模式</div>
+      <div class="step-detail">切換機砲模式：<br>
+      · <span class="val">Weapon Select Switch 向右</span>（WSS RIGHT）→ GUNS<br>
+      · 或 DFM 模式下 WSS 切換到 GUNS<br>
+      · HUD 顯示 <span class="val">GUNS</span> 字樣和機砲瞄準具<br>
+      · 確認 <span class="warn-val">MASTER ARM → ARM！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-gun-cross"/></svg></div>
+      <div class="step-content"><div class="step-action">HUD 機砲瞄準具判讀（EEGS）</div>
+      <div class="step-detail">GUNS 模式 HUD 顯示 <span class="val">EEGS（Enhanced Envelope Gun Sight）</span>：<br>
+      · <span class="val">中央十字準心</span>：機砲射擊方向<br>
+      · <span class="val">漏斗線（Funnel）</span>：依目標翼展自動計算提前量<br>
+      · STT 鎖定時出現 <span class="val">LCOS（Lead Computing Optical Sight）</span>：自動計算提前量，<span class="cyan-val">將目標飛進 LCOS 圓心射擊！</span><br>
+      · HUD 左側顯示剩餘彈量</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-gun-cross"/></svg></div>
+      <div class="step-content"><div class="step-action">機砲射擊距離與時機</div>
+      <div class="step-detail">
+      · <span class="val">最佳射擊距離</span>：<span class="warn-val">0.2–0.4 NM（約 400–750m）</span><br>
+      · 太遠（0.5NM+）彈道散布大，命中率低<br>
+      · 太近（0.1NM 以內）碎片可能擊中自機！<br>
+      · 射擊時間：<span class="warn-val">1–2 秒短促點射</span>，不要長按浪費子彈<br>
+      · 射擊後立即脫離，避免碎片</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-guns"/></svg></div>
+      <div class="step-content"><div class="step-action">Lag Pursuit（滯後追蹤）射擊技巧</div>
+      <div class="step-detail">機砲追尾的標準技術：<br>
+      · <span class="val">Lag Pursuit</span>：飛機位於目標轉彎弧的內側，機頭指向目標後方<br>
+      · 優點：能維持距離不過衝，逐漸縮短射擊距離<br>
+      · 當 LCOS 圓心對準目標時 → 射擊 <span class="warn-val">1–2 秒</span><br>
+      · <span class="cyan-val">STT 鎖定 + LCOS 是最有效的機砲射擊方式！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← Dogfight 模式 & HMD</button><button class="nav-arrow-btn" onclick="showPhase(5)">下一單元：脫離戰術 →</button></div>
+</section>
+
+<!-- PHASE 5 -->
+<section class="phase-section" id="phase-5">
+  <div class="phase-title"><span class="phase-icon-wrap">🚀</span><div><div class="phase-num">PHASE 06</div><h2>脫離戰術 Disengagement</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>知道何時脫離比知道如何纏鬥更重要！</strong>
+纏鬥最危險的錯誤是<span style="color:var(--danger)">過度執著</span>。能量耗盡、彈藥不足、多對一不利時，<span style="color:var(--green)">立即脫離才是正確選擇。</span>F/A-18 的 GE F404 引擎推力強勁，善用加速脫離是優勢。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-5" style="width:0%"></div></div><span class="progress-pct" id="pct-5">0%</span><button class="reset-btn" onclick="resetPhase(5)">重置</button></div>
+  <div class="steps-grid" id="steps-5">
+    <div class="step-card warn-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-break"/></svg></div>
+      <div class="step-content"><div class="step-action">Break Turn — 緊急防禦轉彎</div>
+      <div class="step-detail">有飛彈或炮火來襲時的緊急機動：<br>
+      · 向威脅方向做 <span class="warn-val">最大 G 轉彎（6–7.5G）</span><br>
+      · 同時投放 <span class="val">箔條（Chaff）</span> 和 <span class="val">熱焰彈（Flare）</span><br>
+      · 轉彎讓威脅通過身後<br>
+      · <span class="cyan-val">Break 後立即加速重建能量！</span><br>
+      · Break 方向：朝威脅方向，不是逃離方向！</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-extend"/></svg></div>
+      <div class="step-content"><div class="step-action">Extend — 加速脫離拉距離</div>
+      <div class="step-detail">纏鬥形勢不利時的脫離機動：<br>
+      · 油門推至 <span class="val">MIL 或 AB（後燃器）</span><br>
+      · 機頭指向遠離敵機方向，俯衝加速<br>
+      · 目標是快速增加 <span class="val">1–2 NM 以上的距離</span><br>
+      · 拉開距離後可重新設定交戰條件（再射 AIM-120）<br>
+      · <span class="cyan-val">Extend 後若敵機追來 → 轉向 BVR 射程再射！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-energy"/></svg></div>
+      <div class="step-content"><div class="step-action">脫離時機判斷</div>
+      <div class="step-detail">以下情況應立即考慮脫離：<br>
+      · <span class="red-val">能量過低</span>（速度低於 200 kt，高度不足）<br>
+      · <span class="red-val">彈藥耗盡</span>（機砲子彈少於 100 發）<br>
+      · <span class="red-val">多對一劣勢</span>（被多架敵機圍攻）<br>
+      · <span class="red-val">RWR 多重威脅警告</span><br>
+      · <span class="red-val">油量不足</span>（低於返航所需）</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,5)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-dogfight"/></svg></div>
+      <div class="step-content"><div class="step-action">完整近距纏鬥流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>距離</th><th>動作</th></tr>
+      <tr><td class="mono">10 NM</td><td>Dogfight Switch 前推，DFM + AIM-9</td></tr>
+      <tr><td class="mono">5–8 NM</td><td>HMD 鎖定，AIM-9X 音調，FOX 2！</td></tr>
+      <tr><td class="mono">2–5 NM</td><td>GACQ/VACQ STT 鎖定，AIM-9 / AIM-120</td></tr>
+      <tr><td class="mono">0.5 NM</td><td>切 GUNS，LCOS 對準，點射 1–2 秒</td></tr>
+      <tr><td class="mono">形勢不利</td><td>Break → Extend → 重建能量</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(4)">← M61A2 機砲</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！ ✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">⚔️</span><span class="tab-label">概念</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">🎯</span><span class="tab-label">GACQ</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">⬆️</span><span class="tab-label">VACQ</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🥽</span><span class="tab-label">DFM/HMD</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">💥</span><span class="tab-label">Guns</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(5)" id="mtab-5"><span class="tab-icon">🚀</span><span class="tab-label">脫離</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-5"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · 近距纏鬥教學 · WVR / GACQ / VACQ / Guns<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<5)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<6;i++)updateProgress(i);
+</script>
+</body>
+</html>
