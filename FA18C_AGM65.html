@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AGM-65">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · AGM-65 Maverick</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ff6622;--accent2:#ff3333;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(220,80,20,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,40,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(80,30,0,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(255,100,30,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(255,100,30,.08);border:1px solid rgba(255,100,30,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,100,30,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(255,100,30,.08);box-shadow:0 0 16px rgba(255,100,30,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,100,30,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,100,30,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,100,30,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--danger);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card.danger-card{border-left-color:var(--accent2);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#ffe8dd;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.blue-val{color:var(--blue);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-box.orange-box{background:rgba(255,100,30,.07);border:1px solid rgba(255,100,30,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--accent2);}
+.orange-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(255,100,30,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,100,30,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-agm65" viewBox="0 0 48 48"><rect x="3" y="15" width="32" height="10" rx="5" fill="#100600" stroke="#ff6622" stroke-width="1.5"/><circle cx="38" cy="20" r="7" fill="#0a0400" stroke="#ff6622" stroke-width="1.5"/><circle cx="38" cy="20" r="3" fill="#ff6622" opacity=".5"/><path d="M3 15 L-2 11 L-2 14 L3 18Z" fill="#100600"/><path d="M3 25 L-2 29 L-2 26 L3 22Z" fill="#100600"/><path d="M24 15 L28 9 L30 9 L28 15Z" fill="#ff6622" opacity=".7"/><path d="M24 25 L28 31 L30 31 L28 25Z" fill="#ff6622" opacity=".7"/><text x="20" y="38" fill="#ff6622" font-size="5.5" font-family="monospace" text-anchor="middle">AGM-65 MAVERICK</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">AGM-65</text></symbol>
+<symbol id="ico-mav-tv" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff6622" stroke-width="1.5"/><rect x="6" y="6" width="36" height="24" rx="1" fill="#040804"/><text x="24" y="12" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">MAV TV</text><rect x="14" y="15" width="20" height="14" rx="1" fill="#0a0600"/><rect x="18" y="18" width="6" height="4" fill="#888" opacity=".6"/><rect x="26" y="22" width="5" height="5" fill="#aaa" opacity=".4"/><circle cx="24" cy="22" r="6" fill="none" stroke="#ff3333" stroke-width="1.2"/><line x1="24" y1="16" x2="24" y2="18" stroke="#ff3333" stroke-width="1"/><line x1="24" y1="26" x2="24" y2="28" stroke="#ff3333" stroke-width="1"/><line x1="18" y1="22" x2="20" y2="22" stroke="#ff3333" stroke-width="1"/><line x1="28" y1="22" x2="30" y2="22" stroke="#ff3333" stroke-width="1"/><text x="8" y="35" fill="#00ddff" font-size="3.8" font-family="monospace">EO TV MODE</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">TV SEEKER</text></symbol>
+<symbol id="ico-mav-ir" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff6622" stroke-width="1.5"/><rect x="6" y="6" width="36" height="24" rx="1" fill="#040804"/><text x="24" y="12" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">MAV IR</text><rect x="14" y="15" width="20" height="14" rx="1" fill="#0a0600"/><rect x="18" y="18" width="6" height="4" fill="#ffcc00" opacity=".7"/><rect x="26" y="22" width="5" height="5" fill="#ff8800" opacity=".5"/><circle cx="24" cy="22" r="6" fill="none" stroke="#ff3333" stroke-width="1.2"/><line x1="24" y1="16" x2="24" y2="18" stroke="#ff3333" stroke-width="1"/><line x1="24" y1="26" x2="24" y2="28" stroke="#ff3333" stroke-width="1"/><line x1="18" y1="22" x2="20" y2="22" stroke="#ff3333" stroke-width="1"/><line x1="28" y1="22" x2="30" y2="22" stroke="#ff3333" stroke-width="1"/><text x="8" y="35" fill="#ffcc00" font-size="3.8" font-family="monospace">IR HEAT MODE</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">IIR SEEKER</text></symbol>
+<symbol id="ico-mav-poly" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080400" stroke="#ff6622" stroke-width="1.5"/><text x="24" y="12" fill="#ff6622" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">VARIANTS</text><rect x="6" y="16" width="36" height="7" rx="1" fill="#0a0600" stroke="#332200" stroke-width=".5"/><text x="24" y="21" fill="#00ff44" font-size="4.5" font-family="monospace" text-anchor="middle">AGM-65D (IR)</text><rect x="6" y="25" width="36" height="7" rx="1" fill="#0a0600" stroke="#332200" stroke-width=".5"/><text x="24" y="30" fill="#00ddff" font-size="4.5" font-family="monospace" text-anchor="middle">AGM-65F (IIR Big)</text><rect x="6" y="34" width="36" height="6" rx="1" fill="#0a0600" stroke="#332200" stroke-width=".5"/><text x="24" y="38.5" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">AGM-65H (TV)</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">VARIANTS</text></symbol>
+<symbol id="ico-cursor-mav" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff6622" stroke-width="1.5"/><rect x="6" y="6" width="36" height="24" rx="1" fill="#040804"/><rect x="10" y="12" width="14" height="10" fill="#666" opacity=".5"/><rect x="26" y="18" width="10" height="9" fill="#888" opacity=".4"/><rect x="14" y="16" width="6" height="6" fill="none" stroke="#ffcc00" stroke-width="1.5"/><circle cx="17" cy="19" r="1" fill="#ffcc00"/><text x="8" y="35" fill="#ffcc00" font-size="3.8" font-family="monospace">CURSOR · FOV</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">CURSOR ZOOM</text></symbol>
+<symbol id="ico-mav-lock" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff6622" stroke-width="1.5"/><rect x="6" y="6" width="36" height="24" rx="1" fill="#040804"/><rect x="16" y="12" width="16" height="12" fill="#888" opacity=".5"/><rect x="14" y="10" width="20" height="16" fill="none" stroke="#33cc44" stroke-width="2"/><line x1="14" y1="10" x2="18" y2="10" stroke="#33cc44" stroke-width="3"/><line x1="14" y1="10" x2="14" y2="14" stroke="#33cc44" stroke-width="3"/><line x1="30" y1="26" x2="34" y2="26" stroke="#33cc44" stroke-width="3"/><line x1="34" y1="22" x2="34" y2="26" stroke="#33cc44" stroke-width="3"/><text x="8" y="35" fill="#33cc44" font-size="4" font-family="monospace">TRACK · LOCKED</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">LOCK ON</text></symbol>
+<symbol id="ico-sms-mav" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff6622" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#080400"/><text x="24" y="12" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">SMS · A/G</text><text x="24" y="17" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">AGM-65F × 2</text><rect x="8" y="23" width="14" height="8" rx="2" fill="#0a0600" stroke="#ff6622" stroke-width="1"/><text x="15" y="29" fill="#ff6622" font-size="4" font-family="monospace" text-anchor="middle">STEP</text><rect x="26" y="23" width="14" height="8" rx="2" fill="#0a0800" stroke="#332200" stroke-width="1"/><text x="33" y="29" fill="#332200" font-size="4" font-family="monospace" text-anchor="middle">SOI</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SMS A/G</text></symbol>
+<symbol id="ico-mav-fire" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080400" stroke="#ff6622" stroke-width="1.5"/><path d="M8 30 Q20 30 24 14" fill="none" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="8" cy="30" r="3" fill="#4488ff"/><path d="M24 14 L36 22" fill="none" stroke="#ff6622" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="14" r="2.5" fill="#ffcc00"/><circle cx="36" cy="22" r="3" fill="none" stroke="#33cc44" stroke-width="1.5"/><circle cx="36" cy="22" r="1" fill="#33cc44"/><text x="24" y="40" fill="#ffcc00" font-size="6" font-family="monospace" text-anchor="middle">RIFLE!</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">RADIO CALL</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 空對地武器</div>
+  <h1><span>AGM-65</span> Maverick</h1>
+  <p class="subtitle">電視/紅外線導引 · CAS · 精確打擊裝甲與點目標</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · Maverick 基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 武器設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 目標搜尋與鎖定</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 發射與接戰</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 戰術應用</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🚀</span><div><div class="phase-num">PHASE 01</div><h2>AGM-65 Maverick 基礎概念</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>AGM-65 Maverick 簡介</strong>
+AGM-65 是<span style="color:var(--accent)">影像導引空對地飛彈</span>，無線電呼號 <span style="color:var(--accent)">「RIFLE！」</span>。飛彈自帶<span style="color:var(--accent)">攝影機/紅外線尋的器</span>，飛行員透過飛彈本身的畫面瞄準目標，<span style="color:var(--green)">射後不理（Fire and Forget）</span>。專精攻擊裝甲車輛、雷達站、橋樑等點目標，<span style="color:var(--warn)">不需要雷射照射！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mav-poly"/></svg></div>
+      <div class="step-content"><div class="step-action">AGM-65 各型號差異（DCS 中）</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>型號</th><th>導引方式</th><th>特點</th></tr>
+      <tr><td class="mono">AGM-65D</td><td>IIR（紅外線成像）</td><td>小視野，追蹤熱源</td></tr>
+      <tr><td class="mono">AGM-65F</td><td>IIR（大彈頭）</td><td>反艦用，更大彈頭</td></tr>
+      <tr><td class="mono">AGM-65H</td><td>EO TV（電視）</td><td>白天用，畫質好但無熱顯示</td></tr>
+      </table>
+      <span class="cyan-val">DCS F/A-18C 常配 65F（IIR）：白天黑夜皆可用，熱對比清楚</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-mav-ir"/></svg></div>
+      <div class="step-content"><div class="step-action">IIR（紅外線成像）vs EO TV（電視）</div>
+      <div class="step-detail">
+      · <span class="val">IIR（Imaging Infrared）</span>：偵測熱源差異成像，<span class="green-val">夜間/低能見度可用</span>，畫面較模糊<br>
+      · <span class="val">EO TV（Electro-Optical TV）</span>：可見光攝影機，<span class="warn-val">僅白天能見度良好時可用</span>，畫質清晰<br>
+      · 兩者都靠 <span class="cyan-val">對比度（Contrast）</span> 鎖定目標邊緣</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-agm65"/></svg></div>
+      <div class="step-content"><div class="step-action">AGM-65 適用目標</div>
+      <div class="step-detail">最適合攻擊：<br>
+      · <span class="val">裝甲車輛</span>（坦克、裝甲運輸車）<br>
+      · <span class="val">雷達站 / SAM 發射器</span>（注意：SEAD 用 HARM 更好）<br>
+      · <span class="val">橋樑、建築物</span><br>
+      · <span class="val">船艦</span>（AGM-65F 反艦彈頭較大）<br>
+      <span class="cyan-val">不適合：大面積目標（用 GBU 或 Mk-82）、移動快速的飛機目標</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：武器設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚙️</span><div><div class="phase-num">PHASE 02</div><h2>武器與感測器設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>重要：每枚 Maverick 視野獨立！</strong>
+F/A-18C 若掛載多枚 AGM-65，<span style="color:var(--accent2)">每一枚都有獨立的攝影機視野</span>。切換武器站位時，DDI 顯示的影像會切換到該枚飛彈的視角。確認你正在操作的是想要發射的那一枚！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sms-mav"/></svg></div>
+      <div class="step-content"><div class="step-action">MASTER ARM → ARM</div>
+      <div class="step-detail">左主控台 <span class="warn-val">MASTER ARM → ARM</span>。HUD 顯示 ARM。<span class="red-val">訓練時保持 SAFE！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sms-mav"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → SMS → 選擇 AGM-65 站位</div>
+      <div class="step-detail">右 DDI → <span class="val">MENU → SMS</span>，用 <span class="val">WSS</span> 選擇 AGM-65 武器站。HUD 左下角顯示 <span class="val">65F</span>（或對應型號）。確認站位編號正確（左/右翼下）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mav-ir"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → MAV 頁面顯示飛彈視野</div>
+      <div class="step-detail">DDI 切換至 <span class="val">MAV（Maverick）</span> 頁面，顯示該飛彈的攝影機畫面（IIR 或 TV）。<span class="cyan-val">這就是飛彈「看到」的畫面，不是你的 HUD 視野！</span>確認該 DDI 成為 SOI（控制目標）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-cursor-mav"/></svg></div>
+      <div class="step-content"><div class="step-action">TDC 控制 Maverick 視野指向</div>
+      <div class="step-detail">確認 SOI 在 MAV 頁面後，<span class="val">TDC</span> 控制飛彈攝影機的指向方向：<br>
+      · TDC 上下左右移動 = 飛彈視野轉動<br>
+      · 可調整 <span class="val">FOV（視野）</span>：寬視野找目標，窄視野放大瞄準<br>
+      · 飛彈視野有限（通常前方 ±單側 5°），需先讓飛機機頭大致對準目標方向</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← Maverick 基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：目標搜尋與鎖定 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🔍</span><div><div class="phase-num">PHASE 03</div><h2>目標搜尋與鎖定</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>對比度鎖定原理</strong>
+AGM-65 靠 <span style="color:var(--accent)">對比度（明暗或熱度差異）</span> 識別目標邊緣。鎖定的是「畫面中對比明顯的形狀」，不一定是你想要的目標！<span style="color:var(--warn)">務必在發射前確認鎖定框正確框住目標！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mav-ir"/></svg></div>
+      <div class="step-content"><div class="step-action">飛向目標區，TDC 搜索目標</div>
+      <div class="step-detail">飛機接近目標區（建議 <span class="val">3–8 NM，中高空</span>），MAV 頁面用 TDC 移動視野搜索。IIR 模式下，<span class="val">熱源（引擎、排氣管）顯示為亮白或暗黑</span>（依 Polarity 設定）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-cursor-mav"/></svg></div>
+      <div class="step-content"><div class="step-action">縮小 FOV 放大目標確認</div>
+      <div class="step-detail">找到可能目標後，切換 <span class="val">NFOV（窄視野）</span> 放大畫面，確認目標類型（坦克/車輛/建築）。<span class="cyan-val">花時間確認目標身份，避免誤擊！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mav-lock"/></svg></div>
+      <div class="step-content"><div class="step-action">TDC 對準目標 → 按壓鎖定（Track）</div>
+      <div class="step-detail">TDC 游標移至目標中心，<span class="warn-val">按壓 TDC</span>：<br>
+      · 飛彈導引頭進入 <span class="val">Track（追蹤）模式</span><br>
+      · 畫面出現 <span class="val">鎖定框（追蹤門）</span>包覆目標<br>
+      · 鎖定框會自動跟隨目標移動（即使飛機移動）<br>
+      · DDI 或 HUD 顯示 <span class="green-val">TRACK</span> 狀態</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card danger-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mav-lock"/></svg></div>
+      <div class="step-content"><div class="step-action">確認鎖定框正確！必要時重新鎖定</div>
+      <div class="step-detail"><span class="red-val">常見錯誤</span>：鎖定框框到背景雜物、友軍、地形邊緣而非目標本身！<br>
+      · 仔細觀察鎖定框是否緊貼目標<br>
+      · 若鎖錯，<span class="val">TDC 重新按壓</span>在正確目標上重新 Track<br>
+      · 多目標時用 TDC 微調鎖定框位置</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 武器設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：發射與接戰 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">💥</span><div><div class="phase-num">PHASE 04</div><h2>發射與接戰</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>發射條件確認</strong>
+鎖定框正確框住目標後，確認距離在 <span style="color:var(--accent)">射程內（通常 2–10 NM，依高度速度）</span>，按下發射按鈕。<span style="color:var(--green)">射出後立即可以脫離（Fire and Forget），不需要持續照射！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mav-lock"/></svg></div>
+      <div class="step-content"><div class="step-action">確認 HUD 顯示射程資訊</div>
+      <div class="step-detail">鎖定後 HUD 顯示：<br>
+      · 目標距離（NM）<br>
+      · <span class="val">射程提示</span>（若有 DLZ 樣式顯示）<br>
+      · 確認在<span class="val">建議射程內</span>，太遠飛彈可能無法到達或精度下降</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-mav-fire"/></svg></div>
+      <div class="step-content"><div class="step-action">按下 Weapon Release → 「RIFLE！」</div>
+      <div class="step-detail">鎖定框正確且距離適當，按下 <span class="warn-val">Weapon Release Button</span>！無線電呼號 <span class="val">「RIFLE！」</span>。飛彈離架，朝鎖定框追蹤的目標飛去。短暫延遲後可看到飛彈軌跡或煙跡。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-sms-mav"/></svg></div>
+      <div class="step-content"><div class="step-action">多枚 Maverick 連續攻擊</div>
+      <div class="step-detail">若掛載多枚 AGM-65：<br>
+      1. 第一枚射出後，<span class="val">WSS 切換到下一枚</span><br>
+      2. DDI MAV 頁面顯示新一枚的視野（重新開始）<br>
+      3. 對下一個目標重複：搜索 → 鎖定 → 確認 → 射擊<br>
+      <span class="cyan-val">每枚都需要獨立鎖定流程！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mav-fire"/></svg></div>
+      <div class="step-content"><div class="step-action">射後脫離（Fire and Forget）</div>
+      <div class="step-detail">飛彈射出後即可：<br>
+      · <span class="green-val">立即轉向脫離</span>，不需要繼續照射或鎖定<br>
+      · 若還有目標，可繼續搜索下一個<br>
+      · 注意：脫離時留意地面防空威脅（小型武器、SAM）<br>
+      · 攻擊後考慮改變高度/航向，避免被預判</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← 目標搜尋與鎖定</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：戰術應用 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">📋</span><div><div class="phase-num">PHASE 05</div><h2>戰術應用 CAS</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>AGM-65 在近接支援（CAS）任務中的應用</strong>
+AGM-65 是 CAS（Close Air Support）任務的主力武器，常用於支援地面部隊清除裝甲威脅。搭配 LITENING 莢艙先確認目標身份，再用 Maverick 精確摧毀。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mav-ir"/></svg></div>
+      <div class="step-content"><div class="step-action">CAS 標準流程：莢艙確認 → Maverick 鎖定 → 攻擊</div>
+      <div class="step-detail">完整 CAS 攻擊流程：<br>
+      1. <span class="val">LITENING 莢艙</span>掃描目標區，確認目標身份（敵軍 vs 友軍）<br>
+      2. 切換到 <span class="val">AGM-65 MAV 頁面</span>，TDC 移至同一目標<br>
+      3. 鎖定確認後射擊<br>
+      <span class="cyan-val">兩個感測器配合：莢艙做「眼睛」確認，Maverick 做「拳頭」打擊</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-agm65"/></svg></div>
+      <div class="step-content"><div class="step-action">優先目標選擇</div>
+      <div class="step-detail">CAS 任務中優先攻擊：<br>
+      · <span class="warn-val">防空系統（SAM/AAA）</span>：威脅其他飛機<br>
+      · <span class="val">指揮車輛</span>：癱瘓敵軍協調<br>
+      · <span class="val">裝甲車輛</span>：直接威脅地面部隊<br>
+      · 與地面管制員（JTAC）確認目標優先順序</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mav-poly"/></svg></div>
+      <div class="step-content"><div class="step-action">AGM-65 vs GBU-12 選擇</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>情況</th><th>建議武器</th><th>原因</th></tr>
+      <tr><td>單一裝甲目標</td><td class="mono">AGM-65</td><td>精確、Fire&Forget</td></tr>
+      <tr><td>需要快速多次攻擊</td><td class="mono">AGM-65</td><td>不需持續照射</td></tr>
+      <tr><td>大型建築/橋樑</td><td class="mono">GBU-12</td><td>炸藥量更大</td></tr>
+      <tr><td>友軍持續雷射照射</td><td class="mono">GBU-12</td><td>第三方提供雷射</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mav-fire"/></svg></div>
+      <div class="step-content"><div class="step-action">AGM-65 完整流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>步驟</th><th>動作</th></tr>
+      <tr><td>1</td><td>MASTER ARM → ARM</td></tr>
+      <tr><td>2</td><td>SMS 選擇 AGM-65 站位</td></tr>
+      <tr><td>3</td><td>DDI → MAV 頁面，SOI 確認</td></tr>
+      <tr><td>4</td><td>TDC 搜索 + 縮小 FOV 確認目標</td></tr>
+      <tr><td>5</td><td>TDC 按壓 → Track 鎖定，確認框正確</td></tr>
+      <tr><td>6</td><td>確認射程 → Weapon Release，RIFLE！</td></tr>
+      <tr><td>7</td><td>多彈：WSS 切換下一枚，重複流程</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 發射與接戰</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！ ✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🚀</span><span class="tab-label">基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚙️</span><span class="tab-label">設定</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🔍</span><span class="tab-label">鎖定</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">💥</span><span class="tab-label">發射</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">📋</span><span class="tab-label">戰術</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · AGM-65 Maverick 教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
