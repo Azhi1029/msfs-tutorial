@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GBU-12">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · GBU-12 雷射導引炸彈</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ff8800;--accent2:#ff3333;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(220,120,0,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,60,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(80,40,0,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(255,136,0,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(255,136,0,.08);border:1px solid rgba(255,136,0,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,136,0,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(255,136,0,.08);box-shadow:0 0 16px rgba(255,136,0,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,136,0,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,136,0,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,136,0,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--danger);}
+.step-card.danger-card{border-left-color:var(--accent2);background:rgba(255,51,51,.04);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#ffeedd;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.blue-val{color:var(--blue);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-box.orange-box{background:rgba(255,136,0,.07);border:1px solid rgba(255,136,0,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--accent2);}
+.orange-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(255,136,0,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,136,0,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-gbu12" viewBox="0 0 48 48"><rect x="3" y="14" width="38" height="12" rx="6" fill="#0a0600" stroke="#ff8800" stroke-width="1.5"/><circle cx="38" cy="20" r="6" fill="#0a0600" stroke="#ff8800" stroke-width="1.5"/><path d="M3 14 L3 26 L-2 26 L-2 14 Z" fill="#0a0600"/><line x1="6" y1="14" x2="6" y2="26" stroke="#ff8800" stroke-width="1" opacity=".5"/><path d="M30 14 L34 8 L36 8 L34 14Z" fill="#ff8800" opacity=".7"/><path d="M30 26 L34 32 L36 32 L34 26Z" fill="#ff8800" opacity=".7"/><text x="20" y="38" fill="#ff8800" font-size="5.5" font-family="monospace" text-anchor="middle">GBU-12 PAVEWAY II</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">GBU-12</text></symbol>
+<symbol id="ico-litening" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#020608" stroke="#ff8800" stroke-width="1.5"/><circle cx="24" cy="20" r="14" fill="#080604" stroke="#332200" stroke-width="1"/><circle cx="24" cy="20" r="9" fill="#060402" stroke="#ff8800" stroke-width="1.2"/><circle cx="24" cy="20" r="4" fill="#ff8800" opacity=".5"/><circle cx="20" cy="16" r="1.5" fill="#fff" opacity=".6"/><text x="24" y="35" fill="#ff8800" font-size="5" font-family="monospace" text-anchor="middle">LITENING POD</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">TGP</text></symbol>
+<symbol id="ico-fliright" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff8800" stroke-width="1.5"/><rect x="6" y="6" width="36" height="24" rx="1" fill="#040804"/><text x="24" y="12" fill="#ff8800" font-size="5" font-family="monospace" text-anchor="middle">FLIR</text><rect x="14" y="15" width="20" height="14" rx="1" fill="#0a0600"/><rect x="18" y="18" width="6" height="4" fill="#ffcc00" opacity=".7"/><rect x="26" y="22" width="5" height="5" fill="#ff8800" opacity=".5"/><circle cx="24" cy="22" r="6" fill="none" stroke="#ff3333" stroke-width="1.2"/><line x1="24" y1="16" x2="24" y2="18" stroke="#ff3333" stroke-width="1"/><line x1="24" y1="26" x2="24" y2="28" stroke="#ff3333" stroke-width="1"/><line x1="18" y1="22" x2="20" y2="22" stroke="#ff3333" stroke-width="1"/><line x1="28" y1="22" x2="30" y2="22" stroke="#ff3333" stroke-width="1"/><text x="8" y="35" fill="#00ddff" font-size="3.8" font-family="monospace">SOI: FLIR</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">FLIR PAGE</text></symbol>
+<symbol id="ico-laser-fire" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff8800" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="#0a0600" stroke="#332200" stroke-width="1"/><line x1="14" y1="14" x2="38" y2="34" stroke="#ff3333" stroke-width="2" stroke-dasharray="3,2"/><path d="M34 28 L38 34 L40 30 Z" fill="#ff3333"/><circle cx="38" cy="34" r="5" fill="none" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="42" fill="#ff3333" font-size="4.5" font-family="monospace" text-anchor="middle">LASER FIRE - ON</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">LASER DESIG</text></symbol>
+<symbol id="ico-ccrp" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff8800" stroke-width="1.5"/><path d="M8 30 Q20 30 24 14" fill="none" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="8" cy="30" r="3" fill="#4488ff"/><path d="M24 14 Q26 24 30 36" fill="none" stroke="#ff8800" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="14" r="2.5" fill="#ffcc00"/><circle cx="30" cy="36" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><circle cx="30" cy="36" r="1" fill="#ff3333"/><text x="24" y="9" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">RELEASE</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">CCRP</text></symbol>
+<symbol id="ico-ccip" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff8800" stroke-width="1.5"/><path d="M14 8 L34 32" fill="none" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1" opacity=".5"/><circle cx="14" cy="8" r="3" fill="#4488ff"/><circle cx="34" cy="32" r="4" fill="none" stroke="#ffcc00" stroke-width="2"/><line x1="34" y1="26" x2="34" y2="28" stroke="#ffcc00" stroke-width="1.5"/><line x1="34" y1="36" x2="34" y2="38" stroke="#ffcc00" stroke-width="1.5"/><line x1="28" y1="32" x2="30" y2="32" stroke="#ffcc00" stroke-width="1.5"/><line x1="38" y1="32" x2="40" y2="32" stroke="#ffcc00" stroke-width="1.5"/><circle cx="34" cy="32" r="1.5" fill="#ffcc00"/><text x="34" y="44" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">CCIP CUE</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">CCIP</text></symbol>
+<symbol id="ico-sms-gbu" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff8800" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#080604"/><text x="24" y="12" fill="#ff8800" font-size="5" font-family="monospace" text-anchor="middle">SMS · A/G</text><text x="24" y="17" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">GBU-12 × 2</text><rect x="8" y="23" width="14" height="8" rx="2" fill="#0a0600" stroke="#ff8800" stroke-width="1"/><text x="15" y="29" fill="#ff8800" font-size="4" font-family="monospace" text-anchor="middle">CCRP</text><rect x="26" y="23" width="14" height="8" rx="2" fill="#0a0800" stroke="#332200" stroke-width="1"/><text x="33" y="29" fill="#332200" font-size="4" font-family="monospace" text-anchor="middle">CCIP</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SMS A/G</text></symbol>
+<symbol id="ico-laser-code" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff8800" stroke-width="1.5"/><rect x="6" y="6" width="36" height="10" rx="1" fill="#080600"/><text x="24" y="13" fill="#ff8800" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">LASER CODE</text><rect x="14" y="20" width="20" height="12" rx="2" fill="#0a0600" stroke="#332200" stroke-width="1"/><text x="24" y="29" fill="#00ff44" font-size="8" font-family="monospace" text-anchor="middle">1688</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">LASER CODE</text></symbol>
+<symbol id="ico-pinpoint" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff8800" stroke-width="1.5"/><rect x="6" y="6" width="36" height="24" rx="1" fill="#040804"/><circle cx="24" cy="18" r="8" fill="#0a0600" stroke="#332200" stroke-width="1"/><circle cx="24" cy="18" r="3" fill="#ff3333" opacity=".6"/><line x1="14" y1="18" x2="34" y2="18" stroke="#ff3333" stroke-width=".8" opacity=".5"/><line x1="24" y1="8" x2="24" y2="28" stroke="#ff3333" stroke-width=".8" opacity=".5"/><text x="8" y="35" fill="#00ddff" font-size="3.8" font-family="monospace">SPI SET</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">PINPOINT</text></symbol>
+<symbol id="ico-bombfall" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff8800" stroke-width="1.5"/><path d="M30 8 Q20 8 16 24 Q14 32 18 38" fill="none" stroke="#4488ff" stroke-width="2" stroke-dasharray="3,2"/><circle cx="30" cy="8" r="3" fill="#4488ff"/><circle cx="18" cy="38" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><circle cx="18" cy="38" r="1" fill="#ff3333"/><text x="30" y="6" fill="#4488ff" font-size="3.5" font-family="monospace" text-anchor="middle">RLS</text><text x="18" y="44" fill="#ff3333" font-size="3.5" font-family="monospace" text-anchor="middle">IMPACT</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">BOMB FALL</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 空對地武器</div>
+  <h1><span>GBU-12</span> 雷射導引炸彈</h1>
+  <p class="subtitle">Paveway II · LITENING 莢艙 · CCRP / CCIP 投彈</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · GBU-12 基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · LITENING 莢艙操作</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 武器設定</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · CCRP 投彈</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · CCIP 投彈</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">💣</span><div><div class="phase-num">PHASE 01</div><h2>GBU-12 基礎概念</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>GBU-12 Paveway II 簡介</strong>
+GBU-12 是 <span style="color:var(--accent)">500 磅雷射導引炸彈（Mk-82 + Paveway II 導引套件）</span>。需要 <span style="color:var(--accent)">雷射指定器照射目標</span>（LITENING 莢艙），炸彈尾翼上的 <span style="color:var(--accent)">雷射尋的器</span>偵測反射雷射，導引炸彈精確命中。<span style="color:var(--warn)">精度極高（CEP < 5m），是對付固定目標和裝甲的利器。</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-gbu12"/></svg></div>
+      <div class="step-content"><div class="step-action">GBU-12 工作原理</div>
+      <div class="step-detail">
+      · 炸彈本體是 <span class="val">Mk-82 500lb 通用炸彈</span><br>
+      · 加裝 <span class="val">Paveway II 導引套件</span>（尾翼 + 尋的器）<br>
+      · 投放後依慣性彈道飛行，尋的器搜索 <span class="val">雷射反射光斑</span><br>
+      · 偵測到反射光後，控制尾翼修正彈道直擊目標<br>
+      · <span class="cyan-val">必須全程雷射照射直到命中！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-ccrp"/></svg></div>
+      <div class="step-content"><div class="step-action">兩種投彈模式：CCRP vs CCIP</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>模式</th><th>全名</th><th>特點</th></tr>
+      <tr><td class="mono">CCRP</td><td>Continuously Computed Release Point</td><td>水平飛行投彈，電腦計算投放點</td></tr>
+      <tr><td class="mono">CCIP</td><td>Continuously Computed Impact Point</td><td>俯衝投彈，HUD 顯示落點游標</td></tr>
+      </table>
+      <span class="cyan-val">CCRP 較安全（高空水平投彈），CCIP 較準但需俯衝暴露</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-litening"/></svg></div>
+      <div class="step-content"><div class="step-action">LITENING 莢艙簡介</div>
+      <div class="step-detail">LITENING AT 是 F/A-18C 的<span class="val">目標標定莢艙（Targeting Pod）</span>：<br>
+      · <span class="val">FLIR（前視紅外線）</span>：夜視/熱影像鏡頭<br>
+      · <span class="val">內建雷射指定器</span>：照射目標供 GBU 導引<br>
+      · 可放大、追蹤、自動鎖定移動目標<br>
+      · 掛載於機身下方，DDI 顯示 FLIR 影像</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：LITENING 莢艙操作 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">📷</span><div><div class="phase-num">PHASE 02</div><h2>LITENING 莢艙操作</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>SOI（Sensor of Interest）概念</strong>
+DDI 顯示 FLIR 影像時，該 DDI 成為 <span style="color:var(--accent)">SOI（目前控制的感測器）</span>。<span style="color:var(--warn)">TDC 游標控制 SOI 上的感測器</span>：在 FLIR 頁面移動 TDC = 移動莢艙瞄準點。操作前務必確認 SOI 在正確的 DDI 上！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-litening"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → MENU → FLIR 開啟莢艙</div>
+      <div class="step-detail">選一個 DDI 按 <span class="val">MENU → FLIR</span>，開啟 LITENING 莢艙影像。莢艙啟動需數秒暖機。畫面顯示熱影像（白熱或黑熱模式可切換）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-fliright"/></svg></div>
+      <div class="step-content"><div class="step-action">確認 SOI 在 FLIR DDI 上</div>
+      <div class="step-detail">按 <span class="val">SOI 切換鈕（DMS, Display Management Switch）</span> 將 SOI 切換到 FLIR 顯示的 DDI 上。畫面邊框會 <span class="val">高亮顯示</span> 表示為 SOI。TDC 此時控制莢艙視野方向。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-fliright"/></svg></div>
+      <div class="step-content"><div class="step-action">TDC 移動莢艙視野，尋找目標</div>
+      <div class="step-detail">用 TDC 移動莢艙瞄準點掃視地面：<br>
+      · 莢艙視野跟隨 TDC 移動<br>
+      · 可調整 <span class="val">FOV（視野範圍）</span>：WFOV（廣角）找目標，NFOV（窄角）放大細節<br>
+      · 找到目標後 TDC 對準目標中心</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-pinpoint"/></svg></div>
+      <div class="step-content"><div class="step-action">TDC 按壓 → SPI（鎖點）設定在目標</div>
+      <div class="step-detail">TDC 對準目標後 <span class="warn-val">按壓 TDC</span>：<br>
+      · 莢艙進入 <span class="val">Point Track（點追蹤）</span>模式，鎖定該地面點<br>
+      · 該點成為 <span class="val">SPI（Sensor Point of Interest）</span><br>
+      · 莢艙自動追蹤目標（即使飛機移動，影像也會跟隨）<br>
+      · HUD 和 HSI 上也會顯示 SPI 標記</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-fliright"/></svg></div>
+      <div class="step-content"><div class="step-action">FLIR 影像模式切換</div>
+      <div class="step-detail">DDI OSB 可切換：<br>
+      · <span class="val">WHOT（White Hot）</span>：熱源顯示白色，一般用<br>
+      · <span class="val">BHOT（Black Hot）</span>：熱源顯示黑色，某些情況更清晰<br>
+      · <span class="val">Polarity（極性）</span>切換依場景選擇<br>
+      · 縮放（Zoom）調整放大倍率方便精確瞄準</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← GBU-12 基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：武器設定 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">⚙️</span><div><div class="phase-num">PHASE 03</div><h2>武器與雷射設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>雷射代碼必須一致！</strong>
+LITENING 莢艙的<span style="color:var(--accent2)">雷射發射代碼</span>必須與 GBU-12 的<span style="color:var(--accent2)">雷射接收代碼</span>一致（通常都設為 <span style="color:var(--accent)">1688</span>），否則炸彈尋的器無法識別反射訊號！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sms-gbu"/></svg></div>
+      <div class="step-content"><div class="step-action">MASTER ARM → ARM</div>
+      <div class="step-detail">左主控台 <span class="warn-val">MASTER ARM → ARM</span>。HUD 右上角顯示 ARM。<span class="red-val">訓練時保持 SAFE！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sms-gbu"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → SMS → 選擇 GBU-12</div>
+      <div class="step-detail">右 DDI → <span class="val">MENU → SMS</span>，確認 GBU-12 掛載。用 <span class="val">WSS</span> 選擇 GBU-12 站位，HUD 左下顯示 <span class="val">GBU12</span>。選擇投彈模式：<span class="val">CCRP</span> 或 <span class="val">CCIP</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-laser-code"/></svg></div>
+      <div class="step-content"><div class="step-action">設定雷射代碼（莢艙 & 炸彈一致）</div>
+      <div class="step-detail">透過 DDI 或 UFC 確認雷射代碼設定：<br>
+      · 預設代碼通常為 <span class="warn-val">1688</span>（DCS 預設）<br>
+      · LITENING 莢艙頁面設定 <span class="val">LASER CODE</span><br>
+      · SMS 武器頁面確認 GBU-12 的 <span class="val">雷射接收代碼</span> 相同<br>
+      · 多人合作時需與隊友協調使用不同代碼</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-sms-gbu"/></svg></div>
+      <div class="step-content"><div class="step-action">確認 SPI 來源 = LITENING 莢艙</div>
+      <div class="step-detail">SMS 或 HUD 確認武器瞄準資料來源（SPI Source）設為 <span class="val">TGP（LITENING 莢艙）</span>，這樣炸彈會投向莢艙鎖定的 SPI 點，而不是其他來源（如 INS 航路點）。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← LITENING 莢艙操作</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：CCRP 投彈 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">📐</span><div><div class="phase-num">PHASE 04</div><h2>CCRP 投彈（水平投彈）</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>CCRP — 最安全的投彈方式</strong>
+CCRP 讓你在 <span style="color:var(--accent)">中高空水平飛行</span>即可投彈，飛機不需要俯衝暴露在防空火力下。電腦持續計算投放點，飛越該點時自動或手動投放，炸彈飛行軌跡由雷射導引修正到 SPI 目標。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-pinpoint"/></svg></div>
+      <div class="step-content"><div class="step-action">LITENING 鎖定目標 → SPI 設定完成</div>
+      <div class="step-detail">參考 Phase 02：用 LITENING 莢艙找到目標，TDC 按壓進入 Point Track，SPI 設定在目標上。HUD 顯示 SPI 標記和目標距離。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-ccrp"/></svg></div>
+      <div class="step-content"><div class="step-action">確認武器模式為 CCRP</div>
+      <div class="step-detail">SMS 頁面確認投彈模式為 <span class="val">CCRP</span>。HUD 顯示 CCRP 相關符號：<br>
+      · <span class="val">Release Cue（投放游標）</span><br>
+      · <span class="val">飛行路徑指示</span><br>
+      · 距離 SPI 的資訊</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-bombfall"/></svg></div>
+      <div class="step-content"><div class="step-action">飛向目標，保持航向對準 SPI</div>
+      <div class="step-detail">保持飛機航向讓 HUD 上的 <span class="val">飛行路徑標誌（FPM）</span>朝向目標方向。維持穩定高度和速度（建議 <span class="val">15,000–20,000 ft，350–450 kt</span>），讓電腦準確計算彈道。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-bombfall"/></svg></div>
+      <div class="step-content"><div class="step-action">Release Cue 對齊 → 按住/按下 Weapon Release</div>
+      <div class="step-detail">當 HUD 的 <span class="warn-val">Release Cue（投放標記）</span> 與目標標記重合時：<br>
+      · <span class="val">自動模式</span：電腦自動投放（若設定為 AUTO）<br>
+      · <span class="val">手動模式</span>：按下並 <span class="val">持續按住 Weapon Release</span> 直到投放完成<br>
+      · 投放後 HUD 顯示 <span class="val">飛行時間倒數</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-laser-fire"/></svg></div>
+      <div class="step-content"><div class="step-action">投放後 → 雷射持續照射直到命中</div>
+      <div class="step-detail">炸彈投放後，<span class="warn-val">必須繼續用 LITENING 照射目標（雷射持續開啟）</span>，直到炸彈命中：<br>
+      · 保持 SPI 在目標上（莢艙自動追蹤）<br>
+      · 確認雷射發射開啟（LASE 鈕）<br>
+      · 倒數時間結束 = 命中（DDI 可看到爆炸閃光）</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-gbu12"/></svg></div>
+      <div class="step-content"><div class="step-action">CCRP 注意事項</div>
+      <div class="step-detail">
+      · <span class="cyan-val">飛行高度越高，落彈時間越長，需保持雷射照射的時間越久</span><br>
+      · 若投彈後立即轉向脫離，雷射會失去目標 → 炸彈失導<br>
+      · 至少在落地前 <span class="val">3–5 秒</span> 保持照射<br>
+      · 多彈連投時，每枚需獨立的照射時段（或依序處理）</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← 武器設定</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：CCIP 投彈 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🎯</span><div><div class="phase-num">PHASE 05</div><h2>CCIP 投彈（俯衝投彈）</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>CCIP — 更準但風險更高</strong>
+CCIP 需要將機頭對準目標方向<span style="color:var(--accent2)">俯衝</span>，HUD 顯示<span style="color:var(--accent)">即時落點游標（Impact Point Cue）</span>，游標對準目標即可投彈。精度高但飛機暴露於地面防空火力時間較長，<span style="color:var(--warn)">適合對付高威脅環境的小型/移動目標。</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-ccip"/></svg></div>
+      <div class="step-content"><div class="step-action">切換武器模式為 CCIP</div>
+      <div class="step-detail">SMS 頁面切換投彈模式為 <span class="val">CCIP</span>。HUD 出現 <span class="val">Impact Point Cue（落點游標，通常為圓圈或菱形）</span>，即時顯示「若現在投彈，炸彈會落在哪裡」。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-ccip"/></svg></div>
+      <div class="step-content"><div class="step-action">建立俯衝航線對準目標</div>
+      <div class="step-detail">建立穩定俯衝：<br>
+      · 俯衝角依目標類型 <span class="val">20–45°</span>（越陡越準但風險越高）<br>
+      · 速度建議 <span class="val">400–500 kt</span><br>
+      · 機頭朝向目標方向，HUD 落點游標出現在畫面中</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ccip"/></svg></div>
+      <div class="step-content"><div class="step-action">落點游標對準目標 → 投彈</div>
+      <div class="step-detail">調整飛機姿態讓 <span class="warn-val">落點游標（Impact Cue）精確對準目標</span>，按下 <span class="val">Weapon Release</span> 投彈。<span class="cyan-val">CCIP 不需要事先 SPI 鎖定，落點游標本身就是瞄準依據！</span>但建議仍用 LITENING 維持照射。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card danger-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-bombfall"/></svg></div>
+      <div class="step-content"><div class="step-action">投放後立即拉起脫離（Pull Out）</div>
+      <div class="step-detail">投彈後 <span class="warn-val">立即拉桿脫離俯衝（Pull Out）</span>，避免：<br>
+      · 撞地（CFIT，最致命風險！）<br>
+      · 被己方炸彈破片擊中（過低投放）<br>
+      · 暴露在敵方防空火力過久<br>
+      <span class="red-val">設定「最低投放高度」（Hard Deck）並嚴格遵守！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-laser-fire"/></svg></div>
+      <div class="step-content"><div class="step-action">拉起後嘗試維持雷射照射</div>
+      <div class="step-detail">拉起脫離時若莢艙仍能維持對目標的視線，<span class="val">繼續照射直到命中</span>。若無法維持（機身遮蔽），GBU-12 仍會依慣性彈道飛向最後已知位置，精度會降低但通常仍能命中固定目標。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-gbu12"/></svg></div>
+      <div class="step-content"><div class="step-action">CCRP vs CCIP 選擇指南</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>情況</th><th>建議模式</th></tr>
+      <tr><td>高威脅防空區（SAM）</td><td class="mono">CCRP（高空安全）</td></tr>
+      <tr><td>固定大型目標</td><td class="mono">CCRP</td></tr>
+      <tr><td>小型/移動目標</td><td class="mono">CCIP（精度優先）</td></tr>
+      <tr><td>低威脅環境</td><td class="mono">CCIP（更直觀）</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← CCRP 投彈</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！ ✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">💣</span><span class="tab-label">基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">📷</span><span class="tab-label">莢艙</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">⚙️</span><span class="tab-label">設定</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">📐</span><span class="tab-label">CCRP</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🎯</span><span class="tab-label">CCIP</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · GBU-12 雷射導引炸彈教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
