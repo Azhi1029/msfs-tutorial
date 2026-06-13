@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AGM-88 HARM">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · AGM-88 HARM</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#cc44ff;--accent2:#ff3333;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(180,50,220,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(150,0,200,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(60,0,80,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(204,68,255,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(204,68,255,.08);border:1px solid rgba(204,68,255,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(204,68,255,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(204,68,255,.08);box-shadow:0 0 16px rgba(204,68,255,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(204,68,255,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(204,68,255,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(204,68,255,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--danger);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card.danger-card{border-left-color:var(--danger);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#fff;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#f0d8ff;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-box.purple-box{background:rgba(204,68,255,.07);border:1px solid rgba(204,68,255,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--accent2);}
+.purple-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(204,68,255,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(204,68,255,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-harm" viewBox="0 0 48 48"><rect x="3" y="15" width="36" height="11" rx="5" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><path d="M39 16 L46 20.5 L39 25Z" fill="#cc44ff" opacity=".7"/><path d="M12 15 L6 7 L10 7 L16 15Z" fill="#cc44ff" opacity=".6"/><path d="M12 26 L6 34 L10 34 L16 26Z" fill="#cc44ff" opacity=".6"/><circle cx="32" cy="20.5" r="2.5" fill="#ff3333" opacity=".7"/><text x="20" y="38" fill="#cc44ff" font-size="5.5" font-family="monospace" text-anchor="middle">AGM-88 HARM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">ARM</text></symbol>
+<symbol id="ico-had-page" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><rect x="6" y="6" width="36" height="10" rx="1" fill="#100018"/><text x="24" y="13" fill="#cc44ff" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">HAD PAGE</text><circle cx="24" cy="28" r="13" fill="#0a0010" stroke="#330044" stroke-width="1"/><circle cx="24" cy="28" r="2" fill="#cc44ff"/><circle cx="16" cy="22" r="2.5" fill="#ff3333"/><text x="16" y="19" fill="#ff3333" font-size="3.5" font-family="monospace" text-anchor="middle">SA-8</text><circle cx="32" cy="34" r="2" fill="#ffcc00"/><text x="32" y="40" fill="#ffcc00" font-size="3.5" font-family="monospace" text-anchor="middle">SA-6</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-has-mode" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><circle cx="24" cy="22" r="14" fill="#0a0010" stroke="#330044" stroke-width="1"/><circle cx="24" cy="22" r="9" fill="#0a0010" stroke="#cc44ff" stroke-width="1.2"/><circle cx="24" cy="22" r="4" fill="#cc44ff" opacity=".5"/><line x1="24" y1="8" x2="24" y2="14" stroke="#cc44ff" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><line x1="24" y1="30" x2="24" y2="36" stroke="#cc44ff" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><line x1="10" y1="22" x2="16" y2="22" stroke="#cc44ff" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><line x1="32" y1="22" x2="38" y2="22" stroke="#cc44ff" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><text x="24" y="44" fill="#cc44ff" font-size="4.5" font-family="monospace" text-anchor="middle">HARM AS SENSOR</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-sms-harm" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#100018"/><text x="24" y="12" fill="#cc44ff" font-size="5" font-family="monospace" text-anchor="middle">SMS · A/G</text><text x="24" y="17" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">AGM-88 × 2</text><rect x="8" y="23" width="10" height="8" rx="2" fill="#100018" stroke="#cc44ff" stroke-width="1"/><text x="13" y="29" fill="#cc44ff" font-size="3.5" font-family="monospace" text-anchor="middle">SP</text><rect x="19" y="23" width="10" height="8" rx="2" fill="#100018" stroke="#cc44ff" stroke-width="1"/><text x="24" y="29" fill="#cc44ff" font-size="3.5" font-family="monospace" text-anchor="middle">PB</text><rect x="30" y="23" width="10" height="8" rx="2" fill="#100018" stroke="#cc44ff" stroke-width="1"/><text x="35" y="29" fill="#cc44ff" font-size="3.5" font-family="monospace" text-anchor="middle">POS</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SMS A/G</text></symbol>
+<symbol id="ico-sp-mode" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#100000" stroke="#cc44ff" stroke-width="1.5"/><circle cx="24" cy="22" r="14" fill="#0a0000" stroke="#330000" stroke-width="1"/><circle cx="24" cy="22" r="2" fill="#cc44ff"/><circle cx="14" cy="14" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"><animate attributeName="r" from="2" to="5" dur="1.2s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.2s" repeatCount="indefinite"/></circle><circle cx="14" cy="14" r="2" fill="#ff3333"/><line x1="24" y1="22" x2="14" y2="14" stroke="#cc44ff" stroke-width="2" stroke-linecap="round"/><text x="24" y="40" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">SELF PROTECT</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-pb-mode" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#100018"/><text x="24" y="12" fill="#cc44ff" font-size="5" font-family="monospace" text-anchor="middle">PRE-BRIEFED</text><text x="24" y="17" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">TGT: N25 E121</text><path d="M24 24 L24 36" fill="none" stroke="#cc44ff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3,2"/><circle cx="24" cy="24" r="2.5" fill="#ffcc00"/><circle cx="24" cy="36" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">PB MODE</text></symbol>
+<symbol id="ico-pos-mode" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><circle cx="14" cy="30" r="2.5" fill="#33cc44"/><path d="M14 30 Q24 12 36 16" fill="none" stroke="#cc44ff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3,2"/><circle cx="36" cy="16" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><circle cx="36" cy="16" r="1" fill="#ff3333"/><text x="14" y="38" fill="#33cc44" font-size="4" font-family="monospace" text-anchor="middle">INS POS</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">POS MODE</text></symbol>
+<symbol id="ico-rifle-g" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><path d="M8 30 Q20 30 24 14" fill="none" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="8" cy="30" r="3" fill="#4488ff"/><path d="M24 14 L36 22" fill="none" stroke="#cc44ff" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="14" r="2.5" fill="#ffcc00"/><circle cx="36" cy="22" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="40" fill="#ffcc00" font-size="6" font-family="monospace" text-anchor="middle">RIFLE G!</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-sead-tactic" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0c0010" stroke="#cc44ff" stroke-width="1.5"/><circle cx="24" cy="24" r="16" fill="none" stroke="#ff3333" stroke-width="1" stroke-dasharray="2,2" opacity=".5"/><circle cx="24" cy="24" r="3" fill="#ff3333"/><path d="M8 36 Q12 20 24 14" fill="none" stroke="#33cc44" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="36" r="2.5" fill="#33cc44"/><path d="M40 12 Q36 24 24 24" fill="none" stroke="#cc44ff" stroke-width="2" stroke-linecap="round" stroke-dasharray="3,2"/><circle cx="40" cy="12" r="2.5" fill="#cc44ff"/><text x="24" y="44" fill="#cc44ff" font-size="5" font-family="monospace" text-anchor="middle">SEAD PACKAGE</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 對雷達武器</div>
+  <h1>AGM-88 <span>HARM</span></h1>
+  <p class="subtitle">反輻射飛彈 · SEAD 壓制敵防空 · HAS/PB/SP 模式</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · HARM 基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 武器設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · HAS 威脅偵測</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 發射模式與射擊</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · SEAD 戰術</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">📡</span><div><div class="phase-num">PHASE 01</div><h2>AGM-88 HARM 基礎概念</h2></div></div>
+  <div class="alert-box purple-box"><span class="alert-icon">🟣</span><div class="alert-text"><strong>AGM-88 HARM 簡介</strong>
+HARM（High-speed Anti-Radiation Missile）是<span style="color:var(--accent)">反輻射飛彈</span>，無線電呼號 <span style="color:var(--accent)">「RIFLE G！」</span>。飛彈導引頭<span style="color:var(--accent)">偵測並追蹤敵方雷達發射的電磁波</span>，沿著電磁波束飛向發射源（雷達天線）。主要用於<span style="color:var(--green)">SEAD（Suppression of Enemy Air Defenses，壓制敵方防空）</span>任務，摧毀或迫使敵方雷達關機。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-harm"/></svg></div>
+      <div class="step-content"><div class="step-action">反輻射飛彈工作原理</div>
+      <div class="step-detail">HARM 導引頭是<span class="val">被動式雷達訊號接收器</span>：<br>
+      · 偵測<span class="val">敵方雷達發射的電磁波</span>（搜索/追蹤/火控雷達）<br>
+      · 沿電磁波束方向飛向發射源<br>
+      · <span class="warn-val">若敵方雷達關機，飛彈可能失去導引（依型號和情況）</span><br>
+      · 射程依發射條件可達 <span class="val">40+ NM</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sead-tactic"/></svg></div>
+      <div class="step-content"><div class="step-action">SEAD 任務的角色</div>
+      <div class="step-detail">SEAD 任務目的：<br>
+      · <span class="val">摧毀</span>敵方 SAM 雷達站（Hard Kill）<br>
+      · 或<span class="val">迫使其關閉雷達</span>（Soft Kill / Suppression），暫時失去防空能力<br>
+      · 為其他攻擊機<span class="green-val">開闢安全通道</span><br>
+      · HARM 通常由<span class="cyan-val">專門的 SEAD 編隊</span>在打擊主力之前/同時執行</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-had-page"/></svg></div>
+      <div class="step-content"><div class="step-action">三種發射模式總覽</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>模式</th><th>全名</th><th>使用情境</th></tr>
+      <tr><td class="mono">SP</td><td>Self-Protect</td><td>RWR 偵測到威脅時自衛發射</td></tr>
+      <tr><td class="mono">PB</td><td>Pre-Briefed</td><td>已知目標座標，預先設定</td></tr>
+      <tr><td class="mono">POS</td><td>Position</td><td>依飛機位置推算目標方向</td></tr>
+      </table>
+      <span class="cyan-val">另有 HAS（HARM as Sensor）：用 HARM 導引頭主動掃描威脅</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：武器設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚙️</span><div><div class="phase-num">PHASE 02</div><h2>武器設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>HAD（HARM Attack Display）頁面是核心</strong>
+所有 HARM 操作圍繞 <span style="color:var(--accent2)">HAD 頁面</span>進行：顯示偵測到的雷達威脅、選擇發射模式、查看威脅資料庫資訊。MASTER ARM 必須在 ARM 位置。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sms-harm"/></svg></div>
+      <div class="step-content"><div class="step-action">MASTER ARM → ARM</div>
+      <div class="step-detail">左主控台 <span class="warn-val">MASTER ARM → ARM</span>。HUD 顯示 ARM。<span class="red-val">訓練時保持 SAFE！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sms-harm"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → SMS → 選擇 AGM-88</div>
+      <div class="step-detail">右 DDI → <span class="val">MENU → SMS</span>，用 <span class="val">WSS</span> 選擇 AGM-88 武器站。HUD 左下角顯示 <span class="val">88</span>。確認掛載數量。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-had-page"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → HAD 頁面開啟</div>
+      <div class="step-detail">選擇 AGM-88 後，DDI 切換至 <span class="val">HAD（HARM Attack Display）</span>頁面。該 DDI 成為 SOI。HAD 頁面類似雷達 B-Scope，但顯示的是<span class="cyan-val">偵測到的雷達發射源</span>而非反射回波。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-sms-harm"/></svg></div>
+      <div class="step-content"><div class="step-action">選擇發射模式（SP/PB/POS/HAS）</div>
+      <div class="step-detail">HAD 頁面 OSB 切換發射模式。<span class="cyan-val">通常先用 HAS（HARM as Sensor）掃描威脅，確認目標後再選擇 PB 或 POS 發射，或保持 SP 待自動觸發。</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← HARM 基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：HAS 威脅偵測 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🔭</span><div><div class="phase-num">PHASE 03</div><h2>HAS — HARM as Sensor 威脅偵測</h2></div></div>
+  <div class="alert-box purple-box"><span class="alert-icon">🟣</span><div class="alert-text"><strong>HAS 模式 — 用飛彈當你的眼睛</strong>
+HAS（HARM as Sensor）讓掛載的 AGM-88 <span style="color:var(--accent)">主動掃描周遭雷達訊號</span>，並在 HAD 頁面顯示偵測到的<span style="color:var(--accent)">威脅類型和大致方位</span>，即使尚未發射飛彈。這讓你能<span style="color:var(--green)">提前掌握戰場電磁環境</span>，規劃攻擊。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-has-mode"/></svg></div>
+      <div class="step-content"><div class="step-action">HAD 頁面切換至 HAS 模式</div>
+      <div class="step-detail">HAD 頁面 OSB 選擇 <span class="val">HAS</span>。掛載的 AGM-88 導引頭開始<span class="val">被動掃描</span>環境中的雷達訊號，無需發射即可運作。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-had-page"/></svg></div>
+      <div class="step-content"><div class="step-action">HAD 頁面判讀偵測到的威脅</div>
+      <div class="step-detail">HAD 頁面中心是飛機，偵測到的雷達顯示為<span class="val">符號 + 代碼</span>（如 SA-6、SA-8、SA-11 等）：<br>
+      · 符號位置代表<span class="val">大致方位</span>（B-Scope 顯示，非精確距離）<br>
+      · 代碼代表雷達<span class="val">型號和威脅等級</span><br>
+      · 多個威脅可同時顯示</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-has-mode"/></svg></div>
+      <div class="step-content"><div class="step-action">TDC 選擇目標威脅</div>
+      <div class="step-detail">TDC 移至想攻擊的威脅符號上按壓，將其指定為<span class="val">目前目標</span>。HAD 頁面顯示該目標的詳細資料（型號、可能距離範圍）。<span class="cyan-val">優先選擇對自身威脅最大的雷達（如鎖定你的 SAM 火控雷達）！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-harm"/></svg></div>
+      <div class="step-content"><div class="step-action">HAS 與 RWR 的關係</div>
+      <div class="step-detail">HAS 顯示的資訊與 <span class="val">RWR（AN/ALR-67）</span>有重疊但更詳細：<br>
+      · RWR 主要警告<span class="val">對你自己的威脅</span><br>
+      · HAS 可顯示<span class="val">更廣範圍的雷達發射源</span>（不一定瞄準你）<br>
+      · <span class="cyan-val">兩者配合使用，建立完整電磁戰場圖像</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 武器設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：發射模式與射擊 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🚀</span><div><div class="phase-num">PHASE 04</div><h2>發射模式與射擊</h2></div></div>
+  <div class="alert-box purple-box"><span class="alert-icon">🟣</span><div class="alert-text"><strong>選擇正確的發射模式</strong>
+依任務情境選擇 <span style="color:var(--accent)">SP（自衛）、PB（預先簡報）、POS（位置推算）</span> 三種模式之一。每種模式適用不同場景，<span style="color:var(--warn)">選錯模式可能導致飛彈飛錯方向或無法發射！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="subsection">SP — Self-Protect 自衛模式</div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sp-mode"/></svg></div>
+      <div class="step-content"><div class="step-action">SP 模式：RWR 鎖定觸發自動射擊</div>
+      <div class="step-detail">HAD 選擇 <span class="val">SP</span> 模式：當 <span class="val">RWR 偵測到敵方雷達鎖定（Spike/Track）</span>你時，HARM 可立即朝該威脅方向發射，<span class="green-val">用於緊急自衛，反應最快</span>。按下 Weapon Release 即發射朝向鎖定你的雷達。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="subsection">PB — Pre-Briefed 預先簡報模式</div>
+  <div class="steps-grid" id="steps-3b">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-pb-mode"/></svg></div>
+      <div class="step-content"><div class="step-action">PB 模式：輸入已知目標座標</div>
+      <div class="step-detail">若任務簡報提供<span class="val">已知 SAM 站點座標</span>：<br>
+      · HAD 選擇 <span class="val">PB</span> 模式<br>
+      · 透過 UFC 輸入目標座標（類似 JDAM 座標輸入）<br>
+      · 飛彈朝該方向飛行，<span class="val">接近目標範圍後導引頭啟動</span>，搜索並鎖定該位置實際發射的雷達訊號</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="subsection">POS — Position 位置推算模式</div>
+  <div class="steps-grid" id="steps-3c">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-pos-mode"/></svg></div>
+      <div class="step-content"><div class="step-action">POS 模式：依目前位置朝威脅方向發射</div>
+      <div class="step-detail">HAD 選擇 <span class="val">POS</span> 模式：飛彈使用<span class="val">發射時飛機的 INS 位置和機頭方向</span>計算初始彈道，朝<span class="val">目前機頭指向的方向</span>飛行，途中導引頭搜索匹配的雷達訊號。<span class="cyan-val">適合：已知大致方向但無精確座標時</span>。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="subsection">綜合射擊流程（HAS + 發射）</div>
+  <div class="steps-grid" id="steps-3d">
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-rifle-g"/></svg></div>
+      <div class="step-content"><div class="step-action">HAS 選定目標後 → 按下 Weapon Release，「RIFLE G！」</div>
+      <div class="step-detail">最常見流程：<br>
+      1. HAS 模式偵測並用 TDC 選擇目標威脅<br>
+      2. 確認 MASTER ARM → ARM<br>
+      3. 按下 <span class="warn-val">Weapon Release</span>！無線電呼號 <span class="val">「RIFLE G！」</span><br>
+      4. 飛彈飛向該雷達訊號方向，自主追蹤直到命中或敵方關機</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-harm"/></svg></div>
+      <div class="step-content"><div class="step-action">射後注意事項</div>
+      <div class="step-detail">
+      · HARM 射出後<span class="green-val">飛機可立即脫離</span>（Fire and Forget）<br>
+      · 若敵方雷達<span class="warn-val">在飛彈到達前關機</span>，飛彈可能依最後已知方向繼續飛行（依型號表現不同）<br>
+      · 多枚 HARM 可對多個威脅依序射擊（WSS 切換站位）</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← HAS 威脅偵測</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：SEAD 戰術 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">📋</span><div><div class="phase-num">PHASE 05</div><h2>SEAD 戰術整合</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>HARM 在整體任務中的角色</strong>
+HARM 很少單獨使用，通常是<span style="color:var(--green)">SEAD/DEAD 編隊</span>的一部分，為其他攻擊機<span style="color:var(--accent)">開闢安全走廊</span>。理解整體戰術，才能發揮 HARM 的最大價值。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sead-tactic"/></svg></div>
+      <div class="step-content"><div class="step-action">SEAD vs DEAD 概念</div>
+      <div class="step-detail">
+      · <span class="val">SEAD（Suppression）</span>：<span class="green-val">壓制</span>，迫使敵方雷達關機或降低效能，不一定摧毀<br>
+      · <span class="val">DEAD（Destruction）</span>：<span class="red-val">徹底摧毀</span>敵方防空系統<br>
+      HARM 對兩者都有貢獻：發射本身可能<span class="cyan-val">迫使對方關機（SP 觸發），命中則達成 DEAD</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sead-tactic"/></svg></div>
+      <div class="step-content"><div class="step-action">任務時序：SEAD 先行 vs 同步</div>
+      <div class="step-detail">常見編組方式：<br>
+      · <span class="val">SEAD 先行</span>：HARM 機先進入，壓制 SAM，主力打擊機隨後跟進<br>
+      · <span class="val">同步進入</span>：HARM 機與打擊機同時行動，HARM 機監控並隨時反應 SAM 鎖定<br>
+      · <span class="cyan-val">無論哪種，HARM 機需全程保持 HAS 監控，隨時準備反應</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-harm"/></svg></div>
+      <div class="step-content"><div class="step-action">威脅優先順序判斷</div>
+      <div class="step-detail">多個雷達威脅時優先打擊：<br>
+      · <span class="warn-val">正在追蹤/鎖定友機的雷達</span>（最高優先，立即威脅）<br>
+      · <span class="val">射程覆蓋打擊機航線的 SAM</span><br>
+      · <span class="val">指揮/協調用的早期預警雷達</span>（降低整體防空效能）<br>
+      · 優先級可參考 HAD 顯示的雷達型號和已知威脅資料</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-rifle-g"/></svg></div>
+      <div class="step-content"><div class="step-action">AGM-88 完整流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>步驟</th><th>動作</th></tr>
+      <tr><td>1</td><td>MASTER ARM → ARM</td></tr>
+      <tr><td>2</td><td>SMS 選擇 AGM-88，開啟 HAD 頁面</td></tr>
+      <tr><td>3</td><td>HAS 模式掃描，建立威脅圖像</td></tr>
+      <tr><td>4</td><td>TDC 選擇優先目標</td></tr>
+      <tr><td>5</td><td>選擇發射模式（HAS/SP/PB/POS）</td></tr>
+      <tr><td>6</td><td>Weapon Release，RIFLE G！</td></tr>
+      <tr><td>7</td><td>立即可脫離或處理下一威脅</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 發射模式與射擊</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">📡</span><span class="tab-label">基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚙️</span><span class="tab-label">設定</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🔭</span><span class="tab-label">HAS</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🚀</span><span class="tab-label">發射</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">📋</span><span class="tab-label">SEAD</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · AGM-88 HARM 反輻射飛彈教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
