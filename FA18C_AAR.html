@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="空中加油">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · 空中加油</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#4488ff;--accent2:#00ddff;--accent3:#33cc44;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(20,80,220,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(0,150,220,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(0,30,80,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(68,136,255,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(68,136,255,.08);border:1px solid rgba(68,136,255,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(68,136,255,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(68,136,255,.08);box-shadow:0 0 16px rgba(68,136,255,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(68,136,255,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(68,136,255,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(68,136,255,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--accent3);}
+.step-card.tip-card{border-left-color:var(--accent2);}
+.step-card.danger-card{border-left-color:var(--danger);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#d8eaff;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-box.red-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--accent);}
+.warn-box .alert-text strong{color:var(--warn);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent2);}
+.red-box .alert-text strong{color:var(--danger);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(68,136,255,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(68,136,255,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-kc130" viewBox="0 0 48 48"><rect x="3" y="14" width="34" height="10" rx="5" fill="#0a0e18" stroke="#4488ff" stroke-width="1.5"/><path d="M37 16 L46 19 L37 22Z" fill="#4488ff" opacity=".7"/><path d="M14 14 L8 6 L12 6 L18 14Z" fill="#4488ff" opacity=".6"/><path d="M14 24 L8 32 L12 32 L18 24Z" fill="#4488ff" opacity=".6"/><line x1="2" y1="19" x2="46" y2="19" stroke="#00ddff" stroke-width="1" stroke-dasharray="2,2" opacity=".5"/><circle cx="4" cy="19" r="1.5" fill="#33cc44"/><text x="20" y="38" fill="#4488ff" font-size="5.5" font-family="monospace" text-anchor="middle">KC-130 / S-3</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">TANKER</text></symbol>
+<symbol id="ico-tacan-aar" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="24" r="15" fill="#040810"/><line x1="24" y1="9" x2="24" y2="24" stroke="#4488ff" stroke-width="2" stroke-linecap="round" opacity=".3"/><line x1="24" y1="24" x2="34" y2="14" stroke="#00ddff" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="14" r="3" fill="#00ddff" opacity=".8"/><circle cx="24" cy="24" r="3" fill="#182040"/><text x="24" y="36" fill="#00ddff" font-size="5.5" font-family="monospace" text-anchor="middle">A/A TACAN</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">TACAN A/A</text></symbol>
+<symbol id="ico-probe" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><path d="M8 30 L20 30 L20 12 L26 12" fill="none" stroke="#4488ff" stroke-width="2.5" stroke-linecap="round"/><circle cx="26" cy="12" r="2.5" fill="#00ddff"/><rect x="6" y="28" width="16" height="6" rx="1" fill="#182040" opacity=".5"/><text x="24" y="40" fill="#4488ff" font-size="5" font-family="monospace" text-anchor="middle">PROBE EXTEND</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">REFUEL PROBE</text></symbol>
+<symbol id="ico-basket" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><line x1="6" y1="14" x2="30" y2="14" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1" opacity=".5"/><ellipse cx="36" cy="22" rx="9" ry="7" fill="none" stroke="#ffcc00" stroke-width="2"/><circle cx="36" cy="22" r="3" fill="#0a0000"/><path d="M27 22 L33 22" stroke="#4488ff" stroke-width="2" stroke-linecap="round"/><circle cx="27" cy="22" r="2" fill="#00ddff"/><text x="24" y="38" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">DROGUE BASKET</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">BASKET</text></symbol>
+<symbol id="ico-formation" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><rect x="6" y="14" width="28" height="8" rx="4" fill="#0a0e18" stroke="#4488ff" stroke-width="1.2"/><path d="M34 16 L40 18 L34 20Z" fill="#4488ff" opacity=".7"/><path d="M8 30 L18 30 L18 26 L24 26" fill="none" stroke="#33cc44" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="30" r="2.5" fill="#33cc44"/><text x="24" y="40" fill="#33cc44" font-size="5" font-family="monospace" text-anchor="middle">CLOSE ASTERN</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">FORMATION</text></symbol>
+<symbol id="ico-bumpfuel" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><text x="24" y="11" fill="#4488ff" font-size="5.5" font-family="monospace" text-anchor="middle">FUEL · IFEI</text><rect x="8" y="15" width="32" height="14" rx="2" fill="#040810" stroke="#182040" stroke-width=".8"/><text x="24" y="25" fill="#00ff44" font-size="9" font-family="monospace" text-anchor="middle">+850</text><path d="M14 33 L34 33" stroke="#00ddff" stroke-width="2" stroke-linecap="round"/><path d="M30 30 L34 33 L30 36" fill="none" stroke="#00ddff" stroke-width="1.5" stroke-linecap="round"/><text x="24" y="44" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">FUEL FLOW INCREASING</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-contact-light" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><path d="M8 30 L18 30 L18 26 L26 26 L26 22 L34 22" fill="none" stroke="#33cc44" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="30" r="2.5" fill="#33cc44"/><circle cx="34" cy="22" r="3" fill="#ffcc00" opacity=".8"/><circle cx="36" cy="18" r="4" fill="none" stroke="#33cc44" stroke-width="1.5"><animate attributeName="r" from="3" to="6" dur="1.2s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.2s" repeatCount="indefinite"/></circle><text x="24" y="40" fill="#33cc44" font-size="5" font-family="monospace" text-anchor="middle">CONTACT!</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">PLUG MADE</text></symbol>
+<symbol id="ico-disconnect" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c18" stroke="#4488ff" stroke-width="1.5"/><path d="M8 22 L20 22" stroke="#4488ff" stroke-width="2" stroke-linecap="round"/><path d="M28 22 L40 22" stroke="#ff8800" stroke-width="2.5" stroke-linecap="round"/><path d="M28 22 L34 16 M28 22 L34 28" stroke="#ff8800" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="22" r="2.5" fill="#00ddff"/><text x="24" y="36" fill="#ffcc00" font-size="5" font-family="monospace" text-anchor="middle">BACK & DOWN</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">DISCONNECT</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 導航延伸</div>
+  <h1>空中 <span>加油</span> 教學</h1>
+  <p class="subtitle">TACAN A/A 尋找加油機 · Probe 操作 · 對接與保持</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · 加油機基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 尋找加油機</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 加油前準備</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 對接與加油</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 脫離與常見問題</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">⛽</span><div><div class="phase-num">PHASE 01</div><h2>加油機基礎概念</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>DCS 常見加油機類型</strong>
+DCS World 常見的空中加油機有 <span style="color:var(--accent)">KC-130J（USMC）</span> 和 <span style="color:var(--accent)">S-3B Tanker（USN）</span>，皆使用 <span style="color:var(--accent)">軟管式（Probe and Drogue）</span> 加油系統，與 F/A-18C 的 <span style="color:var(--accent2)">伸縮加油探管（Probe）</span> 對接。任務簡報會提供加油機的呼號、頻率和大致空域。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-kc130"/></svg></div>
+      <div class="step-content"><div class="step-action">加油機通常在固定軌道盤旋</div>
+      <div class="step-detail">加油機在指定空域以<span class="val">固定航線（Racetrack 賽道形）</span>飛行，速度通常 <span class="val">300 kt</span> 左右，高度依任務設定（常見 <span class="val">15,000–25,000 ft</span>）。任務簡報或 F10 地圖會標示其大致位置和航線。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-probe"/></svg></div>
+      <div class="step-content"><div class="step-action">F/A-18C 的加油探管（Probe）位置</div>
+      <div class="step-detail">F/A-18C 的加油探管位於<span class="val">機身右側、座艙前方下方</span>，平時收起貼附機身。需要時可伸出（Extend），<span class="cyan-val">探管尖端要對準加油機拖曳的軟管錐套（Drogue Basket）</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-basket"/></svg></div>
+      <div class="step-content"><div class="step-action">軟管錐套（Drogue/Basket）原理</div>
+      <div class="step-detail">加油機拖曳一條<span class="val">長軟管</span>，末端是<span class="val">漏斗狀錐套（Basket）</span>。錐套會因加油機尾流而<span class="warn-val">輕微搖晃漂移</span>，是加油過程中最考驗操控精度的部分。<span class="cyan-val">飛機飛向錐套，而不是錐套移向飛機！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：尋找加油機 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">📡</span><div><div class="phase-num">PHASE 02</div><h2>使用 TACAN 尋找加油機</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>A/A TACAN 模式</strong>
+加油機通常會發送 <span style="color:var(--accent)">A/A TACAN（空對空 TACAN）</span> 訊號。將 F/A-18C 的 TACAN 設定為任務簡報指定的<span style="color:var(--accent)">加油機頻道</span>，並切換到 <span style="color:var(--accent)">A/A T/R 模式</span>，即可在 HSI 上看到加油機的方位和距離，就像導航到一個地面站一樣。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-tacan-aar"/></svg></div>
+      <div class="step-content"><div class="step-action">設定 TACAN 頻道為加油機頻道</div>
+      <div class="step-detail">用 TACAN 面板或 UFC 輸入任務簡報指定的<span class="val">加油機 TACAN 頻道</span>（通常為 A/A 範圍，如 <span class="val">38Y</span>）。設定方式與一般 TACAN 相同（參考 TACAN 導航教學）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-tacan-aar"/></svg></div>
+      <div class="step-content"><div class="step-action">TACAN 模式切換為 A/A T/R</div>
+      <div class="step-detail">TACAN 面板模式開關切至 <span class="val">A/A T/R</span>（空對空收發模式）。<span class="cyan-val">注意：此時 TACAN 無法同時追蹤地面站，若需要回基地導航記得切回 T/R！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-tacan-aar"/></svg></div>
+      <div class="step-content"><div class="step-action">HSI 確認方位與距離，飛向加油機</div>
+      <div class="step-detail">HSI 出現<span class="val">菱形針</span>指向加油機方向，底部顯示距離。轉向讓菱形針朝向正上方，飛向加油機。<span class="val">無線電聯絡加油機（呼號通常為 Texaco/Shell/Arco 等）</span>，告知意圖加油。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-kc130"/></svg></div>
+      <div class="step-content"><div class="step-action">沒有 TACAN 時：用 F10 地圖或目視</div>
+      <div class="step-detail">若任務未提供 TACAN 頻道：<br>
+      · 查看 <span class="val">F10 地圖</span>（若允許）找加油機大概位置<br>
+      · 飛向預期空域，<span class="val">目視尋找</span>（加油機通常有明顯外型和煙跡）<br>
+      · 加油機通常會在<span class="cyan-val">固定高度盤旋</span>，接近後容易發現</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← 加油機基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：加油前準備 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">✅</span><div><div class="phase-num">PHASE 03</div><h2>加油前準備</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>接近加油機前的標準程序</strong>
+接近加油機時需要<span style="color:var(--warn)">速度匹配、進入正確位置、伸出探管</span>。匆忙接近容易造成尾流擾動或對接困難，<span style="color:var(--accent2)">慢慢來，建立穩定編隊位置最重要！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-formation"/></svg></div>
+      <div class="step-content"><div class="step-action">接近至加油機後方、略低位置（Pre-Contact）</div>
+      <div class="step-detail">從加油機<span class="val">後方下方</span>接近，先到達<span class="val">Pre-Contact 位置</span>：<br>
+      · 距加油機軟管末端約 <span class="val">20–50 ft</span> 後方<br>
+      · 高度略低於加油機（約 <span class="val">10–20 ft</span>）<br>
+      · 速度與加油機相同（約 <span class="val">300 kt</span>）<br>
+      <span class="cyan-val">先穩住相對位置，不要急著往前衝！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-probe"/></svg></div>
+      <div class="step-content"><div class="step-action">伸出加油探管（Extend Probe）</div>
+      <div class="step-detail">在 Pre-Contact 位置穩定後，按下<span class="val">Refuel Probe Extend 開關</span>（左主控台或 HOTAS）。探管從機身右側伸出，DDI 或燈號顯示探管狀態。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-bumpfuel"/></svg></div>
+      <div class="step-content"><div class="step-action">確認外部燈光與通訊</div>
+      <div class="step-detail">夜間加油需確認<span class="val">編隊燈（Formation Lights）</span>開啟，方便雙方互相看見。透過無線電與加油機飛行員確認「Ready to receive fuel」，加油機會回覆同意。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-formation"/></svg></div>
+      <div class="step-content"><div class="step-action">穩定編隊技巧</div>
+      <div class="step-detail">
+      · 用<span class="val">小幅度、緩慢的操控輸入</span>，避免大動作<br>
+      · 視覺參考點：固定盯著加油機某個部位（如機身某標記）判斷相對位置<br>
+      · 油門微調控制前後距離，桿控制上下左右<br>
+      · <span class="cyan-val">先在 Pre-Contact 練到穩定，再嘗試前進對接</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 尋找加油機</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：對接與加油 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🔗</span><div><div class="phase-num">PHASE 04</div><h2>對接與加油</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>對接（Plug）的關鍵：耐心 + 小幅修正</strong>
+從 Pre-Contact 緩慢前進到 Contact 位置，探管尖端插入錐套中心。<span style="color:var(--accent)">錐套會隨亂流晃動，不要追著錐套修正，而是穩定飛機姿態讓錐套自然對齊。</span>對接成功後保持位置直到加滿油。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-basket"/></svg></div>
+      <div class="step-content"><div class="step-action">緩慢前進，瞄準錐套中心</div>
+      <div class="step-detail">從 Pre-Contact 位置，<span class="val">輕推油門 1–2% 增加少量推力</span>，緩慢前進。視線focus在<span class="val">錐套中心的黑色開口</span>，讓探管尖端對準該點。前進速度要非常緩慢（相對速度差約 <span class="val">1–3 kt</span>）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-basket"/></svg></div>
+      <div class="step-content"><div class="step-action">應對錐套晃動 — 不要過度修正！</div>
+      <div class="step-detail"><span class="warn-val">最常見的錯誤：看到錐套晃動就急著修正方向，結果越修越偏（PIO，飛行員誘發震盪）。</span><br>
+      正確做法：<br>
+      · 保持<span class="val">飛機姿態穩定</span>，讓探管軌跡平穩前進<br>
+      · 錐套的小幅晃動是正常的，<span class="cyan-val">不需要追著它動</span><br>
+      · 只修正大幅度、持續性的偏差</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-contact-light"/></svg></div>
+      <div class="step-content"><div class="step-action">對接成功 — 「Contact!」確認</div>
+      <div class="step-detail">探管插入錐套後：<br>
+      · 聽到/看到<span class="val">對接確認（碰撞聲、燈號變化）</span><br>
+      · DDI 或儀表可能顯示<span class="val">FUEL FLOW（燃油流量）</span>開始增加<br>
+      · 無線電可呼叫「<span class="green-val">Contact!</span>」確認對接成功<br>
+      · 加油機飛行員會回覆確認接收燃油</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-bumpfuel"/></svg></div>
+      <div class="step-content"><div class="step-action">維持對接位置，監控油量增加</div>
+      <div class="step-detail">對接後<span class="val">保持相同的相對位置</span>（油門微調維持輕推力，桿保持姿態）。觀察 IFEI 油量數字持續增加。<span class="cyan-val">這個階段最考驗耐心，小修正、緩呼吸、別緊張。</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-basket"/></svg></div>
+      <div class="step-content"><div class="step-action">脫落（Disconnect）後重新嘗試</div>
+      <div class="step-detail">若探管脫離錐套（正常現象，尤其新手）：<br>
+      · 退回 Pre-Contact 位置<br>
+      · 重新穩定，再次緩慢前進嘗試<br>
+      · <span class="cyan-val">多次練習是正常的，真實飛行員也需要反覆對接</span><br>
+      · 注意油量消耗，過程中會持續燒油</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← 加油前準備</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：脫離與常見問題 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🏁</span><div><div class="phase-num">PHASE 05</div><h2>脫離與常見問題</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>加滿油後的標準脫離程序</strong>
+油量加滿（或達到所需油量）後，<span style="color:var(--green)">向後並向下平緩脫離</span>，收回探管，向加油機致謝後返回任務航線。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-disconnect"/></svg></div>
+      <div class="step-content"><div class="step-action">油量達標 → 緩慢向後、向下脫離</div>
+      <div class="step-detail">IFEI 油量達到目標（或加油機示意已滿）：<br>
+      · <span class="val">輕收油門</span>，讓飛機緩慢相對後退<br>
+      · 同時<span class="val">微降高度</span>，避免探管刮到錐套或軟管<br>
+      · 探管自然脫離錐套，回到 Pre-Contact 位置</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-probe"/></svg></div>
+      <div class="step-content"><div class="step-action">收回探管（Retract Probe）</div>
+      <div class="step-detail">確認完全脫離錐套後，按下<span class="val">Refuel Probe 開關收回</span>。探管收回機身，恢復巡航外形（減少阻力）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-tacan-aar"/></svg></div>
+      <div class="step-content"><div class="step-action">脫離編隊，回復任務航線</div>
+      <div class="step-detail">無線電向加油機致謝（「Thanks for the gas」），向側下方緩慢脫離編隊，避開加油機尾流。<span class="warn-val">記得把 TACAN 切回原本的 T/R 模式（地面導航用）。</span>恢復航向飛往下一個任務航路點。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-kc130"/></svg></div>
+      <div class="step-content"><div class="step-action">常見問題排解</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>問題</th><th>原因</th><th>解法</th></tr>
+      <tr><td>找不到加油機</td><td>TACAN 模式錯誤</td><td class="mono">確認 A/A T/R 模式</td></tr>
+      <tr><td>無法穩定編隊</td><td>速度差過大</td><td class="mono">小幅油門調整，勿大幅</td></tr>
+      <tr><td>探管總是脫落</td><td>過度修正(PIO)</td><td class="mono">放鬆操控，緩慢前進</td></tr>
+      <tr><td>油量不增加</td><td>未真正對接</td><td class="mono">確認 Contact 確認訊息</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-disconnect"/></svg></div>
+      <div class="step-content"><div class="step-action">完整空中加油流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>階段</th><th>動作</th></tr>
+      <tr><td>1</td><td>TACAN → A/A T/R，導航至加油機</td></tr>
+      <tr><td>2</td><td>接近至 Pre-Contact 位置，速度匹配</td></tr>
+      <tr><td>3</td><td>伸出探管，無線電確認</td></tr>
+      <tr><td>4</td><td>緩慢前進對接，「Contact!」</td></tr>
+      <tr><td>5</td><td>保持位置直到加滿油</td></tr>
+      <tr><td>6</td><td>緩慢後退脫離，收回探管</td></tr>
+      <tr><td>7</td><td>TACAN 切回 T/R，恢復任務</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 對接與加油</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">⛽</span><span class="tab-label">基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">📡</span><span class="tab-label">尋找</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">✅</span><span class="tab-label">準備</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🔗</span><span class="tab-label">對接</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🏁</span><span class="tab-label">脫離</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · 空中加油教學（Probe and Drogue）<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
