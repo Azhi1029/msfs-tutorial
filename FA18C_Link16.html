@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Link 16">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · Link 16 / MIDS 資料鏈</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#00ddaa;--accent2:#4488ff;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(0,200,170,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(0,100,200,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(0,50,60,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(0,221,170,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(0,221,170,.08);border:1px solid rgba(0,221,170,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(0,221,170,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(0,221,170,.08);box-shadow:0 0 16px rgba(0,221,170,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(0,221,170,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,221,170,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(0,221,170,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--accent2);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#d8fff5;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.blue-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.teal-box{background:rgba(0,221,170,.07);border:1px solid rgba(0,221,170,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--accent2);}
+.warn-box .alert-text strong{color:var(--warn);}
+.teal-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(0,221,170,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(0,221,170,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-mids" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><circle cx="24" cy="20" r="3" fill="#00ddaa"/><circle cx="10" cy="10" r="2.5" fill="none" stroke="#00ddff" stroke-width="1.5"/><circle cx="38" cy="10" r="2.5" fill="none" stroke="#00ddff" stroke-width="1.5"/><circle cx="10" cy="32" r="2.5" fill="none" stroke="#00ddff" stroke-width="1.5"/><circle cx="38" cy="32" r="2.5" fill="none" stroke="#00ddff" stroke-width="1.5"/><line x1="24" y1="20" x2="10" y2="10" stroke="#00ddaa" stroke-width="1" stroke-dasharray="2,1" opacity=".6"/><line x1="24" y1="20" x2="38" y2="10" stroke="#00ddaa" stroke-width="1" stroke-dasharray="2,1" opacity=".6"/><line x1="24" y1="20" x2="10" y2="32" stroke="#00ddaa" stroke-width="1" stroke-dasharray="2,1" opacity=".6"/><line x1="24" y1="20" x2="38" y2="32" stroke="#00ddaa" stroke-width="1" stroke-dasharray="2,1" opacity=".6"/><text x="24" y="42" fill="#00ddaa" font-size="5.5" font-family="monospace" text-anchor="middle">LINK 16 NETWORK</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-tdma" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><text x="24" y="11" fill="#00ddaa" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">TDMA SLOTS</text><rect x="6" y="16" width="6" height="16" fill="#00ddaa" opacity=".5"/><rect x="13" y="16" width="6" height="16" fill="#4488ff" opacity=".5"/><rect x="20" y="16" width="6" height="16" fill="#ffcc00" opacity=".4"/><rect x="27" y="16" width="6" height="16" fill="#00ddaa" opacity=".5"/><rect x="34" y="16" width="6" height="16" fill="#4488ff" opacity=".5"/><text x="9" y="38" fill="#00ddaa" font-size="3" font-family="monospace" text-anchor="middle">A1</text><text x="16" y="38" fill="#4488ff" font-size="3" font-family="monospace" text-anchor="middle">A2</text><text x="23" y="38" fill="#ffcc00" font-size="3" font-family="monospace" text-anchor="middle">NET</text><text x="30" y="38" fill="#00ddaa" font-size="3" font-family="monospace" text-anchor="middle">A1</text><text x="37" y="38" fill="#4488ff" font-size="3" font-family="monospace" text-anchor="middle">A2</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-mids-panel" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><text x="24" y="10" fill="#00ddaa" font-size="5" font-family="monospace" text-anchor="middle">MIDS PANEL</text><rect x="5" y="13" width="10" height="7" rx="1" fill="#0a0600" stroke="#332200" stroke-width=".5"/><text x="10" y="18.5" fill="#ffcc00" font-size="3.5" font-family="monospace" text-anchor="middle">NET#</text><rect x="18" y="13" width="10" height="7" rx="1" fill="#001008" stroke="#003322" stroke-width=".5"/><text x="23" y="18.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">11</text><rect x="31" y="13" width="10" height="7" rx="1" fill="#001008" stroke="#003322" stroke-width=".5"/><text x="36" y="18.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">TXRX</text><rect x="5" y="23" width="10" height="7" rx="1" fill="#0a0600" stroke="#332200" stroke-width=".5"/><text x="10" y="28.5" fill="#ffcc00" font-size="3.5" font-family="monospace" text-anchor="middle">STN#</text><rect x="18" y="23" width="10" height="7" rx="1" fill="#001008" stroke="#003322" stroke-width=".5"/><text x="23" y="28.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">07</text><rect x="31" y="23" width="10" height="7" rx="1" fill="#001008" stroke="#003322" stroke-width=".5"/><text x="36" y="28.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">ON</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">MIDS TERMINAL</text></symbol>
+<symbol id="ico-sa-page" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><rect x="6" y="6" width="36" height="10" rx="1" fill="#000a04"/><text x="24" y="13" fill="#00ddaa" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">SA PAGE</text><circle cx="24" cy="28" r="13" fill="#000a04" stroke="#003322" stroke-width="1"/><path d="M24 28 L24 22 L21 24 L24 22 L27 24" fill="none" stroke="#00ddff" stroke-width="1.5"/><path d="M14 22 L17 24 L14 22 L11 24" fill="none" stroke="#ffcc00" stroke-width="1.5" transform="rotate(45 14 22)"/><circle cx="14" cy="22" r="1.5" fill="#ffcc00"/><circle cx="34" cy="34" r="1.5" fill="#ff3333"/><path d="M30 30 L38 38 M38 30 L30 38" stroke="#ff3333" stroke-width="1.2"/><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-link-symbols" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><path d="M12 12 L12 6 L9 8 L12 6 L15 8" fill="none" stroke="#00ddff" stroke-width="1.5"/><text x="12" y="20" fill="#00ddff" font-size="3.2" font-family="monospace" text-anchor="middle">FRIEND</text><path d="M30 8 L36 8 L36 14 L30 14Z" fill="none" stroke="#ffcc00" stroke-width="1.5"/><text x="33" y="20" fill="#ffcc00" font-size="3.2" font-family="monospace" text-anchor="middle">UNKNOWN</text><path d="M9 30 L15 36 M15 30 L9 36" stroke="#ff3333" stroke-width="1.5"/><text x="12" y="42" fill="#ff3333" font-size="3.2" font-family="monospace" text-anchor="middle">HOSTILE</text><circle cx="33" cy="33" r="3.5" fill="none" stroke="#33cc44" stroke-width="1.5"/><text x="33" y="42" fill="#33cc44" font-size="3.2" font-family="monospace" text-anchor="middle">NEUTRAL</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-data-share" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><rect x="6" y="10" width="14" height="10" rx="2" fill="#0a0e18" stroke="#4488ff" stroke-width="1.2"/><text x="13" y="17" fill="#4488ff" font-size="4" font-family="monospace" text-anchor="middle">F-16</text><rect x="28" y="24" width="14" height="10" rx="2" fill="#0a0e18" stroke="#00ddaa" stroke-width="1.2"/><text x="35" y="31" fill="#00ddaa" font-size="4" font-family="monospace" text-anchor="middle">F-18</text><path d="M20 14 Q26 14 28 28" fill="none" stroke="#ffcc00" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="28" cy="28" r="2" fill="#ff3333"/><path d="M22 20 L26 24" stroke="#ffcc00" stroke-width="1" marker-end="url(#arrow)"/><text x="24" y="44" fill="#ffcc00" font-size="4.5" font-family="monospace" text-anchor="middle">SENSOR DATA SHARE</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-cooperative" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><circle cx="24" cy="24" r="16" fill="none" stroke="#00ddaa" stroke-width="1" stroke-dasharray="2,2" opacity=".4"/><path d="M8 30 Q14 14 24 12" fill="none" stroke="#4488ff" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="30" r="2.5" fill="#4488ff"/><path d="M40 30 Q34 14 24 12" fill="none" stroke="#00ddaa" stroke-width="2" stroke-linecap="round"/><circle cx="40" cy="30" r="2.5" fill="#00ddaa"/><circle cx="24" cy="12" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="12" r="1" fill="#ff3333"/><text x="24" y="42" fill="#00ddaa" font-size="4.5" font-family="monospace" text-anchor="middle">COOPERATIVE ENGAGEMENT</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 導航延伸</div>
+  <h1>Link 16 / <span>MIDS</span></h1>
+  <p class="subtitle">資料鏈基礎 · MIDS 終端設定 · SA 畫面判讀 · 協同作戰</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · Link 16 基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · MIDS 終端設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · SA 畫面判讀</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 資料分享與接收</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 協同戰術應用</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🔗</span><div><div class="phase-num">PHASE 01</div><h2>Link 16 / MIDS 基礎概念</h2></div></div>
+  <div class="alert-box teal-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>Link 16 是什麼？</strong>
+Link 16 是北約標準<span style="color:var(--accent)">戰術資料鏈（TADIL-J）</span>，透過 <span style="color:var(--accent)">MIDS（Multifunctional Information Distribution System）終端</span>運作。它讓編隊內所有裝備 Link 16 的單位（飛機、軍艦、地面站）<span style="color:var(--green)">即時共享雷達追蹤、位置、識別資訊</span>，建立<span style="color:var(--accent3)">共同戰場圖像（Common Operational Picture）</span>。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mids"/></svg></div>
+      <div class="step-content"><div class="step-action">Link 16 網路概念</div>
+      <div class="step-detail">Link 16 是<span class="val">網狀網路（Network）</span>，不是點對點通訊：<br>
+      · 所有參與者共用同一個<span class="val">「網路」（Net）</span>，由 <span class="val">Net Number</span> 識別<br>
+      · 每架飛機有獨立的<span class="val">Station Number（台號）</span><br>
+      · 同網路內所有單位的感測器資料<span class="green-val">自動廣播分享</span>給其他成員</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-tdma"/></svg></div>
+      <div class="step-content"><div class="step-action">TDMA 時槽分配原理</div>
+      <div class="step-detail">Link 16 使用 <span class="val">TDMA（時分多工）</span>：<br>
+      · 時間被分割成極短的<span class="val">時槮（Time Slots）</span><br>
+      · 每個終端被分配特定時槮來<span class="val">發送</span>資料，其他時間<span class="val">接收</span><br>
+      · 這讓眾多終端可以<span class="cyan-val">在同一頻段不互相干擾地共享資訊</span><br>
+      · 終端需與網路<span class="val">時間同步</span>才能正確運作</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-data-share"/></svg></div>
+      <div class="step-content"><div class="step-action">資料鏈帶來的戰術優勢</div>
+      <div class="step-detail">
+      · <span class="val">提早發現威脅</span>：友機雷達偵測到的目標即時顯示在你的 SA 頁面，即使你的雷達還沒掃到<br>
+      · <span class="val">隊形協調</span>：清楚看到友機位置，避免誤擊或互相干擾<br>
+      · <span class="val">分工接戰</span>：不同飛機可針對不同目標各自接戰，避免重複攻擊同一目標<br>
+      · <span class="cyan-val">大幅提升整體編隊的態勢感知（SA）</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：MIDS 終端設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">📻</span><div><div class="phase-num">PHASE 02</div><h2>MIDS 終端設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>加入網路前必須正確設定！</strong>
+所有參與資料鏈的單位<span style="color:var(--warn)">必須使用相同的 Net Number</span>才能互相看見彼此。任務簡報會提供正確的網路設定值（Net、Channel、Station Number 等）。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mids-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">MIDS 控制面板位置</div>
+      <div class="step-detail">MIDS 終端控制可透過 <span class="val">UFC</span> 或專屬的 <span class="val">COMM 控制頁面</span>進入。包含設定：<span class="val">Net Number、Station Number（STN）、收發狀態（TX/RX/Silent）</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-mids-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">設定 Net Number（網路編號）</div>
+      <div class="step-detail">輸入任務簡報指定的<span class="warn-val">Net Number</span>（如 <span class="val">Net 11</span>）。<span class="red-val">所有同編隊成員必須使用相同 Net Number，否則無法互見！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mids-panel"/></svg></div>
+      <div class="step-content"><div class="step-action">設定 Station Number（台號）</div>
+      <div class="step-detail">輸入自己飛機的<span class="val">Station Number（STN）</span>，這是你在網路中的唯一識別碼。不同飛機應使用<span class="val">不同的 STN</span>，避免衝突。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mids"/></svg></div>
+      <div class="step-content"><div class="step-action">設定 TX/RX 狀態</div>
+      <div class="step-detail">
+      · <span class="val">TX/RX（收發）</span>：正常模式，發送自己的資料同時接收他人資料<br>
+      · <span class="val">RX Only（只接收）</span>：不發送自己位置（隱蔽行動考量）<br>
+      · <span class="val">Silent</span>：完全不參與該網路<br>
+      一般任務設為 <span class="green-val">TX/RX</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-mids"/></svg></div>
+      <div class="step-content"><div class="step-action">確認連線狀態</div>
+      <div class="step-detail">設定完成後，SA 頁面應開始顯示<span class="val">友機符號</span>（若編隊成員也已正確設定）。若看不到任何友機符號，檢查 Net Number 是否與隊友一致、是否在 TX/RX 模式。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← Link 16 基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：SA 畫面判讀 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🗺️</span><div><div class="phase-num">PHASE 03</div><h2>SA 畫面判讀</h2></div></div>
+  <div class="alert-box teal-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>SA（Situational Awareness）頁面</strong>
+SA 頁面是<span style="color:var(--accent)">資料鏈資訊的主要顯示介面</span>，類似一個縮小版的戰場地圖，顯示你自己、友機、以及網路上其他單位偵測到的目標位置和識別狀態。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sa-page"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → SA 頁面開啟</div>
+      <div class="step-detail">DDI 切換至 <span class="val">SA（Situational Awareness）頁面</span>。畫面中心為你自己的位置，類似俯視地圖。可調整顯示範圍（縮放）。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-link-symbols"/></svg></div>
+      <div class="step-content"><div class="step-action">識別狀態符號（MIL-STD-2525）</div>
+      <div class="step-detail">標準軍用符號表示識別狀態：<br>
+      · <span class="cyan-val">半圓形（Friend）</span>：已識別為友軍<br>
+      · <span class="warn-val">矩形（Unknown）</span>：尚未識別<br>
+      · <span class="red-val">X / 菱形（Hostile）</span>：已識別為敵軍<br>
+      · <span class="green-val">圓形（Neutral）</span>：中立單位</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-sa-page"/></svg></div>
+      <div class="step-content"><div class="step-action">友機 vs 自己雷達偵測目標的區別</div>
+      <div class="step-detail">SA 頁面上的目標可能來自：<br>
+      · <span class="val">自己的雷達/感測器</span>：即時、精確<br>
+      · <span class="val">資料鏈接收（友機分享）</span>：可能有些<span class="warn-val">延遲</span>，且精度依來源感測器而異<br>
+      · 不同來源的符號樣式可能略有差異，<span class="cyan-val">留意目標資料的時效性</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-sa-page"/></svg></div>
+      <div class="step-content"><div class="step-action">TDC 選取 SA 頁面目標 → 取得詳細資訊</div>
+      <div class="step-detail">TDC 移至 SA 頁面上的目標符號並按壓，可顯示該目標的<span class="val">詳細資訊</span>（高度、航向、速度，依資料來源完整度而異）。也可將該目標<span class="val">設為 SOI 的關注目標</span>，配合雷達/武器系統使用。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← MIDS 終端設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：資料分享與接收 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">📤</span><div><div class="phase-num">PHASE 04</div><h2>感測器資料分享與接收</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>分享你的雷達資料給編隊</strong>
+當你的雷達（RWS/TWS）偵測到目標，<span style="color:var(--blue)">該目標資訊會自動透過 Link 16 廣播</span>給網路上其他成員。同樣地，<span style="color:var(--accent)">你也會接收到友機分享的目標資料</span>，即使你的雷達還沒掃到那個方向。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-data-share"/></svg></div>
+      <div class="step-content"><div class="step-action">自動分享：雷達追蹤自動上傳</div>
+      <div class="step-detail">雷達在 <span class="val">TWS 模式</span>下追蹤到的目標（System Track），會<span class="val">自動透過 MIDS 廣播</span>給網路成員，<span class="green-val">不需要手動操作</span>。其他成員的 SA 頁面和雷達頁面可能顯示這些目標。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-data-share"/></svg></div>
+      <div class="step-content"><div class="step-action">接收友機分享的目標</div>
+      <div class="step-detail">SA 頁面和雷達頁面顯示<span class="val">資料鏈來源的目標</span>（標示方式可能與自己雷達偵測的不同）。即使你的雷達<span class="val">尚未開機或未掃到該方向</span>，仍能看到這些目標的大致位置。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-link-symbols"/></svg></div>
+      <div class="step-content"><div class="step-action">資料鏈目標的精度限制</div>
+      <div class="step-detail"><span class="warn-val">資料鏈接收的目標資訊不能直接用於武器發射！</span><br>
+      · 資料鏈目標<span class="val">精度可能不足</span>（取決於來源感測器和傳輸延遲）<br>
+      · 武器射擊（特別是 STT 鎖定）<span class="val">需要自己的感測器確認</span><br>
+      · 資料鏈目標主要用於<span class="cyan-val">態勢感知和初步判斷</span>，精確接戰前應自行確認</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mids"/></svg></div>
+      <div class="step-content"><div class="step-action">資料鏈中斷的應對</div>
+      <div class="step-detail">若資料鏈突然失效（友機符號消失）：<br>
+      · 檢查 MIDS 設定（Net Number、TX/RX 狀態）<br>
+      · 確認自己飛機的 MIDS 終端是否正常運作<br>
+      · 短暫中斷是正常現象（地形遮蔽、距離過遠）<br>
+      · <span class="cyan-val">資料鏈失效不影響自己的雷達和武器系統，可繼續任務</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← SA 畫面判讀</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：協同戰術應用 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🤝</span><div><div class="phase-num">PHASE 05</div><h2>協同戰術應用</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>Link 16 如何提升編隊戰力</strong>
+資料鏈最大的價值不在於單機，而是讓<span style="color:var(--green)">整個編隊像一個整體運作</span>。理解協同戰術，才能真正發揮 Link 16 的優勢。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-cooperative"/></svg></div>
+      <div class="step-content"><div class="step-action">分工接戰（Target Allocation）</div>
+      <div class="step-detail">SA 頁面看到多個敵方目標時，編隊可<span class="val">分工接戰</span>：<br>
+      · 透過無線電協調「我打左邊那個，你打右邊那個」<br>
+      · 利用 SA 頁面確認彼此攻擊的是<span class="val">不同目標</span><br>
+      · <span class="green-val">避免重複攻擊同一目標而浪費飛彈</span>，也避免漏掉某個威脅</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-mids"/></svg></div>
+      <div class="step-content"><div class="step-action">靜默接戰（Silent Attack）</div>
+      <div class="step-detail">某些戰術需要<span class="val">部分飛機保持雷達靜默</span>（不開雷達以免被偵測）：<br>
+      · 開雷達的飛機（通常是預警角色）將目標資料透過 Link 16 分享<br>
+      · 靜默飛機依據接收到的資料<span class="val">瞄準方向</span>，接近後才開啟自己感測器確認攻擊<br>
+      · <span class="cyan-val">這需要良好的編隊默契和資料鏈正常運作</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-data-share"/></svg></div>
+      <div class="step-content"><div class="step-action">與預警機/地面管制協同</div>
+      <div class="step-detail">若任務中有 <span class="val">AWACS（空中預警機）</span>或地面雷達站加入 Link 16 網路：<br>
+      · 它們能提供<span class="val">更大範圍的態勢感知</span>（高空、遠距偵測能力強）<br>
+      · SA 頁面會顯示這些單位偵測到的目標<br>
+      · <span class="cyan-val">配合 AWACS 的目標分配指示，提升整體作戰效率</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mids"/></svg></div>
+      <div class="step-content"><div class="step-action">Link 16 完整設定流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>步驟</th><th>動作</th></tr>
+      <tr><td>1</td><td>取得任務簡報的 Net Number / STN 設定</td></tr>
+      <tr><td>2</td><td>MIDS 控制頁面輸入 Net Number</td></tr>
+      <tr><td>3</td><td>設定自己的 Station Number</td></tr>
+      <tr><td>4</td><td>確認 TX/RX 模式（一般任務）</td></tr>
+      <tr><td>5</td><td>SA 頁面確認友機符號出現</td></tr>
+      <tr><td>6</td><td>飛行中持續監控 SA 頁面，配合編隊戰術</td></tr>
+      </table>
+      <span class="cyan-val">Link 16 是現代空戰的「眼睛和耳朵」，善用它讓整個編隊比單機強大得多！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 資料分享與接收</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！🎉</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🔗</span><span class="tab-label">基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">📻</span><span class="tab-label">MIDS</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🗺️</span><span class="tab-label">SA頁面</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">📤</span><span class="tab-label">資料分享</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🤝</span><span class="tab-label">協同戰術</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · Link 16 / MIDS 資料鏈教學 · Hornet Academy 擴充模組完成 🎉<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
