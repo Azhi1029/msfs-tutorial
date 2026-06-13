@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JDAM">
+<meta name="theme-color" content="#04060c">
+<title>DCS F/A-18C · JDAM 衛星導引炸彈</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#00ddaa;--accent2:#ff8800;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(0,200,150,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(0,150,120,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(0,60,45,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(0,221,170,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(0,221,170,.08);border:1px solid rgba(0,221,170,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(0,221,170,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(0,221,170,.08);box-shadow:0 0 16px rgba(0,221,170,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(0,221,170,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,221,170,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(0,221,170,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--danger);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card.danger-card{border-left-color:var(--danger);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#d8fff0;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.orange-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-box.green-box{background:rgba(0,221,170,.07);border:1px solid rgba(0,221,170,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--danger);}
+.green-box .alert-text strong{color:var(--accent);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(0,221,170,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(0,221,170,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent3));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-jdam" viewBox="0 0 48 48"><rect x="3" y="15" width="38" height="12" rx="2" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><circle cx="38" cy="21" r="6" fill="#0a0600" stroke="#00ddaa" stroke-width="1.5"/><path d="M3 15 L3 27 L-2 27 L-2 15 Z" fill="#001008"/><path d="M8 27 L8 33 L11 33 L11 27Z" fill="#00ddaa" opacity=".6"/><path d="M14 27 L14 33 L17 33 L17 27Z" fill="#00ddaa" opacity=".6"/><path d="M22 27 L22 33 L25 33 L25 27Z" fill="#00ddaa" opacity=".6"/><path d="M30 27 L30 33 L33 33 L33 27Z" fill="#00ddaa" opacity=".6"/><text x="20" y="40" fill="#00ddaa" font-size="5.5" font-family="monospace" text-anchor="middle">JDAM GBU-38/32</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">JDAM</text></symbol>
+<symbol id="ico-gps-sat" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#001008" stroke="#00ddaa" stroke-width="1.5"/><circle cx="24" cy="14" r="4" fill="#0a0600" stroke="#00ddaa" stroke-width="1.2"/><rect x="20" y="10" width="3" height="3" fill="#00ddaa" opacity=".6"/><rect x="25" y="10" width="3" height="3" fill="#00ddaa" opacity=".6"/><line x1="24" y1="18" x2="14" y2="32" stroke="#00ddff" stroke-width="1.5" stroke-dasharray="2,1"/><line x1="24" y1="18" x2="34" y2="32" stroke="#00ddff" stroke-width="1.5" stroke-dasharray="2,1"/><line x1="24" y1="18" x2="24" y2="34" stroke="#00ddff" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="24" cy="34" r="2.5" fill="#ffcc00"/><text x="24" y="44" fill="#00ddff" font-size="5" font-family="monospace" text-anchor="middle">GPS NAV</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-gbu-poly" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#000a04" stroke="#00ddaa" stroke-width="1.5"/><text x="24" y="12" fill="#00ddaa" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">VARIANTS</text><rect x="6" y="16" width="36" height="7" rx="1" fill="#0a0600" stroke="#003322" stroke-width=".5"/><text x="24" y="21" fill="#00ff44" font-size="4.5" font-family="monospace" text-anchor="middle">GBU-38 (500lb / Mk-82)</text><rect x="6" y="25" width="36" height="7" rx="1" fill="#0a0600" stroke="#003322" stroke-width=".5"/><text x="24" y="30" fill="#00ddff" font-size="4.5" font-family="monospace" text-anchor="middle">GBU-32 (1000lb / Mk-83)</text><rect x="6" y="34" width="36" height="6" rx="1" fill="#0a0600" stroke="#003322" stroke-width=".5"/><text x="24" y="38.5" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">GBU-31 (2000lb / Mk-84)</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">VARIANTS</text></symbol>
+<symbol id="ico-precision-cep" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#000a04" stroke="#00ddaa" stroke-width="1.5"/><circle cx="24" cy="20" r="16" fill="none" stroke="#33cc44" stroke-width="1" stroke-dasharray="2,2" opacity=".5"/><circle cx="24" cy="20" r="6" fill="none" stroke="#00ddaa" stroke-width="2"/><circle cx="24" cy="20" r="1.5" fill="#ff3333"/><text x="24" y="40" fill="#00ddaa" font-size="5" font-family="monospace" text-anchor="middle">CEP &lt; 13m (GPS)</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-ddi-coord" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#00ddaa" stroke-width="1.5"/><rect x="6" y="6" width="36" height="10" rx="1" fill="#001008"/><text x="24" y="13" fill="#00ddaa" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">COORD ENTRY</text><rect x="6" y="18" width="36" height="7" rx="1" fill="#0a0600" stroke="#003322" stroke-width=".5"/><text x="24" y="23" fill="#00ff44" font-size="4.5" font-family="monospace" text-anchor="middle">N25° 04.2'</text><rect x="6" y="27" width="36" height="7" rx="1" fill="#0a0600" stroke="#003322" stroke-width=".5"/><text x="24" y="32" fill="#00ddff" font-size="4.5" font-family="monospace" text-anchor="middle">E121° 33.5'</text><rect x="6" y="36" width="36" height="5" rx="1" fill="#0a0600" stroke="#003322" stroke-width=".5"/><text x="24" y="40" fill="#ffcc00" font-size="3.5" font-family="monospace" text-anchor="middle">ELEV: 250FT</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-sms-jdam" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#00ddaa" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#001008"/><text x="24" y="12" fill="#00ddaa" font-size="5" font-family="monospace" text-anchor="middle">SMS · A/G</text><text x="24" y="17" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">GBU-38 × 4</text><rect x="8" y="23" width="14" height="8" rx="2" fill="#0a0600" stroke="#00ddaa" stroke-width="1"/><text x="15" y="29" fill="#00ddaa" font-size="4" font-family="monospace" text-anchor="middle">JDAM</text><rect x="26" y="23" width="14" height="8" rx="2" fill="#0a0800" stroke="#332200" stroke-width="1"/><text x="33" y="29" fill="#332200" font-size="4" font-family="monospace" text-anchor="middle">STEP</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SMS A/G</text></symbol>
+<symbol id="ico-toss-cue" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#00ddaa" stroke-width="1.5" opacity=".8"/><text x="8" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">320</text><text x="34" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">22000</text><circle cx="30" cy="22" r="5" fill="none" stroke="#00ddaa" stroke-width="1.8"/><circle cx="30" cy="22" r="2" fill="#00ddaa"/><line x1="30" y1="17" x2="30" y2="15" stroke="#00ddaa" stroke-width="1.5"/><line x1="30" y1="27" x2="30" y2="29" stroke="#00ddaa" stroke-width="1.5"/><circle cx="24" cy="22" r="2" fill="#ffcc00"/><line x1="24" y1="22" x2="30" y2="22" stroke="#ffcc00" stroke-width="1" stroke-dasharray="1.5,1"/><text x="24" y="38" fill="#00ddaa" font-size="3.8" font-family="monospace" text-anchor="middle">RELEASE CUE</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-jdam-fall" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#000a04" stroke="#00ddaa" stroke-width="1.5"/><path d="M30 8 Q18 10 16 24 Q15 32 18 38" fill="none" stroke="#4488ff" stroke-width="2" stroke-dasharray="3,2"/><circle cx="30" cy="8" r="3" fill="#4488ff"/><circle cx="18" cy="38" r="3" fill="none" stroke="#00ddaa" stroke-width="1.5"/><circle cx="18" cy="38" r="1" fill="#00ddaa"/><path d="M16 24 L24 26 L30 22" fill="none" stroke="#ffcc00" stroke-width="1" stroke-dasharray="1,1" opacity=".6"/><text x="30" y="6" fill="#4488ff" font-size="3.5" font-family="monospace" text-anchor="middle">RLS</text><text x="18" y="44" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">GPS GUIDED</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="FA18C_Home.html">← 返回 F/A-18C 教學中心</a>
+  <div class="header-badge">DCS F/A-18C · 空對地武器</div>
+  <h1><span>JDAM</span> 衛星導引炸彈</h1>
+  <p class="subtitle">GBU-38/32 · GPS 座標輸入 · 全天候精準轟炸</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · JDAM 基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 武器設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 座標輸入</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 投彈程序</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 戰術應用</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🛰️</span><div><div class="phase-num">PHASE 01</div><h2>JDAM 基礎概念</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>JDAM（Joint Direct Attack Munition）簡介</strong>
+JDAM 是 <span style="color:var(--accent)">GPS/INS 導引套件</span>，加裝在 Mk-80 系列炸彈尾部，使其成為 <span style="color:var(--accent)">全天候精準導引炸彈</span>。與雷射導引炸彈（GBU-12）不同，<span style="color:var(--green)">JDAM 不需要雷射照射，只需輸入目標 GPS 座標</span>，投放後炸彈依 GPS 導航自主飛向座標點，<span class="cyan-val">雲層、煙霧、夜間皆不影響精度！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-gbu-poly"/></svg></div>
+      <div class="step-content"><div class="step-action">JDAM 各型號（DCS 中）</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>型號</th><th>炸彈本體</th><th>重量</th></tr>
+      <tr><td class="mono">GBU-38</td><td>Mk-82</td><td>500 lb</td></tr>
+      <tr><td class="mono">GBU-32</td><td>Mk-83</td><td>1,000 lb</td></tr>
+      <tr><td class="mono">GBU-31</td><td>Mk-84</td><td>2,000 lb</td></tr>
+      </table>
+      <span class="cyan-val">F/A-18C 常掛載 GBU-38，平衡威力與掛載數量</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-gps-sat"/></svg></div>
+      <div class="step-content"><div class="step-action">GPS/INS 導引原理</div>
+      <div class="step-detail">JDAM 投放後：<br>
+      · 內建 <span class="val">GPS 接收器</span>持續定位<br>
+      · <span class="val">INS（慣性導航）</span>作為 GPS 訊號中斷時的備援<br>
+      · 飛彈尾翼依導航資料修正彈道，飛向預設座標<br>
+      · <span class="green-val">CEP（圓概率誤差）小於 13 公尺</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-precision-cep"/></svg></div>
+      <div class="step-content"><div class="step-action">JDAM vs GBU-12 vs AGM-65 比較</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>武器</th><th>導引方式</th><th>限制</th></tr>
+      <tr><td class="mono">JDAM</td><td>GPS/INS</td><td>需事先知道座標，不適合移動目標</td></tr>
+      <tr><td class="mono">GBU-12</td><td>雷射</td><td>需持續雷射照射，受天氣影響</td></tr>
+      <tr><td class="mono">AGM-65</td><td>影像</td><td>需目視鎖定，射程較短</td></tr>
+      </table>
+      <span class="cyan-val">JDAM 最適合：已知座標的固定目標、夜間/惡劣天氣攻擊</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：武器設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚙️</span><div><div class="phase-num">PHASE 02</div><h2>武器與系統設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>關鍵：投放前 GPS 必須對準！</strong>
+JDAM 需要 <span style="color:var(--danger)">GPS 訊號鎖定</span>才能精確導引。投放前確認 GPS 已對準（通常飛行一段時間後自動完成）。MASTER ARM 必須在 ARM 位置。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sms-jdam"/></svg></div>
+      <div class="step-content"><div class="step-action">MASTER ARM → ARM</div>
+      <div class="step-detail">左主控台 <span class="warn-val">MASTER ARM → ARM</span>。HUD 顯示 ARM。<span class="red-val">訓練時保持 SAFE！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sms-jdam"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → SMS → 選擇 JDAM 站位</div>
+      <div class="step-detail">右 DDI → <span class="val">MENU → SMS</span>，用 <span class="val">WSS</span> 選擇 GBU-38/32 武器站。HUD 左下角顯示對應彈種代號。確認掛載數量正確。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-gps-sat"/></svg></div>
+      <div class="step-content"><div class="step-action">確認 GPS 對準狀態</div>
+      <div class="step-detail">DDI 或相關頁面確認 <span class="val">GPS（或 EGI）狀態</span>顯示正常（通常為 <span class="green-val">綠色/READY</span>）。GPS 通常在起飛後一段時間自動對準完成，無需手動操作，但<span class="cyan-val">投彈前留意是否有 GPS 故障警告</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-jdam"/></svg></div>
+      <div class="step-content"><div class="step-action">投彈模式：CCRP（JDAM 標準模式）</div>
+      <div class="step-detail">JDAM 通常使用 <span class="val">CCRP（Continuously Computed Release Point）</span>模式投放，與 GBU-12 的 CCRP 操作類似，但 <span class="green-val">JDAM 的 SPI（目標點）來源是手動輸入的 GPS 座標</span>，而非 LITENING 莢艙鎖定。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← JDAM 基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：座標輸入 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🎯</span><div><div class="phase-num">PHASE 03</div><h2>目標座標輸入</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>目標座標的來源</strong>
+任務簡報通常會提供<span style="color:var(--accent)">目標座標（經緯度）</span>。也可以用 <span style="color:var(--accent)">LITENING 莢艙的 Mark Point</span> 取得座標，或從 <span style="color:var(--accent)">F10 地圖</span>讀取座標（若允許）。輸入正確座標是 JDAM 精度的關鍵！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-ddi-coord"/></svg></div>
+      <div class="step-content"><div class="step-action">DDI → SMS → JDAM 武器頁面 → 座標輸入</div>
+      <div class="step-detail">SMS 頁面選中 JDAM 武器站後，進入<span class="val">座標輸入子頁面</span>。畫面顯示緯度（LAT）、經度（LON）、海拔高度（ELEV）輸入欄位，初始值通常為飛機目前位置。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-ddi-coord"/></svg></div>
+      <div class="step-content"><div class="step-action">用 UFC 輸入緯度（LAT）</div>
+      <div class="step-detail">透過 <span class="val">UFC</span> 輸入目標緯度，格式：<span class="warn-val">N/S + 度分（小數）</span><br>
+      例：<span class="val">N25042</span> = 北緯 25° 04.2'<br>
+      · 按 <span class="val">N</span>（或 S）開頭<br>
+      · 輸入數字後按 <span class="val">ENT</span> 確認</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ddi-coord"/></svg></div>
+      <div class="step-content"><div class="step-action">用 UFC 輸入經度（LON）</div>
+      <div class="step-detail">接著輸入目標經度，格式：<span class="warn-val">E/W + 度分（小數）</span><br>
+      例：<span class="val">E121335</span> = 東經 121° 33.5'<br>
+      · 按 <span class="val">E</span>（或 W）開頭<br>
+      · 輸入數字後按 <span class="val">ENT</span> 確認</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-ddi-coord"/></svg></div>
+      <div class="step-content"><div class="step-action">輸入目標海拔高度（ELEV）</div>
+      <div class="step-detail">輸入目標點的<span class="val">海拔高度（英尺）</span>。可從地圖、任務簡報或機上系統估算取得。<span class="cyan-val">高度誤差會影響投彈精度，盡量取得準確數值。</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-ddi-coord"/></svg></div>
+      <div class="step-content"><div class="step-action">確認座標 → SPI 設定完成</div>
+      <div class="step-detail">座標輸入完成後，該座標成為這枚 JDAM 的 <span class="val">瞄準點（SPI）</span>。DDI 或 HUD 會顯示目標標記和距離。<span class="cyan-val">每枚 JDAM 可設定不同座標，實現一次出擊多目標打擊！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 武器設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：投彈程序 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">💥</span><div><div class="phase-num">PHASE 04</div><h2>投彈程序</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>JDAM 投彈 — 不需要照射，投了就走！</strong>
+座標設定完成後，飛到投放範圍內，依 CCRP 模式投放。<span style="color:var(--accent)">投放後 JDAM 自主導航至座標，飛機可立即脫離</span>，這是 JDAM 相較 GBU-12 最大的優勢。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-jdam-fall"/></svg></div>
+      <div class="step-content"><div class="step-action">飛向目標方向，保持穩定高度速度</div>
+      <div class="step-detail">朝目標座標方向飛行，HUD 顯示目標方位和距離。建議 <span class="val">15,000–25,000 ft，350–450 kt</span> 穩定飛行，讓電腦準確計算投放點。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-toss-cue"/></svg></div>
+      <div class="step-content"><div class="step-action">HUD 顯示 Release Cue，對準目標</div>
+      <div class="step-detail">HUD 顯示 <span class="val">CCRP Release Cue（投放游標）</span>和目標標記。調整航向讓游標朝向目標方向移動，<span class="cyan-val">JDAM 的釋放範圍（Launch Acceptability Region, LAR）較大，比 GBU-12 更寬容</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-jdam"/></svg></div>
+      <div class="step-content"><div class="step-action">Release Cue 對齊 → 按下 Weapon Release</div>
+      <div class="step-detail">游標與目標標記重合（在 LAR 範圍內）時，按下 <span class="warn-val">Weapon Release</span>！JDAM 投放離架。<br>
+      · 自動模式（若設定）：電腦自動投放<br>
+      · 手動模式：按住直到投放確認</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-jdam-fall"/></svg></div>
+      <div class="step-content"><div class="step-action">投放後立即可脫離（無需照射）</div>
+      <div class="step-detail">JDAM 投放後 <span class="green-val">自主依 GPS/INS 飛向設定座標</span>，飛機<span class="green-val">不需要繼續對準目標或照射</span>。可立即轉向脫離、攻擊下一個目標，或處理其他威脅。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-sms-jdam"/></svg></div>
+      <div class="step-content"><div class="step-action">多枚 JDAM 連續攻擊不同目標</div>
+      <div class="step-detail">若每枚 JDAM 已設定不同座標：<br>
+      1. 第一枚投放後，<span class="val">WSS 切換到下一枚</span><br>
+      2. 確認該枚的目標座標正確<br>
+      3. 重新對準投放<br>
+      <span class="cyan-val">可一次飛行打擊多個分散目標，效率極高！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← 座標輸入</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：戰術應用 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">📋</span><div><div class="phase-num">PHASE 05</div><h2>戰術應用</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>JDAM 的戰術價值</strong>
+JDAM 讓 F/A-18C 能在<span style="color:var(--accent)">高空、夜間、惡劣天氣</span>下精確打擊固定目標，且<span style="color:var(--green)">投放後立即脫離</span>降低風險。是 SEAD（壓制敵防空）和 OCA（攻勢制空）任務中摧毀固定設施的理想選擇。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-jdam"/></svg></div>
+      <div class="step-content"><div class="step-action">適合 JDAM 的目標類型</div>
+      <div class="step-detail">最適合：<br>
+      · <span class="val">固定建築物</span>（指揮所、彈藥庫、機堡）<br>
+      · <span class="val">機場設施</span>（跑道、停機坪）<br>
+      · <span class="val">橋樑、基礎設施</span><br>
+      · <span class="val">已知座標的 SAM 站點</span>（先用 ISR 取得座標）<br>
+      <span class="cyan-val">不適合：移動目標（座標投放後就固定了）</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-precision-cep"/></svg></div>
+      <div class="step-content"><div class="step-action">高空高速投放戰術（Standoff）</div>
+      <div class="step-detail">JDAM 的滑翔能力讓飛機可以在<span class="val">遠離目標的高空</span>投放：<br>
+      · 高度越高、速度越快，<span class="val">射程（滑翔距離）越遠</span><br>
+      · 可在 SAM 防空範圍外投放，降低風險<br>
+      · <span class="cyan-val">高空高速 = 更大 LAR，更安全的投彈方式</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-gbu-poly"/></svg></div>
+      <div class="step-content"><div class="step-action">JDAM vs GBU-12 選擇指南</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>情況</th><th>建議武器</th></tr>
+      <tr><td>已知精確座標的固定目標</td><td class="mono">JDAM</td></tr>
+      <tr><td>夜間/惡劣天氣</td><td class="mono">JDAM（不受天氣影響）</td></tr>
+      <tr><td>移動目標</td><td class="mono">GBU-12 / AGM-65</td></tr>
+      <tr><td>需即時視覺確認再攻擊</td><td class="mono">GBU-12（LITENING）</td></tr>
+      <tr><td>高威脅 SAM 區域</td><td class="mono">JDAM（Standoff 投放）</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-jdam-fall"/></svg></div>
+      <div class="step-content"><div class="step-action">JDAM 完整流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>步驟</th><th>動作</th></tr>
+      <tr><td>1</td><td>MASTER ARM → ARM</td></tr>
+      <tr><td>2</td><td>SMS 選擇 JDAM 站位</td></tr>
+      <tr><td>3</td><td>確認 GPS 對準正常</td></tr>
+      <tr><td>4</td><td>UFC 輸入目標座標（LAT/LON/ELEV）</td></tr>
+      <tr><td>5</td><td>飛向目標，CCRP Release Cue 對齊</td></tr>
+      <tr><td>6</td><td>Weapon Release 投放</td></tr>
+      <tr><td>7</td><td>立即可脫離，無需照射</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 投彈程序</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🛰️</span><span class="tab-label">基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚙️</span><span class="tab-label">設定</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🎯</span><span class="tab-label">座標</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">💥</span><span class="tab-label">投彈</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">📋</span><span class="tab-label">戰術</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F/A-18C · JDAM 衛星導引炸彈教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
