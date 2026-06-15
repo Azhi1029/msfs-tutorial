@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="F-16C 教學">
+<meta name="theme-color" content="#04060c">
+<title>DCS F-16C Viper · 冷倉啟動到降落</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ff6622;--accent2:#ffcc00;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(255,100,30,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,40,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(80,30,0,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(255,100,30,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(255,100,30,.08);border:1px solid rgba(255,100,30,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,100,30,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(255,100,30,.08);box-shadow:0 0 16px rgba(255,100,30,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,100,30,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,100,30,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,100,30,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card.danger-card{border-left-color:var(--danger);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#ffe8dd;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.blue-val{color:var(--blue);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.mil-box{background:rgba(255,102,34,.07);border:1px solid rgba(255,102,34,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--warn);}
+.mil-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(255,102,34,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,102,34,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-battery16" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><text x="24" y="10" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">ELEC PWR</text><rect x="6" y="14" width="16" height="8" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="14" y="19.5" fill="#22aa33" font-size="3.5" font-family="monospace" text-anchor="middle">BAT</text><rect x="26" y="14" width="16" height="8" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="34" y="19.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">ON</text><rect x="6" y="26" width="36" height="8" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="24" y="31.5" fill="#22aa33" font-size="3.5" font-family="monospace" text-anchor="middle">EPU · OFF</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">BATTERY</text></symbol>
+<symbol id="ico-jfs" viewBox="0 0 48 48"><rect x="3" y="4" width="42" height="36" rx="3" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><text x="24" y="12" fill="#ff6622" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">JFS START</text><circle cx="24" cy="25" r="11" fill="#040810" stroke="#332200" stroke-width="1"/><path d="M24 16 L26 23 L24 21 L22 23 Z" fill="#ffcc00"/><circle cx="24" cy="25" r="3" fill="#ff8800" opacity=".6"/><rect x="14" y="33" width="20" height="6" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="24" y="37.5" fill="#22aa33" font-size="3.5" font-family="monospace" text-anchor="middle">SPIN UP</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">JFS</text></symbol>
+<symbol id="ico-throttle16" viewBox="0 0 48 48"><rect x="3" y="3" width="14" height="38" rx="3" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><rect x="6" y="6" width="8" height="30" rx="2" fill="#040810"/><rect x="6" y="22" width="8" height="14" rx="2" fill="#ff6622" opacity=".7"/><rect x="5" y="20" width="10" height="3" rx="1" fill="#ffcc00"/><text x="10" y="44" fill="#ff6622" font-size="4.5" font-family="monospace" text-anchor="middle">OFF</text><text x="10" y="14" fill="#22aa33" font-size="4" font-family="monospace" text-anchor="middle">MIL</text><path d="M22 12 L40 12 M22 20 L40 20 M22 28 L40 28" stroke="#1a2840" stroke-width="1" stroke-dasharray="2,2"/><text x="31" y="40" fill="#4a6080" font-size="5" font-family="monospace" text-anchor="middle">IDLE STOP</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-engine16" viewBox="0 0 48 48"><rect x="2" y="14" width="40" height="14" rx="6" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><circle cx="14" cy="21" r="5" fill="#040810" stroke="#332200" stroke-width="1"/><path d="M14 16 L14 26 M9 21 L19 21 M11 17 L17 25 M17 17 L11 25" stroke="#ff8800" stroke-width="1" opacity=".5"/><path d="M42 17 L47 21 L42 25Z" fill="#ff6622" opacity=".7"/><text x="22" y="11" fill="#ff6622" font-size="4.5" font-family="monospace" text-anchor="middle">F110-GE-129</text><text x="22" y="36" fill="#22aa33" font-size="4" font-family="monospace" text-anchor="middle">RPM 60% · FTIT NORM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">ENGINE</text></symbol>
+<symbol id="ico-icp" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><text x="24" y="9" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">ICP</text><rect x="6" y="12" width="36" height="8" rx="1" fill="#000a04"/><text x="24" y="18" fill="#00ff44" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">M-SEL / STPT</text><rect x="6" y="23" width="10" height="6" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="11" y="27.5" fill="#22aa33" font-size="3.2" font-family="monospace" text-anchor="middle">LIST</text><rect x="19" y="23" width="10" height="6" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="24" y="27.5" fill="#22aa33" font-size="3.2" font-family="monospace" text-anchor="middle">DED</text><rect x="32" y="23" width="10" height="6" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="37" y="27.5" fill="#00ddaa" font-size="3.2" font-family="monospace" text-anchor="middle">ENTR</text><rect x="6" y="32" width="36" height="6" rx="1" fill="#0a1408" stroke="#1a2810" stroke-width=".5"/><text x="24" y="36.5" fill="#22aa33" font-size="3.2" font-family="monospace" text-anchor="middle">1 2 3 4 5 6 7 8 9 0</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-ins16" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><circle cx="24" cy="24" r="15" fill="#040810"/><line x1="24" y1="9" x2="24" y2="24" stroke="#ff6622" stroke-width="2" stroke-linecap="round" opacity=".3"/><path d="M24 13 L21 19 L24 17 L27 19 Z" fill="#ff6622"/><line x1="24" y1="17" x2="24" y2="29" stroke="#ff6622" stroke-width="1.5" stroke-linecap="round" opacity=".5"/><text x="24" y="36" fill="#22aa33" font-size="5" font-family="monospace" text-anchor="middle">INS ALIGN</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">INS</text></symbol>
+<symbol id="ico-hud16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#020608" stroke="#ff6622" stroke-width="1.5" opacity=".8"/><text x="8" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">320</text><text x="34" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">12000</text><text x="24" y="11" fill="#4488ff" font-size="4.5" font-family="monospace" text-anchor="middle">045</text><circle cx="24" cy="22" r="3" fill="none" stroke="#ff6622" stroke-width="1.2"/><path d="M19 22 L21 22 M27 22 L29 22 M24 19 L24 21" stroke="#ff6622" stroke-width="1.2"/><path d="M16 28 L32 28 L28 32 L20 32 Z" fill="none" stroke="#22aa33" stroke-width="1.2"/><text x="24" y="38" fill="#22aa33" font-size="4" font-family="monospace" text-anchor="middle">FPM · AOA</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">HUD</text></symbol>
+<symbol id="ico-side-stick" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><text x="24" y="10" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">SIDE STICK</text><rect x="6" y="14" width="20" height="22" rx="2" fill="#040810" stroke="#1a2840" stroke-width="1"/><circle cx="16" cy="25" r="6" fill="#0a1428" stroke="#ff6622" stroke-width="1.5"/><circle cx="16" cy="25" r="2" fill="#ffcc00"/><rect x="30" y="14" width="12" height="22" rx="2" fill="#040810" stroke="#1a2840" stroke-width="1"/><text x="36" y="20" fill="#22aa33" font-size="3" font-family="monospace" text-anchor="middle">FORCE</text><text x="36" y="26" fill="#22aa33" font-size="3" font-family="monospace" text-anchor="middle">SENSE</text><text x="36" y="32" fill="#22aa33" font-size="3" font-family="monospace" text-anchor="middle">±2°</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-flcs-bit" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><text x="24" y="10" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">FLCS BIT</text><rect x="6" y="14" width="36" height="8" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="24" y="19.5" fill="#00ddaa" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">PITCH · GO</text><rect x="6" y="24" width="36" height="8" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="24" y="29.5" fill="#00ddaa" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">ROLL · GO</text><text x="24" y="38" fill="#22aa33" font-size="4" font-family="monospace" text-anchor="middle">YAW · GO</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-lef" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><path d="M6 22 L24 16 L42 22 L24 28 Z" fill="#0a1428" stroke="#1a2840" stroke-width="1"/><path d="M6 22 L24 17 L24 22 Z" fill="#ff6622" opacity=".6"/><path d="M6 22 L24 28 L24 22 Z" fill="#ff6622" opacity=".4"/><text x="24" y="36" fill="#22aa33" font-size="4.5" font-family="monospace" text-anchor="middle">LEF / TEF AUTO</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">FLAPS LEF/TEF</text></symbol>
+<symbol id="ico-runway16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><rect x="20" y="6" width="8" height="32" fill="#1a2840"/><line x1="24" y1="8" x2="24" y2="36" stroke="#ffcc00" stroke-width="1.5" stroke-dasharray="3,2"/><path d="M24 6 L18 16 L30 16Z" fill="#ff6622" opacity=".6"/><text x="24" y="44" fill="#22aa33" font-size="4.5" font-family="monospace" text-anchor="middle">RWY ALIGN</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-gear16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><path d="M24 8 L30 8 L30 20 L36 28" fill="none" stroke="#ff6622" stroke-width="2" stroke-linecap="round"/><circle cx="36" cy="30" r="3" fill="#1a2840" stroke="#ff6622" stroke-width="1"/><path d="M16 8 L10 8 L10 20 L4 28" fill="none" stroke="#4488ff" stroke-width="2" stroke-linecap="round" opacity=".5"/><circle cx="4" cy="30" r="3" fill="#1a2840" stroke="#4488ff" stroke-width="1" opacity=".5"/><circle cx="22" cy="34" r="3" fill="none" stroke="#33cc44" stroke-width="1.5"/><circle cx="22" cy="34" r="3" fill="#33cc44" opacity=".3"/><text x="24" y="44" fill="#22aa33" font-size="4.5" font-family="monospace" text-anchor="middle">GEAR UP/DOWN</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-aoa-indexer" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><text x="24" y="10" fill="#ff6622" font-size="5" font-family="monospace" text-anchor="middle">AOA INDEXER</text><path d="M24 16 L14 26 L34 26 Z" fill="none" stroke="#1a2840" stroke-width="1"/><circle cx="24" cy="19" r="3" fill="#ffcc00" opacity=".8"/><path d="M18 25 L21 25 L19.5 22 Z" fill="none" stroke="#33cc44" stroke-width="1.2" opacity=".3"/><path d="M27 25 L30 25 L28.5 22 Z" fill="#ff3333" opacity=".8"/><text x="24" y="37" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">ON SPEED</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-speedbrake" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#ff6622" stroke-width="1.5"/><path d="M8 24 L24 24 L40 24" stroke="#1a2840" stroke-width="2"/><path d="M16 24 L22 14 L28 14 L22 24Z" fill="#ff6622" opacity=".7"/><path d="M26 24 L32 34 L38 34 L32 24Z" fill="#ff6622" opacity=".5"/><text x="24" y="40" fill="#22aa33" font-size="4.5" font-family="monospace" text-anchor="middle">SPEED BRAKE OUT</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="F16C_Home.html">← 返回 F-16C 教學中心</a>
+  <div class="header-badge">DCS WORLD · F-16C VIPER · Flight Tutorial</div>
+  <h1>F-16C <span>VIPER</span></h1>
+  <p class="subtitle">DCS World ‧ 從冷倉啟動到降落 ‧ 基礎版逐步操作教學</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · 座艙準備</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · JFS & 引擎啟動</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · INS & 航電</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 起飛前確認</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 起飛 & 爬升</button>
+  <button class="phase-btn" onclick="showPhase(5)">06 · ILS 進場 & 降落</button>
+  <button class="phase-btn" onclick="showPhase(6)">07 · 著陸後 & 關機</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🪖</span><div><div class="phase-num">PHASE 01</div><h2>座艙準備 Cockpit Preparation</h2></div></div>
+  <div class="alert-box mil-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>DCS F-16C 教學說明</strong>
+F-16C Fighting Falcon（暱稱 Viper）是美國空軍主力單發多用途戰機，DCS 版本精確模擬 Block 50 座艙系統。本教學為<span style="color:var(--accent)">基礎版（冷倉到降落）</span>。重要差異：F-16 使用<span style="color:var(--warn)">側桿（Side-stick）</span>而非中央操縱桿，且<span style="color:var(--warn)">座椅後傾 30°</span>，操控手感與 F/A-18 不同！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-throttle16"/></svg></div><div class="step-content"><div class="step-action">油門桿 → OFF（後止點）</div><div class="step-detail">確認油門桿在最後方的 <span class="val">OFF 位置</span>（低於 IDLE）。F-16 油門同樣分為 OFF → IDLE → 推力範圍，冷啟動必須從 OFF 開始。側桿在右側操控台旁。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-gear16"/></svg></div><div class="step-content"><div class="step-action">停機煞車 → 確認 SET</div><div class="step-detail">確認停機煞車（Parking Brake）已設定。F-16 煞車控制在腳踏板上方，停機煞車手柄位於儀表板下方左側。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-battery16"/></svg></div><div class="step-content"><div class="step-action">BATTERY switch → ON（左主控台後方）</div><div class="step-detail">左主控台後方，BATTERY 開關撥至 <span class="val">ON</span>。座艙開始通電，部分儀表和警告燈亮起。確認 <span class="val">EPU（緊急動力裝置）開關在 OFF</span>（正常啟動不需要 EPU）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-battery16"/></svg></div><div class="step-content"><div class="step-action">外部電源（如有）→ 連接，或純電池啟動</div><div class="step-detail">若有 <span class="warn-val">External Power（外部電源車）</span>，連接後可減少電池消耗。DCS 中許多場景無外部電源，<span class="warn-val">直接用電池啟動 JFS</span>即可，注意電池續航時間。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-icp"/></svg></div><div class="step-content"><div class="step-action">確認 ICP 與 DED 通電顯示</div><div class="step-detail">電池 ON 後，<span class="val">ICP（Integrated Control Panel）</span>和 <span class="val">DED（Data Entry Display）</span>應開始顯示資訊。DED 在 HUD 下方主儀表板中央，ICP 在 DED 下方，是 F-16 最重要的數據輸入介面（類似 F/A-18 的 UFC）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-side-stick"/></svg></div><div class="step-content"><div class="step-action">確認側桿（Side-stick）與座椅角度</div><div class="step-detail">F-16 操縱桿在<span class="val">右側扶手位置（側桿）</span>，幾乎不可見移動（Force-sensing，力感應式）。座椅後傾 <span class="val">30°</span>有助於承受高 G 力。確認 DCS 中的操控軸已正確綁定側桿輸入。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一階段</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一階段：JFS & 引擎啟動 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">🔥</span><div><div class="phase-num">PHASE 02</div><h2>JFS & 引擎啟動</h2></div></div>
+  <div class="alert-box mil-box"><span class="alert-icon">⚙️</span><div class="alert-text"><strong>F110-GE-129 引擎與 JFS 啟動</strong>
+F-16C 裝備單一 <span style="color:var(--accent)">GE F110-GE-129 渦扇引擎</span>（推力 129 kN，後燃器）。與 F/A-18 不同，F-16 使用 <span style="color:var(--accent)">JFS（Jet Fuel Starter，噴氣燃油啟動器）</span>直接帶動主引擎轉動，<span style="color:var(--accent3)">不需要先啟動 APU 再用 Crank</span>，流程更簡單！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-jfs"/></svg></div><div class="step-content"><div class="step-action">JFS 啟動開關 → 按下啟動</div><div class="step-detail">右主控台後方，按下 <span class="warn-val">JFS（Jet Fuel Starter）啟動開關</span>。JFS 是小型渦輪，直接連接主引擎傳動軸，開始帶動引擎轉動。聽到/看到 <span class="val">RPM 開始上升</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-engine16"/></svg></div><div class="step-content"><div class="step-action">RPM 達 ~20% → 油門 OFF 推過 IDLE 卡榫</div><div class="step-detail">監控發動機 RPM，達到約 <span class="warn-val">20%</span> 時，<span class="warn-val">油門桿從 OFF 推過 IDLE 卡榫</span>。燃油開始供應，引擎點火。注意 FTIT（渦輪入口溫度）開始上升。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-engine16"/></svg></div><div class="step-content"><div class="step-action">監控 RPM、FTIT、油壓穩定在 IDLE</div><div class="step-detail">引擎點火後持續監控：<br>
+    · <span class="val">RPM</span> 穩定在 IDLE（約 60–65%）<br>
+    · <span class="val">FTIT（渦輪溫度）</span> 在正常範圍（不超過限制值）<br>
+    · <span class="val">油壓（OIL PRESS）</span> 正常<br>
+    JFS 完成任務後自動關閉（聽到聲音變化）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-battery16"/></svg></div><div class="step-content"><div class="step-action">GEN（發電機）上線，確認電力正常</div><div class="step-detail">引擎穩定後，<span class="val">GEN（主發電機）自動上線</span>，電力由發電機供應（電池作為備援）。確認電力相關警告燈熄滅。若有外部電源，此時可斷開。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-hud16"/></svg></div><div class="step-content"><div class="step-action">HUD 啟動，確認顯示正常</div><div class="step-detail">引擎運轉後 HUD 自動啟動。確認顯示<span class="val">速度、高度、航向</span>等基本資訊。HUD 亮度可用面板旋鈕調整。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← 座艙準備</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一階段：INS & 航電 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🧭</span><div><div class="phase-num">PHASE 03</div><h2>INS 對齊 & 航電設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>INS 對齊立即執行！</strong>
+F-16 同樣使用<span style="color:var(--warn)">慣性導航系統（INS）</span>，對齊需要時間（DCS 中可加速）。<span style="color:var(--accent)">ICP/DED 是 F-16 最核心的操作介面</span>，幾乎所有導航、武器、通訊設定都透過它完成，務必熟悉其操作邏輯！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card warn-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-ins16"/></svg></div><div class="step-content"><div class="step-action">INS 旋鈕 → NAV，開始對齊</div><div class="step-detail">左主控台 INS 面板，旋鈕轉至 <span class="warn-val">NAV</span>（或 IFA 快速對齊，視任務設定）。對齊期間 <span class="val">ALIGN 燈亮起</span>，需保持飛機靜止。完成後燈熄滅，HUD 顯示正確姿態資訊。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-icp"/></svg></div><div class="step-content"><div class="step-action">熟悉 ICP 基本操作邏輯</div><div class="step-detail">ICP 是 F-16 的核心輸入裝置：<br>
+    · <span class="val">數字鍵 0–9</span>：輸入數值（頻道、座標等）<br>
+    · <span class="val">LIST</span>：開啟功能選單（COM、NAV、AA、AG 等）<br>
+    · <span class="val">DED</span>：切換 DED 顯示頁面<br>
+    · <span class="val">ENTR / SEQ / RCL</span>：確認 / 切換 / 重新呼叫</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-icp"/></svg></div><div class="step-content"><div class="step-action">ICP → LIST → TACAN 設定</div><div class="step-detail">按 <span class="val">LIST</span> 鍵開啟選單，選擇 <span class="val">TACAN</span> 項目（對應數字鍵）。DED 顯示 TACAN 頻道輸入欄位，用數字鍵輸入頻道（如 <span class="val">071</span>），按 <span class="val">ENTR</span> 確認。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hud16"/></svg></div><div class="step-content"><div class="step-action">確認 HSD（水平態勢顯示）正常</div><div class="step-detail">MFD（多功能顯示器）切換至 <span class="val">HSD</span> 頁面，類似 F/A-18 的 HSI。確認 TACAN 針作動、顯示方位距離。MFD 在主儀表板左右兩側。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-ins16"/></svg></div><div class="step-content"><div class="step-action">高度計 → 設定 QNH</div><div class="step-detail">高度計設定當前 <span class="val">QNH</span>，標準壓力 <span class="val">29.92 inHg</span>，或依任務區域設定。F-16 高度計在主儀表板，操作方式與一般飛機相同。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← JFS & 引擎啟動</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一階段：起飛前確認 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">✅</span><div><div class="phase-num">PHASE 04</div><h2>起飛前確認 Before Takeoff</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>FLCS BIT 與 LEF/TEF 自動控制</strong>
+F-16 飛控系統（FLCS）需執行 <span style="color:var(--accent)">BIT（內建測試）</span>確認飛控正常。<span style="color:var(--accent3)">F-16 沒有傳統「flaps」開關 — 前緣縫翼（LEF）和後緣襟翼（TEF）由飛控電腦根據速度/AoA 自動調整</span>，飛行員不需手動設定起飛 flaps！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-flcs-bit"/></svg></div><div class="step-content"><div class="step-action">FLCS BIT 測試（飛控系統自我測試）</div><div class="step-detail">執行 <span class="val">FLCS BIT</span>（通常在地面通電後自動或透過特定開關觸發）。測試期間飛控面會自動小幅移動。確認所有軸（<span class="val">PITCH、ROLL、YAW</span>）顯示 <span class="val">GO（正常）</span>，無 NO GO。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-lef"/></svg></div><div class="step-content"><div class="step-action">LEF/TEF 自動控制確認（無需手動設定）</div><div class="step-detail">F-16 的<span class="val">前緣縫翼（LEF）和後緣襟翼（TEF）</span>由飛控電腦自動依速度和 AoA 調整，<span class="cyan-val">起飛前不需要像傳統飛機一樣設定 Flaps 角度</span>。確認 FLCS 正常運作即代表 LEF/TEF 控制正常。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-engine16"/></svg></div><div class="step-content"><div class="step-action">確認燃油量正常</div><div class="step-detail">檢查 <span class="val">燃油量表（FUEL QTY）</span>，確認總油量符合任務需求。F-16 單發引擎油耗管理相對單純，但仍需留意內油箱與外掛油箱（若有）的供油順序。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hud16"/></svg></div><div class="step-content"><div class="step-action">確認 HUD 顯示正常，外部燈光設定</div><div class="step-detail">確認 HUD 顯示速度、高度、航向、AoA 正常。<span class="val">NAV LIGHTS → ON</span>，<span class="val">ANTI-COLLISION → ON</span>（依任務時段調整）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-gear16"/></svg></div><div class="step-content"><div class="step-action">停機煞車 → 鬆開，開始滑行</div><div class="step-detail">取得滑行許可後，停機煞車鬆開。輕推油門滾動，速度 <span class="val">≤ 15–20 kt</span>，<span class="val">腳踏板（Rudder pedals）</span>控制前輪轉向（Nose Wheel Steering）。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← INS & 航電</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一階段：起飛 & 爬升 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🛫</span><div><div class="phase-num">PHASE 05</div><h2>起飛 & 爬升 Takeoff & Climb</h2></div></div>
+  <div class="alert-box mil-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>單發引擎，推力強勁</strong>
+F-16C 的 <span style="color:var(--accent)">F110-GE-129</span> 在後燃器（AB）狀態下推重比極高，<span style="color:var(--accent3)">起飛加速非常快</span>。注意側桿是<span style="color:var(--accent)">力感應式</span>，拉桿不需要大幅移動，輕微施力即可。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-runway16"/></svg></div><div class="step-content"><div class="step-action">進入跑道，對準中線</div><div class="step-detail">滑行至跑道頭，使用<span class="val">腳踏板</span>對準跑道中線。確認塔台/AI 許可起飛。檢查 <span class="val">FLCS、燃油、液壓</span>狀態最後一次。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-throttle16"/></svg></div><div class="step-content"><div class="step-action">油門推至 MIL 或 AB（後燃器）</div><div class="step-detail">放開煞車後，<span class="warn-val">油門推至 MIL（軍用推力）</span>，若跑道短或需快速爬升可繼續推過卡榫進入 <span class="warn-val">AB（Afterburner，後燃器）</span>。AB 啟動時可感受到明顯推力增加和油耗增加。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-aoa-indexer"/></svg></div><div class="step-content"><div class="step-action">達到起飛速度 → 輕拉側桿抬頭</div><div class="step-detail">速度達 <span class="val">~150–170 kt</span>（依重量），<span class="val">輕輕對側桿施力</span>（不需大動作）讓機頭抬起約 <span class="val">10°</span>。F-16 離地非常迅速，注意俯仰角度不要過大。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-gear16"/></svg></div><div class="step-content"><div class="step-action">離地確認正爬升率 → 收起落架</div>
+    <div class="step-detail">離地後確認<span class="val">正爬升率（VSI 向上）</span>，收起落架（<span class="val">Gear Handle 向上</span>）。聽到液壓作動聲，確認三個輪子指示燈熄滅（收起完成）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-throttle16"/></svg></div><div class="step-content"><div class="step-action">收 AB（若使用），調整爬升姿態</div><div class="step-detail">達到安全高度後<span class="val">收回 AB（若使用過）</span>至 MIL 或巡航推力，建立穩定爬升（建議 <span class="val">爬升角 15–20°，速度 300–350 kt</span>）。LEF/TEF 自動調整，無需介入。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 起飛前確認</button><button class="nav-arrow-btn" onclick="showPhase(5)">下一階段：ILS 進場 & 降落 →</button></div>
+</section>
+
+<!-- PHASE 5 -->
+<section class="phase-section" id="phase-5">
+  <div class="phase-title"><span class="phase-icon-wrap">🛬</span><div><div class="phase-num">PHASE 06</div><h2>ILS 進場 & 降落</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>F-16 沒有航艦作業，採一般機場 ILS 進場</strong>
+與 F/A-18 不同，F-16 教學<span style="color:var(--accent3)">不涉及 CASE I/II/III 航艦回收</span>，而是標準 <span style="color:var(--accent)">ILS（Instrument Landing System）儀器降落</span>進場。<span style="color:var(--warn)">AOA Indexer（攻角指示器）是進場時最重要的速度參考！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-5" style="width:0%"></div></div><span class="progress-pct" id="pct-5">0%</span><button class="reset-btn" onclick="resetPhase(5)">重置</button></div>
+  <div class="steps-grid" id="steps-5">
+    <div class="step-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-icp"/></svg></div><div class="step-content"><div class="step-action">ICP 設定 ILS 頻率</div><div class="step-detail">透過 <span class="val">ICP → LIST → ILS</span>（或對應選單），輸入目標機場 ILS 頻率。HUD 和 HSD 開始顯示 <span class="val">航向道（Localizer）和下滑道（Glideslope）</span>偏移指示。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-speedbrake"/></svg></div><div class="step-content"><div class="step-action">減速，伸出減速板（Speed Brake）</div><div class="step-detail">進場前減速至 <span class="val">250 kt 以下</span>，必要時<span class="val">伸出減速板（Speed Brake）</span>輔助減速。減速板開關通常在油門桿上。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-gear16"/></svg></div><div class="step-content"><div class="step-action">起落架放下（Gear Down）</div><div class="step-detail">距跑道約 <span class="warn-val">10–15 NM</span>，速度低於起落架限速時，<span class="warn-val">Gear Handle 向下</span>放起落架。確認三個綠色 <span class="val">GEAR DOWN 燈</span>亮起。<span class="cyan-val">注意：F-16 起落架放下會增加阻力，需相應調整油門。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-aoa-indexer"/></svg></div><div class="step-content"><div class="step-action">依循 AOA Indexer 控制進場速度</div><div class="step-detail">主儀表板的 <span class="warn-val">AOA Indexer（攻角指示器）</span>有三個燈：<br>
+    · <span class="green-val">綠色圓形（ON SPEED）</span>：理想進場 AoA<br>
+    · <span class="warn-val">黃色梯形（上方，FAST）</span>：速度過快，AoA 過低<br>
+    · <span class="red-val">紅色三角（下方，SLOW）</span>：速度過慢，AoA 過高，危險！<br>
+    <span class="cyan-val">目標：保持綠色燈亮，配合下滑道指示維持穩定下降。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-hud16"/></svg></div><div class="step-content"><div class="step-action">依循 HUD ILS 指示維持航道與下滑道</div><div class="step-detail">HUD 顯示<span class="val">航向道偏移（左右）</span>和<span class="val">下滑道偏移（上下）</span>菱形/十字符號。微調側桿讓符號保持在中心，建立穩定的 <span class="val">3° 下滑角</span>進場航線。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-gear16"/></svg></div><div class="step-content"><div class="step-action">接地 → 油門收 IDLE，輕觸跑道</div><div class="step-detail">越過跑道頭後，保持 <span class="val">AOA Indexer 綠燈</span>逐漸減小油門至 <span class="warn-val">IDLE</span>，主輪先觸地。F-16 起落架較硬，<span class="cyan-val">輕柔放置而非「拉飄」</span>，避免彈跳。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(4)">← 起飛 & 爬升</button><button class="nav-arrow-btn" onclick="showPhase(6)">下一階段：著陸後 & 關機 →</button></div>
+</section>
+
+<!-- PHASE 6 -->
+<section class="phase-section" id="phase-6">
+  <div class="phase-title"><span class="phase-icon-wrap">🅿️</span><div><div class="phase-num">PHASE 07</div><h2>著陸後 & 關機 After Landing & Shutdown</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>標準關機流程</strong>
+落地後依序執行減速、滑行、停妥、關機程序。F-16 關機相對簡單，<span style="color:var(--green)">主要是油門收 OFF 並關閉電力系統</span>，無需特別的 APU 關閉程序（因為起步時用的是 JFS，已自動完成任務）。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-6" style="width:0%"></div></div><span class="progress-pct" id="pct-6">0%</span><button class="reset-btn" onclick="resetPhase(6)">重置</button></div>
+  <div class="steps-grid" id="steps-6">
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-speedbrake"/></svg></div><div class="step-content"><div class="step-action">減速滑行，伸出減速板輔助</div><div class="step-detail">接地後保持機頭方向，<span class="val">減速板（Speed Brake）伸出</span>輔助減速，輕踩煞車（避免抱死）。速度降至滑行速度後收回減速板。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-runway16"/></svg></div><div class="step-content"><div class="step-action">脫離跑道，滑行至停機位</div><div class="step-detail">用<span class="val">腳踏板（Nose Wheel Steering）</span>轉向脫離跑道，依塔台/滑行指示滑行至停機位。速度保持低速（<span class="val">≤15 kt</span>）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-gear16"/></svg></div><div class="step-content"><div class="step-action">停妥 → 停機煞車設定</div><div class="step-detail">到達停機位後，<span class="val">完全停止</span>，設定<span class="val">停機煞車（Parking Brake）</span>。確認飛機完全靜止。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-throttle16"/></svg></div><div class="step-content"><div class="step-action">油門桿 → OFF</div><div class="step-detail"><span class="warn-val">油門桿收回越過 IDLE 卡榫至 OFF</span>，引擎開始減速關閉。監控 RPM 逐漸下降至零，FTIT 隨之下降。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-battery16"/></svg></div><div class="step-content"><div class="step-action">外部燈光、航電系統依序關閉</div><div class="step-detail">關閉 <span class="val">NAV LIGHTS、ANTI-COLLISION LIGHTS</span>，以及不需要的航電系統（雷達、武器系統等已在飛行中關閉）。INS 旋鈕轉回 <span class="val">OFF</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-battery16"/></svg></div><div class="step-content"><div class="step-action">BATTERY switch → OFF</div><div class="step-detail">確認引擎完全停止、所有系統關閉後，<span class="val">BATTERY 開關撥至 OFF</span>。座艙電力切斷，完成關機程序。🎉</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(5)">← ILS 進場 & 降落</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>飛行完成！✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🪖</span><span class="tab-label">座艙</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">🔥</span><span class="tab-label">JFS啟動</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🧭</span><span class="tab-label">INS航電</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">✅</span><span class="tab-label">起飛前</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🛫</span><span class="tab-label">起飛</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(5)" id="mtab-5"><span class="tab-icon">🛬</span><span class="tab-label">ILS進場</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-5"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(6)" id="mtab-6"><span class="tab-icon">🅿️</span><span class="tab-label">關機</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-6"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F-16C Viper · 冷倉啟動到降落教學<div class="swipe-hint">← 左右滑動切換階段 →</div></footer>
+
+<script>
+let currentPhase=0;
+const TOTAL=7;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<TOTAL-1)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<TOTAL;i++)updateProgress(i);
+</script>
+</body>
+</html>
