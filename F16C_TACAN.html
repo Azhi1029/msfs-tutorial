@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="F-16C TACAN">
+<meta name="theme-color" content="#04060c">
+<title>DCS F-16C Viper · TACAN 導航 & STPT 航點</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#4488ff;--accent2:#00ddff;--accent3:#ff6622;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(20,90,220,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(0,150,220,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(0,30,80,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(68,136,255,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(68,136,255,.08);border:1px solid rgba(68,136,255,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(68,136,255,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(68,136,255,.08);box-shadow:0 0 16px rgba(68,136,255,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(68,136,255,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(68,136,255,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(68,136,255,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--accent3);}
+.step-card.tip-card{border-left-color:var(--accent2);}
+.step-card.danger-card{border-left-color:var(--danger);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#d8eaff;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.orange-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.orange-box{background:rgba(255,102,34,.07);border:1px solid rgba(255,102,34,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--accent);}
+.warn-box .alert-text strong{color:var(--warn);}
+.orange-box .alert-text strong{color:var(--accent3);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent2);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(68,136,255,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(68,136,255,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent3);}
+.subsection{margin:22px 0 10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;
+color:var(--accent3);text-transform:uppercase;display:flex;align-items:center;gap:10px;}
+.subsection::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-icp-nav" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a0e18" stroke="#4488ff" stroke-width="1.5"/><text x="24" y="9" fill="#4488ff" font-size="5" font-family="monospace" text-anchor="middle">ICP</text><rect x="6" y="12" width="36" height="8" rx="1" fill="#000a18"/><text x="24" y="18" fill="#00ddff" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">LIST → NAV</text><rect x="6" y="23" width="10" height="6" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="11" y="27.5" fill="#4488ff" font-size="3.2" font-family="monospace" text-anchor="middle">LIST</text><rect x="19" y="23" width="10" height="6" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="27.5" fill="#4488ff" font-size="3.2" font-family="monospace" text-anchor="middle">DED</text><rect x="32" y="23" width="10" height="6" rx="1" fill="#001830" stroke="#003860" stroke-width=".5"/><text x="37" y="27.5" fill="#00ddff" font-size="3.2" font-family="monospace" text-anchor="middle">ENTR</text><rect x="6" y="32" width="36" height="6" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="36.5" fill="#4488ff" font-size="3.2" font-family="monospace" text-anchor="middle">1 2 3 4 5 6 7 8 9 0</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-ded-stpt" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#000a18" stroke="#4488ff" stroke-width="1.5"/><text x="24" y="9" fill="#4488ff" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">DED · STPT</text><rect x="6" y="12" width="36" height="7" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="17" fill="#00ff44" font-size="4.5" font-family="monospace" text-anchor="middle">STPT 03 ▶ ◀</text><rect x="6" y="21" width="36" height="7" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="26" fill="#00ddff" font-size="4.2" font-family="monospace" text-anchor="middle">N25°04.2 E121°33.5</text><rect x="6" y="30" width="36" height="7" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="35" fill="#ffcc00" font-size="4.2" font-family="monospace" text-anchor="middle">ELEV 00250 FT</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-tacan-f16" viewBox="0 0 48 48"><circle cx="24" cy="22" r="18" fill="#0a0e18" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="22" r="13" fill="#040810"/><line x1="24" y1="9" x2="24" y2="22" stroke="#4488ff" stroke-width="2" stroke-linecap="round" opacity=".3"/><line x1="24" y1="22" x2="34" y2="12" stroke="#00ddff" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="12" r="3" fill="#00ddff" opacity=".8"/><circle cx="24" cy="22" r="3" fill="#182040"/><text x="24" y="40" fill="#00ddff" font-size="5" font-family="monospace" text-anchor="middle">TACAN</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-hsd-f16" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#000a04" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="21" r="15" fill="#020806" stroke="#003822" stroke-width="1"/><circle cx="24" cy="21" r="9" fill="none" stroke="#1a3828" stroke-width=".6"/><line x1="24" y1="6" x2="24" y2="21" stroke="#33cc44" stroke-width="1.5" opacity=".6"/><path d="M24 6 L21 11 L27 11Z" fill="#33cc44"/><circle cx="33" cy="14" r="2" fill="#ffcc00"/><circle cx="16" cy="28" r="2" fill="#ffcc00"/><line x1="24" y1="21" x2="33" y2="14" stroke="#ffcc00" stroke-width="1" stroke-dasharray="1.5,1" opacity=".7"/><text x="24" y="40" fill="#00ddff" font-size="5" font-family="monospace" text-anchor="middle">HSD PAGE</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-dtc" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#4488ff" stroke-width="1.5"/><rect x="10" y="10" width="28" height="22" rx="2" fill="#040810" stroke="#1a2840" stroke-width="1"/><rect x="14" y="14" width="20" height="3" fill="#4488ff" opacity=".5"/><rect x="14" y="19" width="20" height="3" fill="#4488ff" opacity=".5"/><rect x="14" y="24" width="14" height="3" fill="#00ddff" opacity=".6"/><circle cx="36" cy="34" r="2" fill="#33cc44"/><text x="24" y="40" fill="#4488ff" font-size="4.5" font-family="monospace" text-anchor="middle">DATA CARTRIDGE</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-course-set" viewBox="0 0 48 48"><circle cx="24" cy="22" r="18" fill="#0a0e18" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="22" r="13" fill="#040810"/><line x1="24" y1="9" x2="24" y2="22" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/><path d="M24 9 L21 14 L27 14Z" fill="#ffcc00"/><line x1="24" y1="22" x2="24" y2="35" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" opacity=".4"/><line x1="24" y1="9" x2="24" y2="35" stroke="#1a2840" stroke-width="1" stroke-dasharray="1,1" opacity=".4"/><circle cx="24" cy="22" r="2" fill="#4488ff"/><text x="24" y="42" fill="#ffcc00" font-size="4.5" font-family="monospace" text-anchor="middle">CRS SET</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-bullseye" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#4488ff" stroke-width="1.5"/><circle cx="24" cy="21" r="14" fill="none" stroke="#ff6622" stroke-width="1.5"/><circle cx="24" cy="21" r="9" fill="none" stroke="#ff6622" stroke-width="1.2" opacity=".7"/><circle cx="24" cy="21" r="4" fill="none" stroke="#ff6622" stroke-width="1" opacity=".5"/><circle cx="24" cy="21" r="1.5" fill="#ff6622"/><line x1="24" y1="7" x2="24" y2="11" stroke="#ff6622" stroke-width="1"/><line x1="24" y1="31" x2="24" y2="35" stroke="#ff6622" stroke-width="1"/><line x1="10" y1="21" x2="14" y2="21" stroke="#ff6622" stroke-width="1"/><line x1="34" y1="21" x2="38" y2="21" stroke="#ff6622" stroke-width="1"/><text x="24" y="40" fill="#ff6622" font-size="4.5" font-family="monospace" text-anchor="middle">BULLSEYE</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+<symbol id="ico-stpt-cycle" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#0a0e18" stroke="#4488ff" stroke-width="1.5"/><circle cx="14" cy="14" r="3" fill="none" stroke="#33cc44" stroke-width="1.5"/><text x="14" y="11" fill="#33cc44" font-size="3.5" font-family="monospace" text-anchor="middle">1</text><circle cx="34" cy="14" r="3" fill="none" stroke="#00ddff" stroke-width="1.5"/><text x="34" y="11" fill="#00ddff" font-size="3.5" font-family="monospace" text-anchor="middle">2</text><circle cx="24" cy="30" r="3" fill="none" stroke="#ffcc00" stroke-width="1.5"/><text x="24" y="27" fill="#ffcc00" font-size="3.5" font-family="monospace" text-anchor="middle">3</text><path d="M17 14 L31 14" stroke="#1a2840" stroke-width="1" stroke-dasharray="2,1"/><path d="M32 17 L26 27" stroke="#1a2840" stroke-width="1" stroke-dasharray="2,1"/><path d="M21 28 L16 17" stroke="#1a2840" stroke-width="1" stroke-dasharray="2,1"/><text x="24" y="40" fill="#4488ff" font-size="4.5" font-family="monospace" text-anchor="middle">STPT CYCLE INC/DEC</text><text x="3" y="47" fill="#4a6080" font-size="0" font-family="monospace"> </text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="F16C_Home.html">← 返回 F-16C 教學中心</a>
+  <div class="header-badge">DCS F-16C VIPER · 導航基礎</div>
+  <h1>TACAN 導航 & <span>STPT</span> 航點</h1>
+  <p class="subtitle">ICP/DED 航點輸入 · TACAN 設定 · HSD 判讀 · Bullseye 參考</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · STPT 基礎概念</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · DED 航點輸入</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · TACAN 設定</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · HSD 頁面判讀</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 導航飛行 & Bullseye</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">📍</span><div><div class="phase-num">PHASE 01</div><h2>STPT 航點基礎概念</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>STPT（Steerpoint）= F-16 的航點</strong>
+F-16 將導航點稱為 <span style="color:var(--accent)">STPT（Steerpoint，操控點）</span>，功能上等同於 F/A-18 的 Waypoint。每個任務最多可規劃 <span style="color:var(--accent)">25 個 STPT</span>，依序編號。飛行員可<span style="color:var(--accent2)">手動輸入座標</span>，或透過 <span style="color:var(--accent2)">DTC（Data Transfer Cartridge）</span>事先載入整個飛行計畫。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-stpt-cycle"/></svg></div>
+      <div class="step-content"><div class="step-action">STPT 編號與循環切換</div>
+      <div class="step-detail">每個 STPT 有<span class="val">編號（1–25）</span>，代表飛行路線上的依序航點。<span class="val">STPT 0</span> 通常保留給特殊用途（如 Mark Point）。透過 ICP 上的 <span class="val">INC/DEC（增減）按鍵</span>可在 STPT 之間切換。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-dtc"/></svg></div>
+      <div class="step-content"><div class="step-action">DTC（資料傳輸卡匣）的角色</div>
+      <div class="step-detail"><span class="val">DTC（Data Transfer Cartridge）</span>是 F-16 的「飛行計畫 USB」：<br>
+      · 任務規劃時可預先載入<span class="val">所有 STPT 座標、無線電頻率、武器配置</span>等<br>
+      · 飛行前透過 DTC 一次性匯入，省去逐一手動輸入<br>
+      · <span class="cyan-val">DCS 中可透過任務規劃介面（Kneeboard/F10）模擬 DTC 資料</span>，本教學著重<span class="cyan-val">手動輸入方式</span>，理解原理後更容易上手 DTC</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ded-stpt"/></svg></div>
+      <div class="step-content"><div class="step-action">STPT 包含的資訊</div>
+      <div class="step-detail">每個 STPT 可包含：<br>
+      · <span class="val">緯度/經度（LAT/LON）</span>：航點座標<br>
+      · <span class="val">海拔高度（ELEV）</span>：地面高度，影響武器投放計算<br>
+      · <span class="val">TOS（Time Over Steerpoint）</span>：預定到達時間（時間導航用）<br>
+      · 部分 STPT 可標記為<span class="val">目標點</span>，配合武器系統使用</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：DED 航點輸入 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⌨️</span><div><div class="phase-num">PHASE 02</div><h2>DED 航點輸入操作</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>ICP/DED 操作邏輯需要練習！</strong>
+F-16 的數據輸入<span style="color:var(--warn)">全部透過 ICP 按鍵 + DED 顯示</span>完成，沒有滑鼠點選。<span style="color:var(--accent)">熟悉「LIST → 選分類 → SEQ 切換欄位 → 數字輸入 → ENTR 確認」</span>這個邏輯，所有資料輸入都是同樣模式。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-icp-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">ICP → LIST → 選擇 STPT（航點選單）</div>
+      <div class="step-detail">按下 <span class="val">LIST</span> 鍵，DED 顯示功能選單（COM、AA、AG、NAV、INSTR 等項目）。按對應數字鍵選擇 <span class="val">STPT（航點）</span>項目，DED 切換至航點資料頁面。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-stpt-cycle"/></svg></div>
+      <div class="step-content"><div class="step-action">用 INC/DEC 選擇要編輯的 STPT 編號</div>
+      <div class="step-detail">DED 顯示目前的 STPT 編號（如 <span class="val">STPT 01</span>）。用 ICP 上的<span class="val">向上/向下（增減）按鍵</span>切換到要編輯或檢視的 STPT 編號。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ded-stpt"/></svg></div>
+      <div class="step-content"><div class="step-action">SEQ 切換至座標欄位，輸入緯度</div>
+      <div class="step-detail">按 <span class="val">SEQ（Sequence）</span>鍵將游標移至<span class="val">緯度（LAT）</span>欄位。用數字鍵輸入緯度，格式 <span class="warn-val">N/S + 度分秒</span>（如 <span class="val">N250412</span> = 北緯25°04.2'）。輸入完按 <span class="val">ENTR</span> 確認。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-ded-stpt"/></svg></div>
+      <div class="step-content"><div class="step-action">SEQ 切換至經度欄位，輸入經度</div>
+      <div class="step-detail">再按 <span class="val">SEQ</span> 移至<span class="val">經度（LON）</span>欄位，輸入格式 <span class="warn-val">E/W + 度分秒</span>（如 <span class="val">E1213330</span> = 東經121°33.3'）。按 <span class="val">ENTR</span> 確認。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-ded-stpt"/></svg></div>
+      <div class="step-content"><div class="step-action">輸入海拔高度（ELEV）</div>
+      <div class="step-detail"><span class="val">SEQ</span> 移至 <span class="val">ELEV（高度）</span>欄位，輸入該航點的<span class="val">海拔高度（英尺）</span>，按 <span class="val">ENTR</span> 確認。完成後該 STPT 即可用於導航。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-icp-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">RCL（重新呼叫）與修正輸入錯誤</div>
+      <div class="step-detail">輸入過程中按錯數字：<br>
+      · 部分欄位可<span class="val">直接覆蓋重新輸入後按 ENTR</span><br>
+      · <span class="val">RCL（Recall）</span>鍵可恢復之前的值或取消未確認的輸入<br>
+      · <span class="cyan-val">建議養成輸入完即覆查的習慣，座標錯誤會導致導航完全偏離！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← STPT 基礎概念</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：TACAN 設定 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">📡</span><div><div class="phase-num">PHASE 03</div><h2>TACAN 設定與運作</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>TACAN 提供方位與距離</strong>
+TACAN（戰術空中導航）提供<span style="color:var(--accent)">相對於地面台站的方位（Bearing）和距離（DME）</span>。F-16 透過 ICP/DED 設定頻道，資訊顯示在 HSD 和 HUD 上。與 STPT 是<span style="color:var(--accent2)">互補關係</span>：TACAN 導航至已知電台，STPT 導航至任意座標點。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-icp-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">ICP → LIST → TACAN</div>
+      <div class="step-detail">按 <span class="val">LIST</span>，選擇 <span class="val">TACAN</span> 項目，DED 顯示 TACAN 頻道輸入頁面，包含頻道號碼和 <span class="val">X/Y 頻段</span>選擇。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-tacan-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">輸入頻道號碼與頻段（X/Y）</div>
+      <div class="step-detail">用數字鍵輸入<span class="val">頻道號碼（1–126）</span>，按 <span class="val">SEQ</span> 切換 <span class="val">X/Y 頻段</span>（依任務簡報指定），按 <span class="val">ENTR</span> 確認。例如：<span class="val">71X</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-tacan-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">選擇 T/R 模式（地對空 vs 空對空）</div>
+      <div class="step-detail">
+      · <span class="val">T/R（Transmit/Receive）</span>：標準模式，導航至地面 TACAN 站<br>
+      · <span class="val">A/A（Air-to-Air）</span>：用於空中加油等場景，與另一架飛機互相導航<br>
+      一般導航選擇 <span class="green-val">T/R</span>。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-tacan-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">TACAN vs STPT：何時用哪個？</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>情境</th><th>建議</th></tr>
+      <tr><td>導航至已知 TACAN 電台（機場/加油機）</td><td class="mono">TACAN</td></tr>
+      <tr><td>導航至任意座標（目標、集合點）</td><td class="mono">STPT</td></tr>
+      <tr><td>多航點飛行計畫</td><td class="mono">STPT（依序切換）</td></tr>
+      </table>
+      <span class="cyan-val">兩者可同時使用：HSD 上可同時顯示 TACAN 方位針和 STPT 方向</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← DED 航點輸入</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：HSD 頁面判讀 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🗺️</span><div><div class="phase-num">PHASE 04</div><h2>HSD 頁面判讀</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">🔵</span><div class="alert-text"><strong>HSD（Horizontal Situation Display）</strong>
+HSD 是 F-16 的<span style="color:var(--accent)">水平態勢顯示</span>，功能類似 F/A-18 的 HSI，顯示在 MFD 上。<span style="color:var(--accent2)">同時顯示飛機位置、航向、STPT 方向、TACAN 方位</span>，是飛行中最常參考的導航頁面。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-hsd-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">MFD → HSD 頁面開啟</div>
+      <div class="step-detail">主儀表板左右兩側的 <span class="val">MFD（多功能顯示器）</span>，按對應 OSB 切換至 <span class="val">HSD</span> 頁面。畫面類似俯視地圖，飛機位於畫面下方，<span class="val">航向朝上（Heading Up）</span>顯示。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-course-set"/></svg></div>
+      <div class="step-content"><div class="step-action">識別 STPT 方向指示</div>
+      <div class="step-detail">HSD 上顯示一個指向<span class="val">目前 STPT</span>的指示線/符號，標示<span class="val">方位和距離</span>。當切換到下一個 STPT，指示會自動更新指向新航點。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-tacan-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">識別 TACAN 方位針</div>
+      <div class="step-detail">若 TACAN 已設定並接收訊號，HSD 顯示<span class="val">TACAN 方位指針</span>，指向地面台站方向，並顯示<span class="val">DME 距離</span>數值。可與 STPT 指示同時顯示，互相對照確認位置。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hsd-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">調整 HSD 顯示範圍（Range）</div>
+      <div class="step-detail">HSD 旁的 OSB 可調整<span class="val">顯示範圍（如 10/20/40/80 NM）</span>。<br>
+      · <span class="val">小範圍</span>：適合精確進場、目標接近時<br>
+      · <span class="val">大範圍</span>：適合長途導航、掌握整體航線<br>
+      依飛行階段切換合適的範圍。</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← TACAN 設定</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：導航飛行 & Bullseye →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🎯</span><div><div class="phase-num">PHASE 05</div><h2>導航飛行 & Bullseye 參考</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>Bullseye — 通用位置參考點</strong>
+任務簡報常以 <span style="color:var(--accent3)">Bullseye（牛眼）</span>作為<span style="color:var(--accent3)">通用參考點</span>，所有位置以「Bullseye 方位 + 距離」描述（如「Bandit, Bullseye 090/35」），<span style="color:var(--green)">避免直接洩漏己方座標，同時讓所有單位用同一基準溝通</span>。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-stpt-cycle"/></svg></div>
+      <div class="step-content"><div class="step-action">飛行中切換 STPT，依序導航</div>
+      <div class="step-detail">飛抵目前 STPT 後，用 ICP 的 <span class="val">INC（增加）按鍵</span>切換到下一個 STPT。HSD/HUD 自動更新指向新航點的方向和距離。<span class="cyan-val">依規劃路線逐個飛越 STPT，即完成導航任務。</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-bullseye"/></svg></div>
+      <div class="step-content"><div class="step-action">Bullseye 的設定方式</div>
+      <div class="step-detail"><span class="val">Bullseye 通常設定為某個特定 STPT</span>（任務簡報會指明，如 <span class="val">STPT 0 或特定編號</span>）。系統可計算<span class="val">飛機目前位置相對於 Bullseye 的方位和距離</span>，用於與友軍溝通位置。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-bullseye"/></svg></div>
+      <div class="step-content"><div class="step-action">Bullseye 通報格式</div>
+      <div class="step-detail">標準格式：<span class="val">「Bullseye + 方位（3位數）+ 距離（NM）」</span><br>
+      例：<span class="val">「Bullseye 270/40」</span>= 從 Bullseye 看，方位 270°（正西）、距離 40 海浬處。<br>
+      <span class="cyan-val">聽到友軍通報威脅位置時，在 HSD/SA 頁面換算成自己的相對位置，建立態勢感知。</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-icp-nav"/></svg></div>
+      <div class="step-content"><div class="step-action">F-16C 導航完整流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>步驟</th><th>動作</th></tr>
+      <tr><td>1</td><td>ICP → LIST → STPT，輸入各航點座標/高度</td></tr>
+      <tr><td>2</td><td>ICP → LIST → TACAN，設定頻道（若需要）</td></tr>
+      <tr><td>3</td><td>MFD 切換至 HSD 頁面，確認顯示正常</td></tr>
+      <tr><td>4</td><td>依 HSD/HUD 指示飛向目前 STPT</td></tr>
+      <tr><td>5</td><td>到達後 INC 切換下一個 STPT</td></tr>
+      <tr><td>6</td><td>需要時換算 Bullseye 通報位置</td></tr>
+      </table>
+      <span class="cyan-val">熟練 ICP/DED 操作是駕駛 F-16 的基本功，後續武器系統操作邏輯相同！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← HSD 頁面判讀</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！✅</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">📍</span><span class="tab-label">STPT</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⌨️</span><span class="tab-label">DED輸入</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">📡</span><span class="tab-label">TACAN</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🗺️</span><span class="tab-label">HSD</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🎯</span><span class="tab-label">Bullseye</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F-16C Viper · TACAN 導航 & STPT 航點教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
