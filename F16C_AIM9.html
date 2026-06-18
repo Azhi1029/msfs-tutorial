@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="F-16C AIM-9">
+<meta name="theme-color" content="#04060c">
+<title>DCS F-16C Viper · AIM-9 響尾蛇 & HMCS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ff4444;--accent2:#ff8800;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 15% 0%,rgba(220,30,30,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,0,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(80,0,0,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;background:radial-gradient(ellipse,rgba(255,50,50,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--accent);background:rgba(255,50,50,.08);border:1px solid rgba(255,50,50,.25);padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,50,50,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(4,6,12,.97);backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);background:rgba(255,50,50,.08);box-shadow:0 0 16px rgba(255,50,50,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,50,50,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,50,50,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,50,50,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--accent);width:24px;height:24px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#ffd8d8;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.orange-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.red-box{background:rgba(255,50,50,.07);border:1px solid rgba(255,50,50,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.red-box .alert-text strong{color:var(--accent);}
+.warn-box .alert-text strong{color:var(--warn);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);text-align:left;padding:8px 12px;background:rgba(255,50,50,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,50,50,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(4,6,12,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-aim9-f16" viewBox="0 0 48 48"><rect x="3" y="16" width="34" height="9" rx="4" fill="#100000" stroke="#ff4444" stroke-width="1.5"/><path d="M37 17 L44 20.5 L37 24Z" fill="#ff4444" opacity=".8"/><path d="M10 16 L6 10 L9 10 L13 16Z" fill="#ff4444" opacity=".6"/><path d="M10 25 L6 31 L9 31 L13 25Z" fill="#ff4444" opacity=".6"/><circle cx="30" cy="20.5" r="2" fill="#ff8800" opacity=".8"/><text x="20" y="38" fill="#ff4444" font-size="5.5" font-family="monospace" text-anchor="middle">AIM-9M/X SIDEWINDER</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">AIM-9</text></symbol>
+<symbol id="ico-hmcs-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#100000" stroke="#ff4444" stroke-width="1.5"/><ellipse cx="24" cy="16" rx="14" ry="8" fill="#0a0000" stroke="#330000" stroke-width="1"/><circle cx="33" cy="19" r="6" fill="none" stroke="#ff4444" stroke-width="2"/><line x1="33" y1="13" x2="33" y2="11" stroke="#ff4444" stroke-width="1.5"/><line x1="33" y1="25" x2="33" y2="27" stroke="#ff4444" stroke-width="1.5"/><line x1="27" y1="19" x2="25" y2="19" stroke="#ff4444" stroke-width="1.5"/><line x1="39" y1="19" x2="41" y2="19" stroke="#ff4444" stroke-width="1.5"/><circle cx="33" cy="19" r="2" fill="#ff4444"/><line x1="24" y1="16" x2="33" y2="19" stroke="#ff4444" stroke-width="1" stroke-dasharray="2,1" opacity=".6"/><text x="24" y="33" fill="#ff4444" font-size="4" font-family="monospace" text-anchor="middle">HMCS · OFF-AXIS 90°</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">HMCS</text></symbol>
+<symbol id="ico-ir-seeker-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#100000" stroke="#ff4444" stroke-width="1.5"/><circle cx="24" cy="21" r="14" fill="#0a0000" stroke="#330000" stroke-width="1"/><circle cx="24" cy="21" r="9" fill="#0a0000" stroke="#ff4444" stroke-width="1.5"/><circle cx="24" cy="21" r="4" fill="#ff4444" opacity=".6"/><circle cx="20" cy="17" r="1.5" fill="#fff" opacity=".6"/><text x="24" y="36" fill="#ff4444" font-size="5" font-family="monospace" text-anchor="middle">IR SEEKER</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SEEKER</text></symbol>
+<symbol id="ico-growl-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#100000" stroke="#ff4444" stroke-width="1.5"/><path d="M8 24 Q12 16 16 24 Q20 32 24 24 Q28 16 32 24 Q36 32 40 24" fill="none" stroke="#ff4444" stroke-width="2.5" stroke-linecap="round"/><text x="24" y="35" fill="#ff4444" font-size="5.5" font-family="monospace" text-anchor="middle">GROWL TONE</text><text x="24" y="40" fill="#ff8800" font-size="4" font-family="monospace" text-anchor="middle">IR LOCK!</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">AUDIO LOCK</text></symbol>
+<symbol id="ico-wvr-select" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#100000" stroke="#ff4444" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#0a0000"/><text x="24" y="12" fill="#ff4444" font-size="5" font-family="monospace" text-anchor="middle">SMS · A-A</text><text x="24" y="17" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">AIM-9M x 2</text><rect x="8" y="23" width="14" height="8" rx="2" fill="#0a0000" stroke="#ff4444" stroke-width="1"/><text x="15" y="29" fill="#ff4444" font-size="4" font-family="monospace" text-anchor="middle">9M</text><rect x="26" y="23" width="14" height="8" rx="2" fill="#0a0800" stroke="#332200" stroke-width="1"/><text x="33" y="29" fill="#332200" font-size="4" font-family="monospace" text-anchor="middle">120</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SMS WVR</text></symbol>
+<symbol id="ico-fox2-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#100000" stroke="#ff4444" stroke-width="1.5"/><text x="24" y="20" fill="#ff4444" font-size="16" font-family="monospace" font-weight="bold" text-anchor="middle">FOX</text><text x="24" y="34" fill="#ff8800" font-size="16" font-family="monospace" font-weight="bold" text-anchor="middle">2</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">RADIO CALL</text></symbol>
+<symbol id="ico-dogfight-f16" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="3" fill="#100000" stroke="#ff4444" stroke-width="1.5"/><text x="24" y="10" fill="#ff4444" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">DGFT SWITCH</text><rect x="18" y="14" width="12" height="18" rx="2" fill="#0a0000" stroke="#330000" stroke-width="1"/><rect x="20" y="14" width="8" height="9" rx="1" fill="#ff4444" opacity=".7"/><text x="24" y="20" fill="#fff" font-size="3.5" font-family="monospace" text-anchor="middle">DGFT</text><rect x="20" y="23" width="8" height="9" rx="1" fill="#0a0800" stroke="#332200" stroke-width=".5"/><text x="24" y="29" fill="#332200" font-size="3.5" font-family="monospace" text-anchor="middle">MSL</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">DOGFIGHT SW</text></symbol>
+<symbol id="ico-aim9-boresight" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff4444" stroke-width="1.5" opacity=".8"/><text x="8" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">320</text><text x="34" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">8000</text><circle cx="26" cy="21" r="6" fill="none" stroke="#ff4444" stroke-width="1.8"/><circle cx="26" cy="21" r="2" fill="#ff4444"/><line x1="26" y1="15" x2="26" y2="13" stroke="#ff4444" stroke-width="1.5"/><line x1="26" y1="27" x2="26" y2="29" stroke="#ff4444" stroke-width="1.5"/><line x1="20" y1="21" x2="18" y2="21" stroke="#ff4444" stroke-width="1.5"/><line x1="32" y1="21" x2="34" y2="21" stroke="#ff4444" stroke-width="1.5"/><text x="24" y="38" fill="#ff4444" font-size="3.5" font-family="monospace" text-anchor="middle">9M BORESIGHT · 3.2NM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">AIM-9 HUD</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="F16C_Home.html">← 返回 F-16C 教學中心</a>
+  <div class="header-badge">DCS F-16C VIPER · 武器系列</div>
+  <h1>AIM-9 響尾蛇 &amp; <span>HMCS</span></h1>
+  <p class="subtitle">紅外線導引 · HMCS 頭盔瞄準具 · 離軸射擊 · FOX 2</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · AIM-9 基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 武器設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 正面軸射擊</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · HMCS 離軸射擊</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · WVR 戰術整合</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🔥</span><div><div class="phase-num">PHASE 01</div><h2>AIM-9 基礎概念</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>AIM-9 Sidewinder 與 HMCS 組合</strong>
+F-16C 配備 <span style="color:var(--accent)">AIM-9M 或 AIM-9X Sidewinder</span>，無線電呼號 <span style="color:var(--accent)">FOX 2</span>。搭配 <span style="color:var(--accent)">HMCS（Helmet Mounted Cueing System）</span>，可實現 <span style="color:var(--green)">±90° 離軸射擊</span>！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-aim9-f16"/></svg></div><div class="step-content"><div class="step-action">AIM-9M vs AIM-9X 差異</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>型號</th><th>離軸角度</th><th>抗干擾</th><th>HMCS整合</th></tr><tr><td class="mono">AIM-9M</td><td>±25°</td><td>一般</td><td>有限</td></tr><tr><td class="mono">AIM-9X</td><td>±90°</td><td>極強 IRCCM</td><td>完整</td></tr></table><span class="cyan-val">DCS F-16C 兩種型號皆可配備，任務簡報確認裝備哪種</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hmcs-f16"/></svg></div><div class="step-content"><div class="step-action">HMCS 頭盔瞄準系統簡介</div><div class="step-detail">HMCS 是 F-16C 的頭盔顯示系統：<br>· 飛行員<span class="val">頭部轉動</span>，HMCS 瞄準圓跟隨<br>· AIM-9 導引頭跟隨 HMCS 方向<br>· 目標不在機頭前方也能鎖定<br>· <span class="cyan-val">DCS 中需要 TrackIR/VR；無頭追蹤時用 HOTAS TDC 控制</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ir-seeker-f16"/></svg></div><div class="step-content"><div class="step-action">IR 導引頭與 Growl 音調</div><div class="step-detail">AIM-9 靠<span class="val">紅外線（熱源）</span>追蹤目標：<br>· 低頻嗡嗡聲：導引頭搜索中<br>· <span class="warn-val">持續高頻 Growl 音調</span>：IR 導引頭鎖定目標！<br>· <span class="cyan-val">等到 Growl 穩定才射擊！</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：武器設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚙️</span><div><div class="phase-num">PHASE 02</div><h2>武器設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>進入 WVR 立即切換 Dogfight Switch！</strong>
+<span style="color:var(--warn)">DGFT Switch 前推</span>一鍵：自動選 AIM-9、雷達切換 DGFT 模式、HMCS 啟動。進入 10NM 立即執行！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-wvr-select"/></svg></div><div class="step-content"><div class="step-action">MASTER ARM → ARM</div><div class="step-detail">左主控台 <span class="warn-val">MASTER ARM → ARM</span>。HUD 顯示 ARM。<span class="red-val">訓練時保持 SAFE！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-dogfight-f16"/></svg></div><div class="step-content"><div class="step-action">方法一：DGFT Switch 前推（最快！）</div><div class="step-detail">油門上 <span class="val">DGFT Switch 前推</span>：自動選 <span class="val">AIM-9</span>、雷達切 <span class="val">DGFT 模式</span>、<span class="val">HMCS 啟動</span>。<span class="cyan-val">進入 10NM 立即前推！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-wvr-select"/></svg></div><div class="step-content"><div class="step-action">方法二：SMS 手動選擇 AIM-9</div><div class="step-detail">MFD → <span class="val">SMS → A-A 模式</span>，選擇 AIM-9 武器站。HUD 顯示 <span class="val">9M</span> 或 <span class="val">9X</span>，導引頭開始搜索。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hmcs-f16"/></svg></div><div class="step-content"><div class="step-action">確認 HMCS 啟動</div><div class="step-detail">DGFT 後確認頭盔顯示<span class="val">瞄準圓（Reticle）</span>，頭部轉動時圓圈隨著移動，AIM-9 導引頭跟隨。無 TrackIR/VR：<span class="cyan-val">HOTAS TDC 控制 HMCS 指向</span>。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← AIM-9 基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：正面軸射擊 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🎯</span><div><div class="phase-num">PHASE 03</div><h2>正面軸射擊（Boresight）</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>傳統機頭對準射擊（AIM-9M 常用）</strong>機頭對準目標 <span style="color:var(--accent)">±25°</span> 以內，等 Growl 鎖定後射擊。是 AIM-9M 的主要射擊方式。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-aim9-boresight"/></svg></div><div class="step-content"><div class="step-action">機頭對準目標方向（±25° 以內）</div><div class="step-detail">操縱飛機讓目標進入 HUD 前方 <span class="val">±25° 範圍</span>。HUD 顯示 AIM-9 導引頭圓圈/鑽石符號。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-growl-f16"/></svg></div><div class="step-content"><div class="step-action">等待穩定 Growl 音調（IR 鎖定）</div><div class="step-detail">低頻嗡嗡 → <span class="warn-val">持續高頻 Growl</span>。<span class="cyan-val">追尾最快，迎頭較難觸發，需更近距離。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-fox2-f16"/></svg></div><div class="step-content"><div class="step-action">Growl 穩定 → 射擊！「FOX 2！」</div><div class="step-detail">確認 Growl 穩定，距離 <span class="warn-val">0.5–8 NM</span>，按下 <span class="warn-val">Weapon Release</span>！呼號 <span class="val">「FOX 2！」</span>。射後不理，飛機可脫離。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-aim9-f16"/></svg></div><div class="step-content"><div class="step-action">最佳射擊條件</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>條件</th><th>說明</th></tr><tr><td>追尾 Rear</td><td class="mono">最佳，引擎尾焰強</td></tr><tr><td>側面 Beam</td><td class="mono">良好</td></tr><tr><td>迎頭 Front</td><td class="mono">需更近才能 Growl</td></tr><tr><td>最佳距離</td><td class="mono">1–5 NM</td></tr></table></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 武器設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：HMCS 離軸射擊 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🥽</span><div><div class="phase-num">PHASE 04</div><h2>HMCS 離軸射擊（AIM-9X）</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>頭轉哪裡，飛彈射哪裡！</strong>
+AIM-9X + HMCS，<span style="color:var(--accent)">離軸高達 ±90°</span>：不需機頭對準目標，頭轉向目標 → 等 Growl → 射擊！</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card warn-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-dogfight-f16"/></svg></div><div class="step-content"><div class="step-action">DGFT Switch 前推 → HMCS + AIM-9X 啟動</div><div class="step-detail"><span class="warn-val">DGFT Switch 前推</span>，HMCS 啟動，自動選 AIM-9X，頭盔顯示瞄準圓。MASTER ARM 確認 ARM。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hmcs-f16"/></svg></div><div class="step-content"><div class="step-action">頭轉向目標 → HMCS 瞄準圓對準目標</div><div class="step-detail">頭部轉動（TrackIR/VR）或 HOTAS TDC 移動 HMCS 瞄準圓對準目標。最大離軸 <span class="val">±90°</span>，超出限制 HMCS 會提示。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-growl-f16"/></svg></div><div class="step-content"><div class="step-action">等待 Growl + 鎖定環出現</div><div class="step-detail">HMCS 對準後等待：<span class="warn-val">Growl 持續音調</span> + 瞄準圓內<span class="val">鎖定環（小圓）</span>出現。兩個條件都滿足才射擊。<span class="cyan-val">離軸角越大，Growl 越難觸發，需更靠近。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-fox2-f16"/></svg></div><div class="step-content"><div class="step-action">Growl + 鎖定環 → 射擊！FOX 2！</div><div class="step-detail">按下 <span class="warn-val">Weapon Release</span>！飛彈沿 HMCS 方向飛出追蹤目標。<span class="green-val">完全 Fire and Forget，射後立即可機動！</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← 正面軸射擊</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：WVR 戰術整合 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">📋</span><div><div class="phase-num">PHASE 05</div><h2>WVR 戰術整合</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>F-16C WVR 優勢</strong>高推重比 + AIM-9X + HMCS = <span style="color:var(--green)">極強的近距接戰能力</span>。善用 AB 維持能量，HMCS 讓不利位置也能反擊。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-dogfight-f16"/></svg></div><div class="step-content"><div class="step-action">F-16 WVR 能量管理</div><div class="step-detail">F-16 是純能量型戰機：最佳纏鬥速度 <span class="val">~300–350 kt（Corner Speed）</span>。推重比接近 1:1，AB 後 &gt;1。<span class="cyan-val">善用垂直機動保持能量，能量不足時用 AB 快速補充。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hmcs-f16"/></svg></div><div class="step-content"><div class="step-action">HMCS 離軸射擊的戰術場景</div><div class="step-detail">· <span class="val">纏鬥中目標甩到側方</span>：頭轉過去直接射<br>· <span class="val">劣勢位置反擊</span>：被追尾時轉彎後 HMCS 反擊<br>· <span class="cyan-val">確認是敵機！HMCS 不分敵我！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-aim9-f16"/></svg></div><div class="step-content"><div class="step-action">AIM-9M vs AIM-9X 使用場景</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>場景</th><th>建議型號</th></tr><tr><td>目標在前方追尾</td><td class="mono">9M 或 9X</td></tr><tr><td>目標在側方</td><td class="mono">9X + HMCS</td></tr><tr><td>目標有熱焰彈</td><td class="mono">9X（IRCCM）</td></tr></table></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-fox2-f16"/></svg></div><div class="step-content"><div class="step-action">完整 WVR 接戰流程</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>距離</th><th>動作</th></tr><tr><td>10 NM</td><td>DGFT Switch 前推</td></tr><tr><td>5–8 NM</td><td>HMCS 對準，Growl，FOX 2！</td></tr><tr><td>2–5 NM</td><td>機頭對準，Growl，FOX 2！</td></tr><tr><td>形勢不利</td><td>AB 拉垂直，Extend</td></tr></table></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← HMCS 離軸射擊</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！✅</button></div>
+</section>
+</div>
+
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🔥</span><span class="tab-label">基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚙️</span><span class="tab-label">設定</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🎯</span><span class="tab-label">正面軸</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🥽</span><span class="tab-label">HMCS</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">📋</span><span class="tab-label">WVR戰術</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F-16C Viper · AIM-9 響尾蛇 &amp; HMCS 離軸射擊教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);const label=document.getElementById("pct-"+i);const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";if(label)label.textContent=pct+"%";if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){if(dx<0&&currentPhase<4)showPhase(currentPhase+1);else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);}
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
