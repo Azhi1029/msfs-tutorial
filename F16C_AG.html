@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="F-16C 空對地">
+<meta name="theme-color" content="#04060c">
+<title>DCS F-16C Viper · 空對地武器基礎</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ff8800;--accent2:#ffcc00;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;
+background-image:radial-gradient(ellipse at 15% 0%,rgba(220,120,0,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,60,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);
+background:linear-gradient(180deg,rgba(80,30,0,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;
+background:radial-gradient(ellipse,rgba(255,136,0,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;
+letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;
+color:var(--accent);background:rgba(255,136,0,.08);border:1px solid rgba(255,136,0,.25);
+padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);
+color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,136,0,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;
+border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+background:rgba(4,6,12,.97);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;
+color:var(--text-dim);background:var(--panel);border:1px solid var(--border);
+padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);
+background:rgba(255,136,0,.08);box-shadow:0 0 16px rgba(255,136,0,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,136,0,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);
+border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;
+gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,136,0,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,136,0,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--danger);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card.danger-card{border-left-color:var(--danger);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#000;
+background:var(--accent);width:24px;height:24px;border-radius:3px;
+display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#ffeedd;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.yellow-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,51,51,.07);border:1px solid rgba(255,51,51,.28);}
+.alert-box.orange-box{background:rgba(255,136,0,.07);border:1px solid rgba(255,136,0,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--danger);}
+.orange-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);
+text-align:left;padding:8px 12px;background:rgba(255,136,0,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,136,0,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;
+margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);
+background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);
+background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);
+font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){
+header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}
+.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}
+.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}
+.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}
+.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}
+.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}
+.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}
+.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}
+}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+background:rgba(4,6,12,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;
+justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;
+background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-mk82" viewBox="0 0 48 48"><rect x="3" y="16" width="38" height="11" rx="2" fill="#0a0600" stroke="#ff8800" stroke-width="1.5"/><circle cx="38" cy="21.5" r="5" fill="#0a0600" stroke="#ff8800" stroke-width="1.2"/><path d="M3 16 L3 27 L-1 27 L-1 16Z" fill="#0a0600"/><path d="M8 27 L8 32 L11 32 L11 27Z" fill="#ff8800" opacity=".6"/><path d="M16 27 L16 32 L19 32 L19 27Z" fill="#ff8800" opacity=".6"/><text x="22" y="38" fill="#ff8800" font-size="5.5" font-family="monospace" text-anchor="middle">Mk-82 500lb</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">Mk-82</text></symbol>
+<symbol id="ico-cbu-f16" viewBox="0 0 48 48"><rect x="3" y="14" width="32" height="13" rx="6" fill="#0a0600" stroke="#ff8800" stroke-width="1.5"/><path d="M35 16 L44 20.5 L35 25Z" fill="#ff8800" opacity=".7"/><circle cx="12" cy="20.5" r="2" fill="#ffcc00" opacity=".7"/><circle cx="20" cy="20.5" r="2" fill="#ffcc00" opacity=".7"/><circle cx="28" cy="20.5" r="2" fill="#ffcc00" opacity=".7"/><text x="20" y="35" fill="#ff8800" font-size="5" font-family="monospace" text-anchor="middle">CBU-87/97</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">CBU</text></symbol>
+<symbol id="ico-jdam-f16" viewBox="0 0 48 48"><rect x="3" y="15" width="38" height="12" rx="2" fill="#001008" stroke="#ff8800" stroke-width="1.5"/><circle cx="38" cy="21" r="5" fill="#001008" stroke="#ff8800" stroke-width="1.2"/><path d="M8 27 L8 33 L11 33 L11 27Z" fill="#ff8800" opacity=".6"/><path d="M14 27 L14 33 L17 33 L17 27Z" fill="#ff8800" opacity=".6"/><path d="M22 27 L22 33 L25 33 L25 27Z" fill="#ff8800" opacity=".6"/><text x="20" y="40" fill="#00ddaa" font-size="5" font-family="monospace" text-anchor="middle">GBU-38 JDAM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">JDAM</text></symbol>
+<symbol id="ico-ccrp-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff8800" stroke-width="1.5"/><path d="M8 30 Q20 30 24 14" fill="none" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1"/><circle cx="8" cy="30" r="3" fill="#4488ff"/><path d="M24 14 Q26 24 30 36" fill="none" stroke="#ff8800" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="14" r="2.5" fill="#ffcc00"/><circle cx="30" cy="36" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="8" fill="#ffcc00" font-size="4" font-family="monospace" text-anchor="middle">RELEASE</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">CCRP</text></symbol>
+<symbol id="ico-ccip-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff8800" stroke-width="1.5"/><path d="M14 8 L34 32" fill="none" stroke="#4488ff" stroke-width="1.5" stroke-dasharray="2,1" opacity=".5"/><circle cx="14" cy="8" r="3" fill="#4488ff"/><circle cx="34" cy="32" r="4" fill="none" stroke="#ffcc00" stroke-width="2"/><line x1="34" y1="26" x2="34" y2="28" stroke="#ffcc00" stroke-width="1.5"/><line x1="34" y1="36" x2="34" y2="38" stroke="#ffcc00" stroke-width="1.5"/><line x1="28" y1="32" x2="30" y2="32" stroke="#ffcc00" stroke-width="1.5"/><line x1="38" y1="32" x2="40" y2="32" stroke="#ffcc00" stroke-width="1.5"/><circle cx="34" cy="32" r="1.5" fill="#ffcc00"/><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">CCIP</text></symbol>
+<symbol id="ico-sms-ag" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#020608" stroke="#ff8800" stroke-width="1.5"/><rect x="6" y="6" width="36" height="14" rx="1" fill="#080400"/><text x="24" y="12" fill="#ff8800" font-size="5" font-family="monospace" text-anchor="middle">SMS · A-G</text><text x="24" y="17" fill="#00ff44" font-size="4" font-family="monospace" text-anchor="middle">Mk-82 x 4 · GBU-38 x 2</text><rect x="8" y="23" width="10" height="8" rx="2" fill="#080400" stroke="#ff8800" stroke-width="1"/><text x="13" y="29" fill="#ff8800" font-size="3.5" font-family="monospace" text-anchor="middle">CCRP</text><rect x="20" y="23" width="10" height="8" rx="2" fill="#080400" stroke="#ff8800" stroke-width="1"/><text x="25" y="29" fill="#ff8800" font-size="3.5" font-family="monospace" text-anchor="middle">CCIP</text><rect x="32" y="23" width="10" height="8" rx="2" fill="#001008" stroke="#003322" stroke-width="1"/><text x="37" y="29" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">JDAM</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SMS A-G</text></symbol>
+<symbol id="ico-hud-ag" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#020608" stroke="#ff8800" stroke-width="1.5" opacity=".8"/><text x="8" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">320</text><text x="34" y="11" fill="#4488ff" font-size="4.5" font-family="monospace">15000</text><circle cx="24" cy="22" r="3" fill="none" stroke="#ff8800" stroke-width="1.2"/><path d="M19 22 L21 22 M27 22 L29 22 M24 19 L24 21" stroke="#ff8800" stroke-width="1.2"/><circle cx="32" cy="28" r="4" fill="none" stroke="#ffcc00" stroke-width="1.5"/><circle cx="32" cy="28" r="1.5" fill="#ffcc00"/><text x="24" y="38" fill="#ffcc00" font-size="3.8" font-family="monospace" text-anchor="middle">CCIP PIPPER · ON TGT</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">HUD A-G</text></symbol>
+<symbol id="ico-dive-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff8800" stroke-width="1.5"/><path d="M8 8 L28 36" fill="none" stroke="#4488ff" stroke-width="2.5" stroke-linecap="round"/><circle cx="8" cy="8" r="3" fill="#4488ff"/><circle cx="28" cy="36" r="3" fill="none" stroke="#ff3333" stroke-width="1.5"/><circle cx="28" cy="36" r="1" fill="#ff3333"/><path d="M25 33 L28 36 L31 33" fill="none" stroke="#ff3333" stroke-width="1.5" stroke-linecap="round"/><text x="24" y="18" fill="#ff8800" font-size="4" font-family="monospace" text-anchor="middle">DIVE 30-45°</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">DIVE ATTACK</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="F16C_Home.html">← 返回 F-16C 教學中心</a>
+  <div class="header-badge">DCS F-16C VIPER · 武器系列</div>
+  <h1>空對地 <span>武器</span> 基礎</h1>
+  <p class="subtitle">Mk-82 / JDAM / CBU · CCRP / CCIP · MFD SMS 設定</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · 武器種類總覽</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · SMS 武器設定</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · CCRP 水平投彈</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · CCIP 俯衝投彈</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · JDAM / CBU 特殊操作</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">💣</span><div><div class="phase-num">PHASE 01</div><h2>F-16C 空對地武器種類</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>F-16C 的多用途空對地能力</strong>
+F-16C 可掛載多種空對地武器，從<span style="color:var(--accent)">非制導炸彈（Mk-82）</span>到<span style="color:var(--accent)">GPS 導引（JDAM）</span>再到<span style="color:var(--accent)">集束炸彈（CBU）</span>。投彈方式分為 <span style="color:var(--accent2)">CCRP（水平自動）</span>和 <span style="color:var(--accent2)">CCIP（俯衝手動）</span>兩種，本模組涵蓋所有基礎操作。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mk82"/></svg></div>
+      <div class="step-content"><div class="step-action">Mk-82 500lb 通用炸彈</div>
+      <div class="step-detail">最基礎的非制導炸彈（鐵炸彈）：<br>
+      · <span class="val">500 磅（227 kg）</span>，F-16 最多可掛 6 枚<br>
+      · 無導引，完全依賴<span class="val">飛行軌跡和瞄準</span><br>
+      · 使用 <span class="val">CCRP 或 CCIP</span> 投彈<br>
+      · <span class="cyan-val">適合：目標密集區、機場跑道、倉庫等大型固定目標</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-jdam-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">GBU-38 JDAM（GPS 導引炸彈）</div>
+      <div class="step-detail">Mk-82 加裝 GPS/INS 導引套件：<br>
+      · <span class="val">全天候精準</span>，CEP &lt; 13m<br>
+      · 需事先輸入目標<span class="val">GPS 座標</span>（透過 STPT 或直接輸入）<br>
+      · 投放後<span class="green-val">射後不理</span>，不需要雷射照射<br>
+      · 使用 <span class="val">CCRP 模式</span>投放</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-cbu-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">CBU-87/97 集束炸彈</div>
+      <div class="step-detail">散布子母彈覆蓋較大區域：<br>
+      · <span class="val">CBU-87</span>：一般集束，對人員/輕裝甲有效<br>
+      · <span class="val">CBU-97 SFW</span>：感測器引爆，專門對付裝甲車<br>
+      · 投放後子彈藥在空中散開，覆蓋<span class="val">200m 以上的範圍</span><br>
+      · <span class="warn-val">注意：子彈藥未爆率高，對平民危險，部分任務禁用</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-ccrp-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">CCRP vs CCIP 投彈模式比較</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>模式</th><th>方式</th><th>優點</th><th>缺點</th></tr>
+      <tr><td class="mono">CCRP</td><td>水平飛行，電腦計算</td><td>高空安全</td><td>需要準確目標資料</td></tr>
+      <tr><td class="mono">CCIP</td><td>俯衝，HUD 落點游標</td><td>直觀精準</td><td>暴露於防空</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：SMS 武器設定 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚙️</span><div><div class="phase-num">PHASE 02</div><h2>SMS 武器設定</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>A-G 模式切換與 MASTER ARM</strong>
+空對地武器使用前必須：<span style="color:var(--danger)">MASTER ARM → ARM</span>，並在 SMS 頁面切換至 <span style="color:var(--accent)">A-G（Air-to-Ground）模式</span>選擇武器站和投彈模式。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card warn-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sms-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">MASTER ARM → ARM</div>
+      <div class="step-detail">左主控台 <span class="red-val">MASTER ARM → ARM</span>。HUD 顯示 ARM。<span class="red-val">訓練時保持 SAFE！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-sms-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">MFD → SMS → 切換至 A-G 模式</div>
+      <div class="step-detail">MFD 切換至 <span class="val">SMS 頁面</span>，按 OSB 選擇 <span class="val">A-G（Air-to-Ground）模式</span>。畫面顯示掛載的空對地武器站和彈藥數量。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-sms-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">選擇武器站與投彈模式</div>
+      <div class="step-detail">在 SMS 頁面：<br>
+      · 用 OSB 選擇要使用的<span class="val">武器站（左翼/右翼/機身）</span><br>
+      · 選擇<span class="val">投彈模式：CCRP 或 CCIP</span><br>
+      · 設定<span class="val">投彈數量（Single/Pairs/Salvo）</span><br>
+      · 設定<span class="val">投彈間隔（Release Interval）</span>，多彈投彈時的炸彈間距</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,1)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hud-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">確認 HUD 顯示 A-G 武器資訊</div>
+      <div class="step-detail">SMS 設定完成後，HUD 應顯示：<br>
+      · <span class="val">左下角武器代號</span>（如 MK82、GBU38）<br>
+      · <span class="val">投彈模式指示</span>（CCRP 或 CCIP）<br>
+      · <span class="val">可用彈數</span><br>
+      · <span class="cyan-val">HUD 從 A-A 模式切換為 A-G 顯示格式</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← 武器種類總覽</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：CCRP 水平投彈 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">📐</span><div><div class="phase-num">PHASE 03</div><h2>CCRP 水平投彈</h2></div></div>
+  <div class="alert-box orange-box"><span class="alert-icon">🟠</span><div class="alert-text"><strong>CCRP — 高空安全投彈方式</strong>
+CCRP 讓 F-16 在<span style="color:var(--accent)">中高空水平飛行</span>時投彈，電腦持續計算最佳投放點，<span style="color:var(--green)">飛行員只需對準目標方向飛行並在正確時機按下投彈鈕</span>。適合 JDAM 和 Mk-82 高空投彈。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-ccrp-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">設定目標 STPT 或從 HSD 取得目標</div>
+      <div class="step-detail">CCRP 需要知道目標位置。來源：<br>
+      · <span class="val">STPT</span>：預先規劃的目標航點（最常用）<br>
+      · <span class="val">HSD 上標記</span>：飛行中手動指定目標點<br>
+      確認目標 STPT 已設定正確座標。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hud-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">飛向目標，保持穩定高速飛行</div>
+      <div class="step-detail">朝目標方向飛行，建議<span class="val">15,000–20,000 ft，400–500 kt</span>穩定飛行。HUD 顯示 CCRP 符號：<br>
+      · <span class="val">投放游標（Release Cue）</span>：顯示最佳投放點<br>
+      · <span class="val">目標標記</span>：顯示目標方向和距離</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ccrp-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">Release Cue 對齊 → 按住 Weapon Release</div>
+      <div class="step-detail">HUD 的<span class="warn-val">投放游標（Release Cue）</span>與目標標記重合時：<br>
+      · 按下並<span class="val">持續按住 Weapon Release</span>直到炸彈投出<br>
+      · 或設定為<span class="val">自動投放（AUTO）</span>：電腦自動在最佳時機投放<br>
+      · 投出後 HUD 顯示<span class="val">飛行時間倒數</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-ccrp-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">CCRP 投彈後注意事項</div>
+      <div class="step-detail">
+      · Mk-82 CCRP：投出後可立即脫離（非制導，已離手）<br>
+      · JDAM CCRP：投出後也可立即脫離（GPS 自主導引）<br>
+      · <span class="cyan-val">高空投彈安全距離大，一般不需要擔心碎片傷害</span><br>
+      · 投彈後可繼續對下一個目標攻擊或脫離任務區</div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← SMS 武器設定</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：CCIP 俯衝投彈 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🎯</span><div><div class="phase-num">PHASE 04</div><h2>CCIP 俯衝投彈</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>CCIP — 俯衝精準投彈，風險較高</strong>
+CCIP 需要<span style="color:var(--danger)">俯衝接近目標</span>，HUD 顯示即時落點游標（Pipper），游標對準目標投彈。精度高但暴露在防空火力的時間長，<span style="color:var(--accent)">適合低威脅環境或需要精確打擊的小型目標。</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-dive-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">建立俯衝航線，機頭朝向目標</div>
+      <div class="step-detail">從目標上方建立穩定俯衝：<br>
+      · 俯衝角 <span class="val">20–45°</span>（依目標類型和精度需求）<br>
+      · 速度 <span class="val">400–500 kt</span><br>
+      · 機頭朝向目標方向，HUD 顯示落點游標（Pipper）</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-ccip-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">調整飛機讓 Pipper 游標對準目標</div>
+      <div class="step-detail">HUD 的 <span class="val">CCIP Pipper（落點游標，圓圈+十字）</span>代表「現在投彈炸彈的落點」。微調飛機姿態讓 <span class="warn-val">Pipper 精確對準目標中心</span>，保持穩定俯衝角度。</div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-hud-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">Pipper 對準 → 按下 Weapon Release</div>
+      <div class="step-detail">Pipper 精確對準目標時，按下 <span class="warn-val">Weapon Release</span>！炸彈投出。<span class="cyan-val">CCIP 不需要事先 STPT 設定，落點游標即時反映當前投彈落點。</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card danger-card" onclick="toggleStep(this,3)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-dive-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">投彈後立即拉起脫離（Pull Out！）</div>
+      <div class="step-detail">投彈後 <span class="red-val">立即拉桿脫離俯衝！</span>風險：<br>
+      · <span class="red-val">撞地（CFIT）</span>：最致命，俯衝拉太慢會直接撞地<br>
+      · <span class="red-val">碎片傷害</span>：太低投彈碎片可能擊中自機<br>
+      · <span class="red-val">防空火力</span>：低空長時間暴露<br>
+      <span class="cyan-val">設定「最低投放高度 Hard Deck」並嚴格遵守！</span></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← CCRP 水平投彈</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：JDAM / CBU 特殊操作 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">📋</span><div><div class="phase-num">PHASE 05</div><h2>JDAM / CBU 特殊操作 & 總整理</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>武器選擇指南</strong>
+不同武器適合不同目標，<span style="color:var(--green)">選對武器比精確瞄準更重要</span>。了解每種武器的特性，才能在任務中作出正確決策。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-jdam-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">JDAM（GBU-38）特殊設定</div>
+      <div class="step-detail">JDAM 需要目標 GPS 座標：<br>
+      1. <span class="val">STPT 設定目標座標</span>（參考 TACAN & STPT 教學）<br>
+      2. SMS → 選擇 JDAM 站位 → 確認 <span class="val">GPS 對準正常</span><br>
+      3. 確認目標 STPT 設為武器瞄準點（SPI 來源）<br>
+      4. CCRP 模式投放，<span class="green-val">投出即可脫離！</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-cbu-f16"/></svg></div>
+      <div class="step-content"><div class="step-action">CBU 集束炸彈特殊考量</div>
+      <div class="step-detail">CBU 投放需特別注意：<br>
+      · SMS 設定 <span class="val">高度（Height of Function, HOF）</span>：決定子母彈在多高散開<br>
+      · HOF 越高 = 散布越廣但密度越低<br>
+      · HOF 越低 = 集中但覆蓋區域小<br>
+      · <span class="cyan-val">建議 HOF：對人員 300–600m，對裝甲 300m 以下</span></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-sms-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">武器選擇指南總整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>目標</th><th>建議武器</th><th>模式</th></tr>
+      <tr><td>固定建築/橋樑</td><td class="mono">Mk-82</td><td class="mono">CCIP / CCRP</td></tr>
+      <tr><td>已知座標固定目標</td><td class="mono">GBU-38 JDAM</td><td class="mono">CCRP</td></tr>
+      <tr><td>人員/輕裝甲密集區</td><td class="mono">CBU-87</td><td class="mono">CCRP</td></tr>
+      <tr><td>裝甲車輛群</td><td class="mono">CBU-97 SFW</td><td class="mono">CCRP</td></tr>
+      <tr><td>精確點目標（低威脅）</td><td class="mono">Mk-82</td><td class="mono">CCIP</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)">
+      <div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hud-ag"/></svg></div>
+      <div class="step-content"><div class="step-action">空對地完整操作流程整理</div>
+      <div class="step-detail">
+      <table class="data-table" style="margin-top:6px">
+      <tr><th>步驟</th><th>動作</th></tr>
+      <tr><td>1</td><td>MASTER ARM → ARM</td></tr>
+      <tr><td>2</td><td>MFD SMS → A-G 模式 → 選武器站</td></tr>
+      <tr><td>3</td><td>選投彈模式（CCRP / CCIP）</td></tr>
+      <tr><td>4</td><td>設定目標 STPT（CCRP）或直接俯衝（CCIP）</td></tr>
+      <tr><td>5</td><td>飛向目標，對準 Release Cue / Pipper</td></tr>
+      <tr><td>6</td><td>按下 Weapon Release，投彈！</td></tr>
+      <tr><td>7</td><td>CCRP：立即可脫離；CCIP：立即拉起！</td></tr>
+      </table></div></div><div class="step-check">✅</div>
+    </div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← CCIP 俯衝投彈</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！✅</button></div>
+</section>
+
+</div>
+
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">💣</span><span class="tab-label">武器總覽</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚙️</span><span class="tab-label">SMS設定</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">📐</span><span class="tab-label">CCRP</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🎯</span><span class="tab-label">CCIP</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">📋</span><span class="tab-label">JDAM/CBU</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F-16C Viper · 空對地武器基礎教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<4)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
