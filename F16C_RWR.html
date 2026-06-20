@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="F-16C RWR">
+<meta name="theme-color" content="#04060c">
+<title>DCS F-16C Viper · RWR & 電子戰</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04060c;--panel:#07090f;--border:#0e1428;--accent:#ff3333;--accent2:#ff8800;--accent3:#00ddff;--warn:#ffcc00;--danger:#ff3333;--green:#33cc44;--blue:#4488ff;--text:#ddeeff;--text-dim:#7a9ab8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 15% 0%,rgba(220,30,30,.10) 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,rgba(180,0,0,.07) 0%,transparent 50%);}
+header{text-align:center;padding:44px 20px 32px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(80,0,0,.5) 0%,transparent 100%);position:relative;}
+header::before{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:500px;height:180px;background:radial-gradient(ellipse,rgba(255,50,50,.14) 0%,transparent 70%);pointer-events:none;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:6px 14px;border-radius:3px;margin-bottom:18px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);}
+.header-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--accent);background:rgba(255,50,50,.08);border:1px solid rgba(255,50,50,.25);padding:5px 16px;border-radius:2px;margin-bottom:14px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,4vw,42px);color:#fff;letter-spacing:2px;text-shadow:0 0 40px rgba(255,50,50,.5);line-height:1.1;}
+header h1 span{color:var(--accent);}
+.subtitle{margin-top:8px;font-size:13px;color:var(--text-dim);letter-spacing:1px;}
+.phase-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:14px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(4,6,12,.97);backdrop-filter:blur(14px);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.2px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:6px 13px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.phase-btn:hover,.phase-btn.active{color:var(--accent);border-color:var(--accent);background:rgba(255,50,50,.08);box-shadow:0 0 16px rgba(255,50,50,.25);}
+.main{max-width:1100px;margin:0 auto;padding:32px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .35s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.phase-icon-wrap{font-size:28px;filter:drop-shadow(0 0 8px rgba(255,50,50,.5));}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(15px,3vw,21px);font-weight:700;color:#fff;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent);font-size:12px;letter-spacing:3px;}
+.steps-grid{display:grid;gap:10px;}
+.step-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:5px;padding:12px 15px 12px 11px;display:grid;grid-template-columns:54px 1fr auto;gap:11px;align-items:start;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,50,50,.04) 0%,transparent 60%);opacity:0;transition:opacity .25s;}
+.step-card:hover::before{opacity:1;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(255,50,50,.3);transform:translateX(3px);}
+.step-card.done{border-left-color:var(--green);background:rgba(51,204,68,.04);}
+.step-card.done .step-num{background:var(--green);color:#000;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--blue);}
+.step-card.tip-card{border-left-color:var(--accent3);}
+.step-card.danger-card{border-left-color:var(--accent);background:rgba(255,51,51,.04);}
+.step-card:active{transform:scale(.985);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--accent);width:24px;height:24px;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:15px;color:#ffd8d8;margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-dim);line-height:1.65;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.orange-val{color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--accent3);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:20px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.alert-box{display:flex;gap:12px;padding:12px 15px;border-radius:4px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:rgba(68,136,255,.07);border:1px solid rgba(68,136,255,.28);}
+.alert-box.warn-box{background:rgba(255,204,0,.07);border:1px solid rgba(255,204,0,.3);}
+.alert-box.red-box{background:rgba(255,50,50,.07);border:1px solid rgba(255,50,50,.28);}
+.alert-box.green-box{background:rgba(51,204,68,.07);border:1px solid rgba(51,204,68,.28);}
+.alert-box.tip-box{background:rgba(0,221,255,.06);border:1px solid rgba(0,221,255,.25);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--blue);}
+.warn-box .alert-text strong{color:var(--warn);}
+.red-box .alert-text strong{color:var(--accent);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--accent3);}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);text-align:left;padding:8px 12px;background:rgba(255,50,50,.07);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:rgba(255,50,50,.04);}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent2);}
+.progress-wrap{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:11px 15px;margin-bottom:20px;display:flex;align-items:center;gap:11px;}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:5px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--danger);border-color:var(--danger);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1.5px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:10px 15px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:24px;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:2px;}
+@media(max-width:640px){header{padding:22px 13px 18px;}header h1{font-size:20px;}.subtitle{font-size:11px;}.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:16px 10px 106px;}.step-card{grid-template-columns:47px 1fr 25px;gap:8px;padding:11px 9px;min-height:72px;}.cockpit-icon{width:37px;height:37px;}.step-num{width:22px;height:22px;font-size:10px;}.step-action{font-size:13px;}.step-detail{font-size:11.5px;}.step-check{font-size:17px;}.phase-title h2{font-size:15px;}.alert-text{font-size:12px;}.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(4,6,12,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:17px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7.5px;color:var(--text-dim);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:var(--accent);}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 5px var(--accent));}
+.tab-bar{width:22px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);opacity:.5;padding:5px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-rwr-f16-scope" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#100000" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="24" r="14" fill="#0a0000" stroke="#330000" stroke-width="1"/><circle cx="24" cy="24" r="7" fill="#0a0000" stroke="#330000" stroke-width=".8"/><circle cx="24" cy="24" r="2" fill="#ff3333"/><line x1="24" y1="4" x2="24" y2="44" stroke="#330000" stroke-width=".5"/><line x1="4" y1="24" x2="44" y2="24" stroke="#330000" stroke-width=".5"/><text x="24" y="36" fill="#ff3333" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">12</text><text x="36" y="26" fill="#ffcc00" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">6</text><circle cx="32" cy="14" r="2.5" fill="#33cc44"/><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">AN/ALR-56M</text></symbol>
+<symbol id="ico-threat-search-f16" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#100000" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="24" r="14" fill="#0a0000" stroke="#330000" stroke-width="1"/><circle cx="24" cy="24" r="2" fill="#ff3333"/><text x="24" y="14" fill="#33cc44" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">12</text><text x="14" y="26" fill="#33cc44" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">11</text><text x="36" y="20" fill="#ffcc00" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">8</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">SEARCH RADAR</text></symbol>
+<symbol id="ico-threat-track-f16" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#100000" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="24" r="14" fill="#0a0000" stroke="#330000" stroke-width="1"/><circle cx="24" cy="24" r="2" fill="#ff3333"/><text x="14" y="14" fill="#ffcc00" font-size="7" font-family="monospace" font-weight="bold" text-anchor="middle">11</text><circle cx="14" cy="14" r="8" fill="none" stroke="#ffcc00" stroke-width="1.5" stroke-dasharray="2,2"/><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">TRACK RADAR</text></symbol>
+<symbol id="ico-threat-missile-f16" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#100000" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="24" r="14" fill="#0a0000" stroke="#330000" stroke-width="1"/><circle cx="24" cy="24" r="2" fill="#ff3333"/><text x="14" y="14" fill="#ff3333" font-size="7" font-family="monospace" font-weight="bold" text-anchor="middle">8</text><circle cx="14" cy="14" r="9" fill="none" stroke="#ff3333" stroke-width="2"/><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">MISSILE LAUNCH</text></symbol>
+<symbol id="ico-chaff-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#080600" stroke="#ff3333" stroke-width="1.5"/><circle cx="18" cy="20" r="8" fill="#ff8800" opacity=".6"/><path d="M14 15 L12 10" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/><path d="M18 13 L18 9" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/><path d="M22 15 L24 10" stroke="#ffcc00" stroke-width="2" stroke-linecap="round"/><rect x="29" y="14" width="6" height="12" fill="#aaaaaa" opacity=".5" transform="rotate(20 32 20)"/><text x="24" y="37" fill="#ffcc00" font-size="4.5" font-family="monospace" text-anchor="middle">CHAFF/FLARE</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">ALE-47</text></symbol>
+<symbol id="ico-cmds-panel" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#100000" stroke="#ff3333" stroke-width="1.5"/><text x="24" y="10" fill="#ff3333" font-size="5" font-family="monospace" text-anchor="middle">CMDS PANEL</text><rect x="5" y="13" width="10" height="7" rx="1" fill="#0a0000" stroke="#330000" stroke-width=".5"/><text x="10" y="18.5" fill="#ff5555" font-size="3.5" font-family="monospace" text-anchor="middle">CHAFF</text><rect x="18" y="13" width="10" height="7" rx="1" fill="#0a0600" stroke="#332200" stroke-width=".5"/><text x="23" y="18.5" fill="#ffcc00" font-size="3.5" font-family="monospace" text-anchor="middle">FLARE</text><rect x="31" y="13" width="10" height="7" rx="1" fill="#001808" stroke="#003820" stroke-width=".5"/><text x="36" y="18.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">BOTH</text><rect x="5" y="23" width="10" height="7" rx="1" fill="#001008" stroke="#003020" stroke-width=".5"/><text x="10" y="28.5" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">AUTO</text><rect x="18" y="23" width="10" height="7" rx="1" fill="#0a0000" stroke="#330000" stroke-width=".5"/><text x="23" y="28.5" fill="#ff5555" font-size="3.5" font-family="monospace" text-anchor="middle">SEMI</text><rect x="31" y="23" width="10" height="7" rx="1" fill="#0a0000" stroke="#330000" stroke-width=".5"/><text x="36" y="28.5" fill="#ff5555" font-size="3.5" font-family="monospace" text-anchor="middle">MAN</text><text x="3" y="47" fill="#4a6080" font-size="5" font-family="monospace">CMDS PROGRAM</text></symbol>
+<symbol id="ico-jammer-f16" viewBox="0 0 48 48"><rect x="3" y="14" width="38" height="14" rx="4" fill="#0a0600" stroke="#ff3333" stroke-width="1.5"/><circle cx="38" cy="21" r="5" fill="#0a0000" stroke="#ff3333" stroke-width="1"/><path d="M3 14 L-2 11 L-2 17 L3 21Z" fill="#0a0600"/><path d="M3 28 L-2 31 L-2 25 L3 21Z" fill="#0a0600"/><path d="M8 14 L8 8" stroke="#ff3333" stroke-width="1.5" stroke-linecap="round"/><path d="M14 14 L14 6" stroke="#ff3333" stroke-width="1.5" stroke-linecap="round" opacity=".7"/><text x="20" y="38" fill="#ff3333" font-size="5.5" font-family="monospace" text-anchor="middle">ALQ-184</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">JAMMER POD</text></symbol>
+<symbol id="ico-notch-f16" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#060c08" stroke="#ff3333" stroke-width="1.5"/><circle cx="24" cy="22" r="14" fill="#040c06" stroke="#1a0808" stroke-width="1"/><line x1="24" y1="8" x2="24" y2="22" stroke="#ff3333" stroke-width="2" stroke-linecap="round"/><path d="M24 22 L38 22" fill="none" stroke="#4488ff" stroke-width="2.5" stroke-linecap="round"/><text x="26" y="19" fill="#ff3333" font-size="3.5" font-family="monospace">RADAR</text><text x="12" y="34" fill="#4488ff" font-size="4" font-family="monospace">NOTCH 90°</text><text x="3" y="47" fill="#4a6080" font-size="5.5" font-family="monospace">NOTCH MANEUVER</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="F16C_Home.html">← 返回 F-16C 教學中心</a>
+  <div class="header-badge">DCS F-16C VIPER · 進階電戰</div>
+  <h1>RWR &amp; <span>電子戰</span></h1>
+  <p class="subtitle">AN/ALR-56M · 威脅判讀 · ALE-47 反制 · ALQ-184 干擾莢艙</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · RWR 基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 威脅符號判讀</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 箔條 / 熱焰彈</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · ECM 干擾莢艙</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 綜合防禦戰術</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">📟</span><div><div class="phase-num">PHASE 01</div><h2>AN/ALR-56M RWR 基礎</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>AN/ALR-56M 雷達警告接收器</strong>
+F-16C 配備 <span style="color:var(--accent)">AN/ALR-56M</span> RWR，偵測敵方雷達照射並顯示在座艙圓形顯示器。<span style="color:var(--warn)">RWR 是生存第一道防線</span>，與 F/A-18C 的 AN/ALR-67 功能相似，操作邏輯一致。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card info-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-rwr-f16-scope"/></svg></div><div class="step-content"><div class="step-action">RWR 顯示器佈局</div><div class="step-detail">圓形顯示器模擬俯視圖：<br>· <span class="val">中心點</span> = 你的飛機<br>· <span class="val">12 點鐘</span> = 機頭正前方<br>· <span class="val">6 點鐘</span> = 機尾正後方<br>· 威脅符號方位真實，距離只代表訊號強度概略</div></div><div class="step-check">✅</div></div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-rwr-f16-scope"/></svg></div><div class="step-content"><div class="step-action">RWR 音效系統</div><div class="step-detail">不同威脅有不同音效：<br>· <span class="val">搜索雷達</span>：低頻間斷嗶聲<br>· <span class="warn-val">追蹤雷達（Lock）</span>：較快連續音調<br>· <span class="orange-val">飛彈發射警告</span>：急促特殊音效<br>· <span class="cyan-val">熟悉聲音比盯畫面更快反應</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card info-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-rwr-f16-scope"/></svg></div><div class="step-content"><div class="step-action">RWR 限制與盲點</div><div class="step-detail">· RWR 只能偵測<span class="val">主動發射雷達訊號</span>的威脅<br>· <span class="warn-val">紅外線飛彈不會被 RWR 偵測！</span><br>· <span class="cyan-val">仍需目視掃描，RWR 是輔助工具！</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：威脅符號判讀 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚠️</span><div><div class="phase-num">PHASE 02</div><h2>威脅符號判讀</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>三種威脅狀態：搜索 → 追蹤 → 飛彈發射</strong>
+威脅狀態逐步升級，<span style="color:var(--warn)">符號變化代表威脅等級提升</span>。學會分辨，判斷何時該行動。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-threat-search-f16"/></svg></div><div class="step-content"><div class="step-action">搜索雷達（Search）— 綠色/白色符號</div><div class="step-detail">威脅雷達<span class="val">廣域掃描</span>，尚未鎖定你：<br>· 符號<span class="green-val">綠色或白色</span><br>· 音效低頻間斷<br>· <span class="cyan-val">可繼續任務，但持續監控</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-threat-track-f16"/></svg></div><div class="step-content"><div class="step-action">追蹤鎖定（Track/STT）— 黃色符號</div><div class="step-detail">威脅雷達已<span class="warn-val">鎖定你</span>：<br>· 符號變<span class="warn-val">黃色</span>，可能出現虛線圈<br>· 音效快速連續（Spike）<br>· <span class="orange-val">考慮 Crank、增加距離、準備防禦</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card danger-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-threat-missile-f16"/></svg></div><div class="step-content"><div class="step-action">飛彈發射警告（Launch）— 紅色閃爍</div><div class="step-detail"><span class="orange-val">最高優先警告！</span><br>· 符號<span class="orange-val">紅色實心圈閃爍</span><br>· 急促特殊警報聲<br>· <span class="orange-val">立即執行防禦機動！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-rwr-f16-scope"/></svg></div><div class="step-content"><div class="step-action">威脅符號代碼判讀</div><div class="step-detail">符號旁顯示<span class="val">數字/字母代碼</span>，代表雷達類型。不同 SAM 系統射程威脅不同，<span class="cyan-val">熟悉常見代碼有助判斷應對策略</span>。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← RWR 基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：箔條 / 熱焰彈 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">✨</span><div><div class="phase-num">PHASE 03</div><h2>箔條 / 熱焰彈使用</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>ALE-47 — Chaff vs Flare</strong>
+<span style="color:var(--accent)">箔條（Chaff）</span>對抗<span style="color:var(--accent)">雷達導引</span>威脅。<span style="color:var(--accent2)">熱焰彈（Flare）</span>對抗<span style="color:var(--accent2)">紅外線導引</span>威脅。<span style="color:var(--warn)">用錯類型 = 無效！</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-cmds-panel"/></svg></div><div class="step-content"><div class="step-action">CMDS（反制措施分配系統）面板</div><div class="step-detail">CMDS 控制面板設定：<br>· <span class="val">CHAFF / FLARE / BOTH</span>：投放類型<br>· <span class="val">AUTO / SEMI / MAN</span>：投放模式<br>· 每次投放數量和間隔可預先設定</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-cmds-panel"/></svg></div><div class="step-content"><div class="step-action">三種投放模式</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>模式</th><th>說明</th></tr><tr><td class="mono">AUTO</td><td>RWR 偵測飛彈時自動投放</td></tr><tr><td class="mono">SEMI</td><td>RWR 提示，需按鈕投放</td></tr><tr><td class="mono">MAN</td><td>完全手動，按一次一組</td></tr></table></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-chaff-f16"/></svg></div><div class="step-content"><div class="step-action">投放 + 配合機動</div><div class="step-detail">按 <span class="warn-val">CMDS Dispense Switch</span>：<br>· <span class="orange-val">必須配合機動（Notch/Break）！</span><br>· 雷達威脅：Chaff + Notch<br>· 紅外線威脅：Flare + Break Turn</div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-chaff-f16"/></svg></div><div class="step-content"><div class="step-action">彈藥管理</div><div class="step-detail">Chaff/Flare <span class="val">數量有限</span>：<br>· 不要過早無謂投放<br>· 真正飛彈警告才大量投放<br>· <span class="cyan-val">長任務需考慮消耗速度</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 威脅符號判讀</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：ECM 干擾莢艙 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">📡</span><div><div class="phase-num">PHASE 04</div><h2>ECM 干擾莢艙</h2></div></div>
+  <div class="alert-box red-box"><span class="alert-icon">🔴</span><div class="alert-text"><strong>ALQ-184 主動干擾系統</strong>
+F-16C 可掛載 <span style="color:var(--accent)">ALQ-184</span> 電子干擾莢艙，主動發射干擾訊號<span style="color:var(--warn)">欺騙或壓制敵方雷達</span>。是<span style="color:var(--green)">持續性主動防護</span>，與 Chaff/Flare 互補。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-jammer-f16"/></svg></div><div class="step-content"><div class="step-action">ECM 莢艙工作原理</div><div class="step-detail">接收敵方雷達訊號後：<br>· 分析頻率和模式<br>· 發射<span class="val">干擾訊號</span>（噪音或假目標）<br>· 讓敵方雷達<span class="val">無法準確測距/測向</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-jammer-f16"/></svg></div><div class="step-content"><div class="step-action">ECM 開關啟動</div><div class="step-detail">左主控台 <span class="val">ECM SW → ON</span>，通常設為<span class="val">自動模式</span>：偵測威脅照射時自動發射干擾。座艙顯示 <span class="green-val">ECM 啟動指示燈</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-jammer-f16"/></svg></div><div class="step-content"><div class="step-action">ECM 限制</div><div class="step-detail">· <span class="green-val">優點</span>：被動持續，不消耗彈藥<br>· <span class="warn-val">缺點</span>：發射訊號可能被偵測，暴露位置！<br>· <span class="cyan-val">ECM 是輔助，不能取代機動和 Chaff/Flare！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-jammer-f16"/></svg></div><div class="step-content"><div class="step-action">ECM 戰術運用</div><div class="step-detail">· <span class="val">滲透高威脅空域</span>：ECM 開啟降低被鎖定機率<br>· <span class="val">隱蔽行動</span>：考慮 ECM OFF，靠地形隱蔽<br>· <span class="val">遭遇飛彈</span>：ECM + Chaff/Flare + 機動三者並用最佳</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← 箔條 / 熱焰彈</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：綜合防禦戰術 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">🛡️</span><div><div class="phase-num">PHASE 05</div><h2>綜合防禦戰術</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>完整防禦反應流程</strong>
+把 RWR 判讀、機動、Chaff/Flare、ECM 整合成<span style="color:var(--green)">一套標準反應程序</span>。F-16 的高機動性讓 Notch 機動特別有效。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-rwr-f16-scope"/></svg></div><div class="step-content"><div class="step-action">對抗 SAM 標準流程</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>RWR 狀態</th><th>動作</th></tr><tr><td>綠色（搜索）</td><td>記錄方位，繼續任務</td></tr><tr><td>黃色（鎖定）</td><td>Crank 轉向，準備防禦</td></tr><tr><td>紅色（發射）</td><td>Notch + Chaff + Break！</td></tr></table></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-notch-f16"/></svg></div><div class="step-content"><div class="step-action">Notch 機動詳解</div><div class="step-detail">Notch 是對抗都卜勒雷達最有效機動：<br>· 轉向讓<span class="warn-val">威脅在你正側方（90° ATA）</span><br>· 都卜勒頻移接近零，飛彈難以分辨你和地面雜波<br>· <span class="cyan-val">配合投放 Chaff，效果加倍！F-16 的轉彎率讓 Notch 更快完成</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-rwr-f16-scope"/></svg></div><div class="step-content"><div class="step-action">多重威脅優先順序</div><div class="step-detail">· 優先處理<span class="orange-val">紅色閃爍（飛彈發射）</span><br>· 黃色威脅次之<br>· 綠色持續監控<br>· <span class="cyan-val">無法同時應對時，朝威脅較少方向脫離</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-rwr-f16-scope"/></svg></div><div class="step-content"><div class="step-action">完整電戰防禦整合流程</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>階段</th><th>動作</th></tr><tr><td>任務開始</td><td>ECM ON，CMDS 設 SEMI/AUTO</td></tr><tr><td>RWR 綠色</td><td>記錄位置，調整航線</td></tr><tr><td>RWR 黃色</td><td>Crank，準備防禦</td></tr><tr><td>RWR 紅色</td><td>Notch 90° + Chaff/Flare + Break</td></tr><tr><td>威脅消失</td><td>恢復航向，繼續任務</td></tr></table><span class="cyan-val">RWR + 機動 + 干擾 + ECM 是完整系統，缺一不可！</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← ECM 干擾莢艙</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green)" disabled>單元完成！🎉</button></div>
+</section>
+
+</div>
+
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">📟</span><span class="tab-label">RWR</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚠️</span><span class="tab-label">符號</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">✨</span><span class="tab-label">箔條/熱焰</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">📡</span><span class="tab-label">ECM</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">🛡️</span><span class="tab-label">綜合戰術</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>DCS World · F-16C Viper · RWR &amp; 電子戰教學 · Viper Academy 全系列完成 🎉<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);const label=document.getElementById("pct-"+i);const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";if(label)label.textContent=pct+"%";if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){if(dx<0&&currentPhase<4)showPhase(currentPhase+1);else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);}
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
