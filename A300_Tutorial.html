@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A300 教學">
+<meta name="theme-color" content="#001a33">
+<title>MSFS 2024 · A300-600R · 冷啟動到降落</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f0f4f8;--panel:#ffffff;--border:#dde3ea;--accent:#0055aa;--accent2:#0088cc;--accent3:#e8f0ff;--accent-dark:#003377;--text:#1a2a3a;--text-mid:#4a6080;--text-dim:#8aaccc;--green:#1a9a44;--red:#cc2222;--warn:#cc7700;--cyan:#0099bb;--shadow:0 2px 12px rgba(0,60,120,.10);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+header{background:linear-gradient(135deg,#001a33 0%,#003366 60%,#004488 100%);color:#fff;text-align:center;padding:36px 20px 28px;border-bottom:3px solid #0055aa;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:3px;margin-bottom:14px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.5);}
+.header-badge{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:#66aaff;text-transform:uppercase;margin-bottom:8px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(20px,4vw,36px);color:#fff;line-height:1.2;}
+header h1 span{color:#66aaff;}
+.subtitle{margin-top:6px;font-size:13px;color:rgba(255,255,255,.6);letter-spacing:1px;}
+.phase-nav{background:#fff;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:100;padding:10px 12px;display:flex;justify-content:center;flex-wrap:wrap;gap:4px;box-shadow:0 2px 8px rgba(0,60,120,.08);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);background:#f5f8fc;border:1px solid var(--border);padding:6px 12px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;white-space:nowrap;}
+.phase-btn:hover,.phase-btn.active{color:#fff;background:var(--accent);border-color:var(--accent);box-shadow:0 2px 8px rgba(0,85,170,.3);}
+.main{max-width:1100px;margin:0 auto;padding:28px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .3s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px 20px;background:#fff;border-radius:8px;border-left:4px solid var(--accent);box-shadow:var(--shadow);}
+.phase-icon-wrap{font-size:28px;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent2);font-size:11px;letter-spacing:3px;margin-bottom:3px;}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(14px,2.5vw,19px);font-weight:700;color:var(--text);}
+.progress-wrap{background:#fff;border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:6px;background:#e8eef5;border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--red);border-color:var(--red);}
+.alert-box{display:flex;gap:12px;padding:13px 16px;border-radius:6px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:#e8f4ff;border:1px solid #aaccee;border-left:4px solid var(--accent);}
+.alert-box.warn-box{background:#fff8e8;border:1px solid #eedd99;border-left:4px solid var(--warn);}
+.alert-box.green-box{background:#e8f8ee;border:1px solid #99ddaa;border-left:4px solid var(--green);}
+.alert-box.red-box{background:#ffeaea;border:1px solid #eeaaaa;border-left:4px solid var(--red);}
+.alert-box.tip-box{background:#e8f8ff;border:1px solid #99ccee;border-left:4px solid var(--cyan);}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;color:var(--text);}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--accent);}
+.warn-box .alert-text strong{color:var(--warn);}
+.green-box .alert-text strong{color:var(--green);}
+.red-box .alert-text strong{color:var(--red);}
+.tip-box .alert-text strong{color:var(--cyan);}
+.steps-grid{display:grid;gap:10px;margin-bottom:24px;}
+.step-card{background:#fff;border:1px solid var(--border);border-left:4px solid var(--border);border-radius:6px;padding:14px 16px 14px 14px;display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:start;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(0,85,170,.3);transform:translateX(3px);box-shadow:0 4px 16px rgba(0,60,120,.15);}
+.step-card.done{border-left-color:var(--green);background:#f4fbf6;}
+.step-card.done .step-num{background:var(--green);color:#fff;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.info-card{border-left-color:var(--accent2);}
+.step-card.tip-card{border-left-color:var(--cyan);}
+.step-card.danger-card{border-left-color:var(--red);background:#fff8f8;}
+.step-card:active{transform:scale(.98);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--accent);width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:14px;color:var(--text);margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-mid);line-height:1.7;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--red);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:22px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);text-align:left;padding:8px 12px;background:var(--accent3);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:#f5f9ff;}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent-dark);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--text-dim);background:#fff;border:1px solid var(--border);padding:10px 16px;border-radius:4px;cursor:pointer;transition:all .2s;text-transform:uppercase;box-shadow:var(--shadow);}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent3);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:20px;background:#001a33;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;}
+@media(max-width:640px){header{padding:22px 13px 18px;}header h1{font-size:19px;}.subtitle{font-size:11px;}.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:14px 10px 106px;}.step-card{grid-template-columns:46px 1fr 26px;gap:8px;padding:11px 10px;}.cockpit-icon{width:36px;height:36px;}.step-num{width:22px;height:22px;font-size:10px;}.step-action{font-size:13px;}.step-detail{font-size:12px;}.step-check{font-size:18px;}.phase-title h2{font-size:14px;}.alert-text{font-size:12px;}.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(0,26,51,.97);backdrop-filter:blur(16px);border-top:2px solid #0055aa;padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:18px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,.4);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:#66aaff;}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 6px #66aaff);}
+.tab-bar{width:24px;height:2px;background:rgba(255,255,255,.15);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);opacity:.5;padding:4px 0 0;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-battery-a300" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="10" fill="#0055aa" font-size="5" font-family="monospace" text-anchor="middle">ELEC PWR</text><rect x="6" y="14" width="16" height="8" rx="1" fill="#e8f0ff" stroke="#88aacc" stroke-width=".5"/><text x="14" y="19.5" fill="#1a9a44" font-size="3.5" font-family="monospace" text-anchor="middle">BAT1/2</text><rect x="26" y="14" width="16" height="8" rx="1" fill="#e8f8ee" stroke="#88cc99" stroke-width=".5"/><text x="34" y="19.5" fill="#1a9a44" font-size="3.5" font-family="monospace" text-anchor="middle">ON</text><rect x="6" y="26" width="36" height="8" rx="1" fill="#fff8e8" stroke="#ccaa66" stroke-width=".5"/><text x="24" y="31.5" fill="#cc7700" font-size="3.5" font-family="monospace" text-anchor="middle">EXT PWR · AVAIL</text><text x="3" y="46" fill="#8aaccc" font-size="5" font-family="monospace">BATTERY</text></symbol>
+<symbol id="ico-apu-a300" viewBox="0 0 48 48"><rect x="3" y="4" width="42" height="36" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="12" fill="#0055aa" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">APU START</text><circle cx="24" cy="25" r="11" fill="#fff" stroke="#cc9933" stroke-width="1"/><path d="M24 16 L26 23 L24 21 L22 23 Z" fill="#cc7700"/><circle cx="24" cy="25" r="3" fill="#ffaa44" opacity=".6"/><rect x="14" y="33" width="20" height="6" rx="1" fill="#e8f8ee" stroke="#88cc99" stroke-width=".5"/><text x="24" y="37.5" fill="#1a9a44" font-size="3.5" font-family="monospace" text-anchor="middle">N1 100%</text><text x="3" y="46" fill="#8aaccc" font-size="5.5" font-family="monospace">APU</text></symbol>
+<symbol id="ico-hydraulic-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="11" fill="#0055aa" font-size="5" font-family="monospace" text-anchor="middle">HYD SYS</text><rect x="6" y="15" width="10" height="20" rx="2" fill="#e8f0ff" stroke="#88aacc" stroke-width=".8"/><text x="11" y="13" fill="#0055aa" font-size="3" font-family="monospace" text-anchor="middle">GRN</text><rect x="19" y="15" width="10" height="20" rx="2" fill="#fff0e8" stroke="#ccaa88" stroke-width=".8"/><text x="24" y="13" fill="#cc7700" font-size="3" font-family="monospace" text-anchor="middle">BLU</text><rect x="32" y="15" width="10" height="20" rx="2" fill="#f8e8f8" stroke="#cc88cc" stroke-width=".8"/><text x="37" y="13" fill="#aa44aa" font-size="3" font-family="monospace" text-anchor="middle">YLW</text><text x="24" y="40" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">3000 PSI · NORM</text><text x="3" y="46" fill="#8aaccc" font-size="5.5" font-family="monospace">HYDRAULIC</text></symbol>
+<symbol id="ico-engine-a300" viewBox="0 0 48 48"><rect x="2" y="14" width="40" height="14" rx="6" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><circle cx="14" cy="21" r="5" fill="#fff" stroke="#cc9933" stroke-width="1"/><path d="M14 16 L14 26 M9 21 L19 21 M11 17 L17 25 M17 17 L11 25" stroke="#cc7700" stroke-width="1" opacity=".5"/><path d="M42 17 L47 21 L42 25Z" fill="#0055aa" opacity=".6"/><text x="22" y="11" fill="#0055aa" font-size="4.5" font-family="monospace" text-anchor="middle">CF6-80C2</text><text x="22" y="36" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">N2 20% · IGN ON</text><text x="3" y="46" fill="#8aaccc" font-size="5.5" font-family="monospace">ENGINE</text></symbol>
+<symbol id="ico-fuel-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="11" fill="#0055aa" font-size="5" font-family="monospace" text-anchor="middle">FUEL PANEL</text><path d="M16 16 Q24 16 24 24 Q24 32 16 32 Q8 32 8 24 Q8 16 16 16" fill="#e8f0ff" stroke="#88aacc" stroke-width=".8"/><path d="M32 16 Q40 16 40 24 Q40 32 32 32 Q24 32 24 24 Q24 16 32 16" fill="#e8f0ff" stroke="#88aacc" stroke-width=".8"/><text x="24" y="40" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">PUMPS · AUTO</text><text x="3" y="46" fill="#8aaccc" font-size="5.5" font-family="monospace">FUEL</text></symbol>
+<symbol id="ico-mcdu-a300" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a1018" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="9" fill="#66aaff" font-size="5" font-family="monospace" text-anchor="middle">MCDU</text><rect x="6" y="12" width="36" height="8" rx="1" fill="#000a14"/><text x="24" y="18" fill="#00ddaa" font-size="5.5" font-family="monospace" font-weight="bold" text-anchor="middle">INIT · FROM/TO</text><rect x="6" y="23" width="10" height="6" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="11" y="27.5" fill="#66aaff" font-size="3.2" font-family="monospace" text-anchor="middle">F-PLN</text><rect x="19" y="23" width="10" height="6" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="27.5" fill="#66aaff" font-size="3.2" font-family="monospace" text-anchor="middle">PERF</text><rect x="32" y="23" width="10" height="6" rx="1" fill="#001830" stroke="#003860" stroke-width=".5"/><text x="37" y="27.5" fill="#00ddff" font-size="3.2" font-family="monospace" text-anchor="middle">INIT</text><rect x="6" y="32" width="36" height="6" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="36.5" fill="#66aaff" font-size="3.2" font-family="monospace" text-anchor="middle">1 2 3 4 5 6 7 8 9 0</text></symbol>
+<symbol id="ico-flap-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><path d="M6 22 L24 16 L42 22 L24 28 Z" fill="#e8f0ff" stroke="#88aacc" stroke-width="1"/><path d="M6 22 L24 17 L24 22 Z" fill="#0055aa" opacity=".5"/><path d="M6 22 L24 28 L24 22 Z" fill="#0055aa" opacity=".3"/><text x="24" y="36" fill="#1a9a44" font-size="4.5" font-family="monospace" text-anchor="middle">SLAT/FLAP 15/20</text><text x="3" y="46" fill="#8aaccc" font-size="5.5" font-family="monospace">FLAPS</text></symbol>
+<symbol id="ico-checklist-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="10" fill="#0055aa" font-size="5" font-family="monospace" text-anchor="middle">BEFORE T/O</text><rect x="8" y="14" width="4" height="4" rx="1" fill="#1a9a44"/><text x="15" y="17.5" fill="#1a2a3a" font-size="3.5" font-family="monospace">FLAPS SET</text><rect x="8" y="20" width="4" height="4" rx="1" fill="#1a9a44"/><text x="15" y="23.5" fill="#1a2a3a" font-size="3.5" font-family="monospace">TRIM SET</text><rect x="8" y="26" width="4" height="4" rx="1" fill="#1a9a44"/><text x="15" y="29.5" fill="#1a2a3a" font-size="3.5" font-family="monospace">BRIEFING</text><rect x="8" y="32" width="4" height="4" rx="1" fill="none" stroke="#88aacc" stroke-width=".8"/><text x="15" y="35.5" fill="#8aaccc" font-size="3.5" font-family="monospace">CABIN RDY</text></symbol>
+<symbol id="ico-throttle-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="14" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><rect x="6" y="6" width="8" height="30" rx="2" fill="#e8f0ff"/><rect x="6" y="22" width="8" height="14" rx="2" fill="#0055aa" opacity=".5"/><rect x="5" y="20" width="10" height="3" rx="1" fill="#cc7700"/><text x="10" y="44" fill="#0055aa" font-size="4.5" font-family="monospace" text-anchor="middle">IDLE</text><text x="10" y="14" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">TOGA</text></symbol>
+<symbol id="ico-gear-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><path d="M24 8 L30 8 L30 20 L36 28" fill="none" stroke="#0055aa" stroke-width="2" stroke-linecap="round"/><circle cx="36" cy="30" r="3" fill="#e8f0ff" stroke="#0055aa" stroke-width="1"/><path d="M16 8 L10 8 L10 20 L4 28" fill="none" stroke="#88aacc" stroke-width="2" stroke-linecap="round" opacity=".5"/><circle cx="4" cy="30" r="3" fill="#e8f0ff" stroke="#88aacc" stroke-width="1" opacity=".5"/><circle cx="22" cy="34" r="3" fill="none" stroke="#1a9a44" stroke-width="1.5"/><circle cx="22" cy="34" r="3" fill="#1a9a44" opacity=".3"/><text x="24" y="44" fill="#1a9a44" font-size="4.5" font-family="monospace" text-anchor="middle">GEAR UP/DOWN</text></symbol>
+<symbol id="ico-hud-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#0a0e14" stroke="#0055aa" stroke-width="1.5"/><text x="8" y="11" fill="#66aaff" font-size="4.5" font-family="monospace">320</text><text x="34" y="11" fill="#66aaff" font-size="4.5" font-family="monospace">12000</text><circle cx="24" cy="22" r="3" fill="none" stroke="#fff" stroke-width="1.2"/><path d="M19 22 L21 22 M27 22 L29 22 M24 19 L24 21" stroke="#fff" stroke-width="1.2"/><path d="M16 28 L32 28 L28 32 L20 32 Z" fill="none" stroke="#1a9a44" stroke-width="1.2"/><text x="24" y="38" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">FD · ILS</text></symbol>
+<symbol id="ico-ap-a300" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="10" fill="#0055aa" font-size="5" font-family="monospace" text-anchor="middle">FCU AUTOFLIGHT</text><rect x="6" y="14" width="10" height="7" rx="1" fill="#e8f8ee" stroke="#88cc99" stroke-width=".5"/><text x="11" y="18.5" fill="#1a9a44" font-size="3.2" font-family="monospace" text-anchor="middle">AP1</text><rect x="19" y="14" width="10" height="7" rx="1" fill="#e8f0ff" stroke="#88aacc" stroke-width=".5"/><text x="24" y="18.5" fill="#0055aa" font-size="3.2" font-family="monospace" text-anchor="middle">A/THR</text><rect x="32" y="14" width="10" height="7" rx="1" fill="#fff0e8" stroke="#ccaa88" stroke-width=".5"/><text x="37" y="18.5" fill="#cc7700" font-size="3.2" font-family="monospace" text-anchor="middle">HDG</text><rect x="6" y="24" width="36" height="7" rx="1" fill="#0a1428" stroke="#1a2840" stroke-width=".5"/><text x="24" y="28.5" fill="#00ddaa" font-size="4.5" font-family="monospace" text-anchor="middle">ALT 35000</text></symbol>
+<symbol id="ico-descent-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><path d="M8 12 Q24 12 38 34" fill="none" stroke="#0055aa" stroke-width="2.5" stroke-linecap="round"/><circle cx="8" cy="12" r="3" fill="#0055aa"/><circle cx="38" cy="34" r="3" fill="none" stroke="#1a9a44" stroke-width="1.5"/><text x="24" y="44" fill="#1a9a44" font-size="4.5" font-family="monospace" text-anchor="middle">TOD · -2500FPM</text></symbol>
+<symbol id="ico-ils-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="36" rx="3" fill="#0a0e14" stroke="#0055aa" stroke-width="1.5"/><circle cx="24" cy="20" r="14" fill="none" stroke="#1a3850" stroke-width=".6"/><line x1="24" y1="6" x2="24" y2="34" stroke="#1a3850" stroke-width=".5"/><line x1="10" y1="20" x2="38" y2="20" stroke="#1a3850" stroke-width=".5"/><path d="M24 9 L21 14 L27 14Z" fill="#fff"/><line x1="24" y1="20" x2="24" y2="14" stroke="#fff" stroke-width="1.5"/><line x1="20" y1="20" x2="28" y2="20" stroke="#ffcc44" stroke-width="2"/><line x1="24" y1="16" x2="24" y2="24" stroke="#ffcc44" stroke-width="2"/><text x="24" y="38" fill="#ffcc44" font-size="4" font-family="monospace" text-anchor="middle">LOC/GS CAPTURE</text></symbol>
+<symbol id="ico-flare-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><path d="M6 30 Q24 30 40 16" fill="none" stroke="#0055aa" stroke-width="2" stroke-dasharray="3,2" opacity=".5"/><path d="M30 18 Q36 22 40 30" fill="none" stroke="#1a9a44" stroke-width="2.5" stroke-linecap="round"/><circle cx="40" cy="30" r="3" fill="none" stroke="#1a9a44" stroke-width="1.5"/><text x="24" y="40" fill="#1a9a44" font-size="4.5" font-family="monospace" text-anchor="middle">FLARE · 30FT RA</text></symbol>
+<symbol id="ico-shutdown-a300" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="38" rx="3" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><circle cx="24" cy="20" r="11" fill="none" stroke="#cc2222" stroke-width="2.5"/><line x1="24" y1="11" x2="24" y2="20" stroke="#cc2222" stroke-width="2.5" stroke-linecap="round"/><text x="24" y="38" fill="#cc2222" font-size="4.5" font-family="monospace" text-anchor="middle">SHUTDOWN</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="A300_Home.html">← 返回 A300-600R 教學中心</a>
+  <div class="header-badge">INIBUILDS A300-600R · MSFS 2024</div>
+  <h1>Airbus <span>A300-600R</span></h1>
+  <p class="subtitle">冷倉啟動到降落 · 完整逐步飛行教學</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · 飛前準備</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 引擎啟動</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · MCDU & 起飛前確認</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 起飛 & 爬升</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 巡航 & 自動駕駛</button>
+  <button class="phase-btn" onclick="showPhase(5)">06 · 下降 & 進場準備</button>
+  <button class="phase-btn" onclick="showPhase(6)">07 · ILS 進場 & 降落</button>
+  <button class="phase-btn" onclick="showPhase(7)">08 · 著陸後 & 關機</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🔌</span><div><div class="phase-num">PHASE 01</div><h2>飛前準備 Pre-Flight Preparation</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>A300-600R 系統說明</strong>
+A300-600R 採用<span style="color:var(--accent)">傳統機械操控（非 FBW）</span>。電力層級：<span style="color:var(--accent)">BAT → GPU → APU GEN → ENG GEN</span>，本教學從完全斷電開始。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-battery-a300"/></svg></div><div class="step-content"><div class="step-action">電池開關 BAT 1 / BAT 2 → ON</div><div class="step-detail">頂板 <span class="val">ELEC 面板</span>，將 <span class="val">BAT 1 / BAT 2 → ON</span>。座艙開始供電，待機儀表通電。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-battery-a300"/></svg></div><div class="step-content"><div class="step-action">外部電源（GPU）連接（如有）</div><div class="step-detail">ELEC 面板按下 <span class="val">EXT PWR</span>，確認 <span class="green-val">AVAIL → ON</span>。可在 APU 啟動前提供穩定電力，減少電池消耗。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-apu-a300"/></svg></div><div class="step-content"><div class="step-action">APU MASTER SW → ON，APU START</div><div class="step-detail">頂板 APU 面板，<span class="warn-val">APU MASTER → ON</span>，等 2 秒後按 <span class="warn-val">APU START</span>。監控 N1 上升，約 <span class="val">45 秒後 100% N1</span>，<span class="green-val">AVAIL 燈亮</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-battery-a300"/></svg></div><div class="step-content"><div class="step-action">APU GEN → ON</div><div class="step-detail">APU 穩定後，<span class="val">APU GEN → ON</span>，電力切換至 APU 發電機，座艙所有系統正式上線。可斷開外部電源。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-hydraulic-a300"/></svg></div><div class="step-content"><div class="step-action">確認液壓系統（GREEN / BLUE / YELLOW）</div><div class="step-detail">A300 三套液壓系統互為備援。APU 運轉時 <span class="val">YELLOW 電動泵</span>可先啟動，確認壓力 <span class="green-val">~3000 PSI 正常</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-fuel-a300"/></svg></div><div class="step-content"><div class="step-action">燃油面板確認，泵浦 → AUTO</div><div class="step-detail">確認油箱燃油量，<span class="val">燃油泵浦 → AUTO</span>，系統自動管理供油順序與左右平衡。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一階段</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一階段：引擎啟動 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">🔥</span><div><div class="phase-num">PHASE 02</div><h2>引擎啟動 Engine Start</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>CF6-80C2 引擎啟動原理</strong>
+靠 <span style="color:var(--accent)">APU 引氣（Bleed Air）</span>驅動氣動馬達，<span style="color:var(--accent3)">先 2 號後 1 號</span>依序啟動，避免同時啟動過載。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-apu-a300"/></svg></div><div class="step-content"><div class="step-action">APU BLEED → ON</div><div class="step-detail">頂板 <span class="val">APU BLEED → ON</span>，提供引擎啟動所需引氣，確認引氣壓力正常。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-engine-a300"/></svg></div><div class="step-content"><div class="step-action">ENG 2 START → IGN/START，ENG MASTER 2 → ON</div><div class="step-detail"><span class="warn-val">ENG 2 START 選擇器 → IGN/START</span>，<span class="warn-val">ENG MASTER 2 → ON</span>。監控 <span class="val">N2 上升至約 20%</span> 後點火，<span class="green-val">EGT 開始上升</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-engine-a300"/></svg></div><div class="step-content"><div class="step-action">監控 EGT / N1 / N2 至 IDLE 穩定</div><div class="step-detail">· <span class="val">N2</span> 穩定 ~60% 以上<br>· <span class="val">EGT</span> 在限制內（避免 Hot Start）<br>· <span class="val">OIL PRESS</span> 正常<br>啟動器自動脫開，2 號引擎完成。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-engine-a300"/></svg></div><div class="step-content"><div class="step-action">ENG 1 START → IGN/START，ENG MASTER 1 → ON</div><div class="step-detail">重複相同程序啟動 1 號引擎。<span class="cyan-val">兩具引擎穩定後，APU 可關閉。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-apu-a300"/></svg></div><div class="step-content"><div class="step-action">APU BLEED OFF → APU MASTER OFF</div><div class="step-detail">引擎 GEN 自動接手供電後，<span class="val">APU BLEED → OFF</span>，再 <span class="val">APU MASTER → OFF</span>，節省燃油。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-hydraulic-a300"/></svg></div><div class="step-content"><div class="step-action">確認三套液壓系統全部正常</div><div class="step-detail"><span class="val">GREEN / BLUE / YELLOW</span> 三套液壓均顯示 <span class="green-val">正常壓力</span>，這是飛控、起落架、煞車的動力來源。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← 飛前準備</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一階段：MCDU & 起飛前確認 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">📋</span><div><div class="phase-num">PHASE 03</div><h2>MCDU 設定 & 起飛前確認</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>A300 MCDU 操作核心</strong>
+<span style="color:var(--accent)">INIT → F-PLN → PERF</span> 是三個主要頁面。用鍵盤輸入 + <span style="color:var(--accent)">LSK（行選鍵）</span>確認，是飛行計畫和性能資料的輸入介面。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mcdu-a300"/></svg></div><div class="step-content"><div class="step-action">MCDU → INIT 頁面：輸入 FROM/TO</div><div class="step-detail">按 <span class="val">INIT</span>，在 FROM/TO 欄輸入 <span class="val">出發/目的 ICAO 代碼</span>（如 RCTP/RCSS），按 <span class="val">LSK 確認</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-mcdu-a300"/></svg></div><div class="step-content"><div class="step-action">INIT 頁面：ALIGN IRS</div><div class="step-detail">按 <span class="val">ALIGN IRS</span> LSK，IRS 開始對齊（需保持靜止）。MSFS 中通常較快完成。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mcdu-a300"/></svg></div><div class="step-content"><div class="step-action">F-PLN 頁面：確認飛行計畫</div><div class="step-detail">按 <span class="val">F-PLN</span>，確認航路點、<span class="val">SID</span>、<span class="val">STAR</span> 程序正確。手動輸入時用鍵盤輸入航路點後按 LSK 插入。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mcdu-a300"/></svg></div><div class="step-content"><div class="step-action">PERF → TAKE OFF：輸入 V1 / VR / V2 / FLEX</div><div class="step-detail">PERF → TAKE OFF 頁面輸入：<span class="val">V1（決定速度）、VR（抬頭）、V2（安全爬升）、FLEX 推力</span>（減推力，延長引擎壽命）或 TOGA。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-flap-a300"/></svg></div><div class="step-content"><div class="step-action">起飛 Flaps 設定（CONF 2 = Slat 15° / Flap 20°）</div><div class="step-detail">· <span class="val">CONF 1</span>：縫翼 15°，無後緣<br>· <span class="val">CONF 2</span>：15°/20°（一般起飛）<br>· <span class="val">CONF 3</span>：25°/20°（短跑道）<br>依 PERF 頁面推 Flap 控制桿至對應位置。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-checklist-a300"/></svg></div><div class="step-content"><div class="step-action">Before Takeoff Check</div><div class="step-detail"><table class="data-table" style="margin-top:6px"><tr><th>項目</th><th>確認狀態</th></tr><tr><td>FLAPS</td><td class="mono">起飛構型</td></tr><tr><td>TRIM</td><td class="mono">依重量設定</td></tr><tr><td>FLIGHT CONTROLS</td><td class="mono">活動正常</td></tr><tr><td>TRANSPONDER</td><td class="mono">TA/RA</td></tr><tr><td>LIGHTS</td><td class="mono">Landing/Strobe ON</td></tr></table></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 引擎啟動</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一階段：起飛 & 爬升 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">🛫</span><div><div class="phase-num">PHASE 04</div><h2>起飛 & 爬升 Takeoff & Climb</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>A300 起飛特點</strong>
+傳統操控，推力桿手動推至 <span style="color:var(--accent)">TOGA 或 FLEX</span>。跟隨 <span style="color:var(--accent3)">飛行指引（FD）</span>維持最佳爬升。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-throttle-a300"/></svg></div><div class="step-content"><div class="step-action">推力桿推至 TOGA 或 FLEX</div><div class="step-detail">對準跑道中線後，<span class="warn-val">推力桿推至 TOGA（全推力）</span>或預設 <span class="warn-val">FLEX</span> 位置。確認兩具引擎 N1 對稱，鬆煞車開始滾跑。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hud-a300"/></svg></div><div class="step-content"><div class="step-action">到達 V1（決定速度）→ 不可棄飛</div><div class="step-detail">達 <span class="val">V1</span>，不可中止起飛。手從推力桿移開表示通過 V1 決定點。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-throttle-a300"/></svg></div><div class="step-content"><div class="step-action">VR → 平穩拉桿抬頭 12–15°</div><div class="step-detail">達 <span class="warn-val">VR</span>，<span class="warn-val">平穩拉桿</span>讓機鼻抬至 <span class="val">12–15° 仰角</span>。A300 機身大，動作要沉穩，<span class="cyan-val">避免過度抬頭（尾擦地 Tailstrike）！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-gear-a300"/></svg></div><div class="step-content"><div class="step-action">正爬升率確認 → 收起落架</div><div class="step-detail">離地後確認正爬升率，<span class="val">Gear Lever → UP</span>，確認<span class="green-val">三燈熄滅</span>（收起完成）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-flap-a300"/></svg></div><div class="step-content"><div class="step-action">依速度逐步收 Flap：CONF 2 → 1 → 0</div><div class="step-detail">· <span class="val">S 速度以上</span>：CONF 2 → CONF 1<br>· <span class="val">F 速度以上</span>：CONF 1 → CONF 0<br>各速度由 MCDU PERF 頁面和 PFD 速度帶顯示。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-ap-a300"/></svg></div><div class="step-content"><div class="step-action">400 ft AGL 以上 → 接通 AP1</div><div class="step-detail">安全高度後按 <span class="val">FCU AP1</span>，確認 FMA 顯示 <span class="val">NAV / CLB</span> 正確模式。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← MCDU & 起飛前確認</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一階段：巡航 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">✈️</span><div class="phase-title-text"><div class="phase-num">PHASE 05</div><h2>巡航 & 自動駕駛 Cruise</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>A300 FCU 自動飛行系統</strong>
+A300 的 <span style="color:var(--accent)">FCU（飛行控制單元）</span>位於儀表板上方，控制自動駕駛模式、目標高度、速度、航向和垂直速度。巡航階段通常使用 <span style="color:var(--accent)">NAV（跟隨飛行計畫）+ ALT（保持高度）+ A/THR（自動推力）</span>三個模式。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-ap-a300"/></svg></div><div class="step-content"><div class="step-action">FCU 設定巡航高度與速度</div><div class="step-detail">在 FCU 上旋轉 <span class="val">ALT 旋鈕</span>至巡航高度（如 <span class="val">FL350</span>），旋轉 <span class="val">SPD 旋鈕</span>至巡航馬赫數（如 <span class="val">M0.80</span>）。確認 <span class="val">A/THR（自動推力）</span>已接通，系統將自動調整推力維持目標速度。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-ap-a300"/></svg></div><div class="step-content"><div class="step-action">確認 FMA 飛行模式告示</div><div class="step-detail">PFD 上方的 <span class="val">FMA（Flight Mode Annunciator）</span>確認：<br>· <span class="val">橫側模式</span>：NAV（跟隨飛行計畫）<br>· <span class="val">縱向模式</span>：ALT（到達巡航高度後保持）或 CLB（爬升中）<br>· <span class="val">推力模式</span>：THR（自動推力管理）</div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mcdu-a300"/></svg></div><div class="step-content"><div class="step-action">MCDU → PERF → CRZ（巡航性能）頁面</div><div class="step-detail">進入 <span class="val">MCDU PERF CRZ 頁面</span>確認：<br>· <span class="val">巡航高度（CRZ FL）</span>與當前高度一致<br>· <span class="val">COST INDEX</span>（速度/燃油效率平衡值）<br>· 系統顯示預計到達時間（ETA）和剩餘燃油<br>可根據 ATC 指令在此調整巡航高度或速度。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-fuel-a300"/></svg></div><div class="step-content"><div class="step-action">定期監控燃油平衡</div><div class="step-detail">A300 有<span class="val">中央油箱和主翼油箱</span>，燃油系統應<span class="val">優先耗用中央油箱</span>，再使用主翼油箱（維持機翼彎矩）。確認 FUEL PANEL 顯示<span class="green-val">左右平衡（差異小於 500kg）</span>，必要時手動開啟交叉輸送。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 起飛 & 爬升</button><button class="nav-arrow-btn" onclick="showPhase(5)">下一階段：下降 & 進場準備 →</button></div>
+</section>
+
+<!-- PHASE 5 -->
+<section class="phase-section" id="phase-5">
+  <div class="phase-title"><span class="phase-icon-wrap">📉</span><div class="phase-title-text"><div class="phase-num">PHASE 06</div><h2>下降 & 進場準備 Descent & Approach Prep</h2></div></div>
+  <div class="alert-box warn-box"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>TOD（下降頂點）提前準備</strong>
+A300 下降率通常 <span style="color:var(--warn)">-2000 至 -2500 FPM</span>，需在 <span style="color:var(--warn)">TOD（Top of Descent）</span>前完成所有進場準備。MCDU 會計算並顯示 TOD 位置，提前 <span style="color:var(--accent)">10 分鐘</span>開始準備進場資料。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-5" style="width:0%"></div></div><span class="progress-pct" id="pct-5">0%</span><button class="reset-btn" onclick="resetPhase(5)">重置</button></div>
+  <div class="steps-grid" id="steps-5">
+    <div class="step-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mcdu-a300"/></svg></div><div class="step-content"><div class="step-action">MCDU → PERF → APPR 頁面，設定進場資料</div><div class="step-detail">在 MCDU PERF APPR 頁面輸入：<br>· <span class="val">QNH</span>（目的地機場氣壓）<br>· <span class="val">溫度（TEMP）</span><br>· <span class="val">VAPP（進場速度）</span>：系統自動計算<br>· <span class="val">最低決定高（MDA/DH）</span>：依進場圖設定</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-ils-a300"/></svg></div><div class="step-content"><div class="step-action">設定 ILS 頻率與跑道方位角</div><div class="step-detail">在 MCDU F-PLN 或 RAD NAV 頁面確認<span class="val">目的地 ILS 頻率</span>已自動載入（或手動輸入）。在 PFD 確認 <span class="val">LOC 頻率和航道角（Course）</span>正確。也可在無線電面板手動設定 ILS 頻率（通常為 108-111 MHz）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-descent-a300"/></svg></div><div class="step-content"><div class="step-action">到達 TOD → FCU 設定下降高度，開始下降</div><div class="step-detail">到達 TOD 時，FCU 旋轉 <span class="val">ALT 旋鈕至目標下降高度</span>，按下 <span class="val">PULL（拉出）</span>進入 Open Descent 或 <span class="val">VS 模式設定 -2000 FPM</span>。A/THR 自動調整推力，保持速度限制（下降通常 <span class="val">250 kt 以下 10,000 ft</span>）。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,5)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hud-a300"/></svg></div><div class="step-content"><div class="step-action">10,000 ft 以下 → 速度減至 250 kt，Landing Lights ON</div><div class="step-detail">通過 <span class="val">10,000 ft</span>：<br>· 速度限制 <span class="warn-val">250 kt 以下</span>（FCU SPD 設為 250）<br>· <span class="val">Landing Lights → ON</span><br>· 開始進場簡報（Approach Briefing）<br>· 確認天氣、備降場、進場類型</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(4)">← 巡航 & 自動駕駛</button><button class="nav-arrow-btn" onclick="showPhase(6)">下一階段：ILS 進場 & 降落 →</button></div>
+</section>
+
+<!-- PHASE 6 -->
+<section class="phase-section" id="phase-6">
+  <div class="phase-title"><span class="phase-icon-wrap">🛬</span><div class="phase-title-text"><div class="phase-num">PHASE 07</div><h2>ILS 進場 & 降落 ILS Approach & Landing</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>A300 ILS 自動進場程序</strong>
+A300 可執行 <span style="color:var(--accent)">ILS 自動進場（Autoland）</span>，自動駕駛跟隨 LOC（航向道）和 GS（下滑道）至決定高，或直接自動落地。本教學說明標準 <span style="color:var(--accent3)">CAT I ILS 進場</span>（200 ft DH，550m RVR），在 DH 前由飛行員接管手動落地。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-6" style="width:0%"></div></div><span class="progress-pct" id="pct-6">0%</span><button class="reset-btn" onclick="resetPhase(6)">重置</button></div>
+  <div class="steps-grid" id="steps-6">
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-flap-a300"/></svg></div><div class="step-content"><div class="step-action">減速 & 放 Flap：CONF 1 → 2 → 3 → FULL</div><div class="step-detail">依速度逐步放 Flap：<br>· <span class="val">Flap 1</span>（CONF 1）：速度 &lt; VFE 1<br>· <span class="val">Flap 2</span>（CONF 2）：速度 &lt; VFE 2<br>· <span class="val">Flap 3</span>（CONF 3）：截獲 LOC 前<br>· <span class="val">FULL</span>（CONF FULL）：截獲 GS 前，最終構型</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-gear-a300"/></svg></div><div class="step-content"><div class="step-action">放起落架（Gear Down）</div><div class="step-detail">速度低於 <span class="warn-val">起落架限速（VLO，約 250 kt）</span>時，<span class="warn-val">Gear Lever → DOWN</span>。確認<span class="green-val">三個綠燈亮起</span>（三輪鎖定放下）。起落架放下後阻力增加，需調整推力維持目標速度 VAPP。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-ils-a300"/></svg></div><div class="step-content"><div class="step-action">截獲 LOC & GS → 確認 FMA 顯示</div><div class="step-detail">自動駕駛截獲 ILS：<br>· <span class="val">LOC 截獲</span>：FMA 顯示 LOC（綠色）<br>· <span class="val">GS 截獲</span>：FMA 顯示 GS（綠色）<br>· PFD LOC/GS 偏移條應居中<br>· 確認飛機跟隨下滑道下降，<span class="cyan-val">3° 下滑角</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hud-a300"/></svg></div><div class="step-content"><div class="step-action">穩定進場確認（1000 ft AGL 以上）</div><div class="step-detail">在 <span class="val">1000 ft AGL</span>（儀器進場）或 <span class="val">500 ft AGL</span>（目視進場）確認穩定進場（Stabilized Approach）：<br>· <span class="val">速度</span>：VAPP ± 5 kt<br>· <span class="val">姿態</span>：正常，無過大修正<br>· <span class="val">下降率</span>：約 -700 FPM<br>· <span class="red-val">不穩定必須重飛（Go Around）！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-flare-a300"/></svg></div><div class="step-content"><div class="step-action">50 ft RA → Flare，拉起機頭減緩下降率</div><div class="step-detail">無線電高度計報「<span class="val">50 ft</span>」時開始 Flare：<br>· 平順後拉操縱桿，讓機鼻上揚約 <span class="val">3–5°</span><br>· 同時<span class="val">收油門至 IDLE</span><br>· <span class="warn-val">30 ft</span> 時報「THIRTY」，繼續保持姿態讓主輪輕柔接地<br>· A300 機身長，<span class="cyan-val">注意收 Flare 不要過度以免尾擦地！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,6)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-gear-a300"/></svg></div><div class="step-content"><div class="step-action">接地後 → 反推、自動煞車、方向舵減速</div><div class="step-detail">主輪接地後立即：<br>· <span class="val">反推（Reverse Thrust）</span>：推力桿拉過 IDLE 至 REV 位置<br>· <span class="val">自動煞車（Auto Brake）</span>：已設定的 MED 或 LO 自動作動<br>· <span class="val">前輪接地</span>後可用腳踏板方向舵控制<br>· 速度低於 60 kt 後收回反推</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(5)">← 下降 & 進場準備</button><button class="nav-arrow-btn" onclick="showPhase(7)">下一階段：著陸後 & 關機 →</button></div>
+</section>
+
+<!-- PHASE 7 -->
+<section class="phase-section" id="phase-7">
+  <div class="phase-title"><span class="phase-icon-wrap">🅿️</span><div class="phase-title-text"><div class="phase-num">PHASE 08</div><h2>著陸後 & 關機 After Landing & Shutdown</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>安全抵達，標準關機程序</strong>
+著陸後依序執行<span style="color:var(--green)">減速滑行、脫離跑道、停妥、引擎關閉</span>程序。A300 關機程序相對直覺，主要是<span style="color:var(--accent)">依序關閉引擎、液壓、航電，最後切斷電池</span>。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-7" style="width:0%"></div></div><span class="progress-pct" id="pct-7">0%</span><button class="reset-btn" onclick="resetPhase(7)">重置</button></div>
+  <div class="steps-grid" id="steps-7">
+    <div class="step-card" onclick="toggleStep(this,7)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-throttle-a300"/></svg></div><div class="step-content"><div class="step-action">速度低於 60 kt → 收反推，輕踩煞車</div><div class="step-detail">速度降至 <span class="val">60 kt 以下</span>後，收回反推桿至 <span class="val">IDLE</span>。繼續輕踩煞車減速至滑行速度（約 <span class="val">20–30 kt</span>）。<span class="cyan-val">不要持續重踩煞車，容易過熱！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,7)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-flap-a300"/></svg></div><div class="step-content"><div class="step-action">脫離跑道後 → 收 Flap 至 0，Landing Lights OFF</div><div class="step-detail">完全脫離跑道進入滑行道後：<br>· <span class="val">Flap/Slat 收至 0（CONF 0）</span><br>· <span class="val">Landing Lights → OFF</span>（保留 Taxi Light）<br>· <span class="val">Transponder → STBY 或 ALT（依機場要求）</span><br>· 依 Ground 指示滑行至停機位</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,7)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-apu-a300"/></svg></div><div class="step-content"><div class="step-action">停妥後 → APU 重新啟動（備用電力）</div><div class="step-detail">到達停機位停妥、設定停機煞車後，重新<span class="val">啟動 APU</span>（APU MASTER ON → START），提供關機期間所需的電力和空調。等 <span class="green-val">APU AVAIL 燈亮</span>，開啟 <span class="val">APU GEN</span>。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,7)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-engine-a300"/></svg></div><div class="step-content"><div class="step-action">引擎關閉：ENG MASTER 1 & 2 → OFF</div><div class="step-detail">依序將 <span class="warn-val">ENG MASTER 1 → OFF</span>，再 <span class="warn-val">ENG MASTER 2 → OFF</span>。監控 N1/N2 逐漸下降至零，EGT 隨之下降。<span class="cyan-val">等兩具引擎完全停止後再進行下一步。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,7)"><div class="step-icon-col"><div class="step-num">5</div><svg class="cockpit-icon"><use href="#ico-hydraulic-a300"/></svg></div><div class="step-content"><div class="step-action">液壓泵浦、燃油泵浦 → OFF</div><div class="step-detail">引擎關閉後：<br>· <span class="val">所有液壓電動泵浦 → OFF</span><br>· <span class="val">燃油泵浦 → OFF</span><br>· <span class="val">防冰系統 → OFF</span><br>· 非必要頂板開關逐一關閉</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,7)"><div class="step-icon-col"><div class="step-num">6</div><svg class="cockpit-icon"><use href="#ico-shutdown-a300"/></svg></div><div class="step-content"><div class="step-action">航電 & APU 關閉，最後 BAT OFF</div><div class="step-detail">完成所有關機後：<br>· <span class="val">所有航電系統 → OFF</span><br>· <span class="val">APU BLEED → OFF</span><br>· <span class="val">APU MASTER → OFF</span>（等 APU 冷卻後自動關閉）<br>· 確認 APU 完全停止後，<span class="warn-val">BAT 1 & 2 → OFF</span><br>· 🎉 <span class="green-val">飛行任務完成！</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(6)">← ILS 進場 & 降落</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green);background:#f4fbf6" disabled>飛行完成！🎉</button></div>
+</section>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🔌</span><span class="tab-label">飛前準備</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">🔥</span><span class="tab-label">引擎啟動</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">📋</span><span class="tab-label">MCDU</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">🛫</span><span class="tab-label">起飛</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">✈️</span><span class="tab-label">巡航</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(5)" id="mtab-5"><span class="tab-icon">📉</span><span class="tab-label">下降</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-5"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(6)" id="mtab-6"><span class="tab-icon">🛬</span><span class="tab-label">ILS降落</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-6"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(7)" id="mtab-7"><span class="tab-icon">🅿️</span><span class="tab-label">關機</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-7"></div></div></button>
+  </div>
+</nav>
+
+<footer>MSFS 2024 · iniBuilds A300-600R · 冷倉啟動到降落教學<div class="swipe-hint">← 左右滑動切換階段 →</div></footer>
+
+<script>
+let currentPhase=0;
+const TOTAL=8;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);
+  const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);
+  const label=document.getElementById("pct-"+i);
+  const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";
+  if(label)label.textContent=pct+"%";
+  if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){
+    if(dx<0&&currentPhase<TOTAL-1)showPhase(currentPhase+1);
+    else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);
+  }
+},{passive:true});
+for(let i=0;i<TOTAL;i++)updateProgress(i);
+</script>
+</body>
+</html>
