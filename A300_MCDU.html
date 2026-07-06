@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A300 MCDU">
+<meta name="theme-color" content="#001a33">
+<title>MSFS 2024 · A300-600R · MCDU 深度操作</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f0f4f8;--panel:#ffffff;--border:#dde3ea;--accent:#0055aa;--accent2:#0088cc;--accent3:#e8f0ff;--accent-dark:#003377;--text:#1a2a3a;--text-mid:#4a6080;--text-dim:#8aaccc;--green:#1a9a44;--red:#cc2222;--warn:#cc7700;--cyan:#0099bb;--shadow:0 2px 12px rgba(0,60,120,.10);--mcdu-bg:#0a1018;--mcdu-text:#00ddaa;--mcdu-label:#66aaff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+header{background:linear-gradient(135deg,#001a33 0%,#003366 60%,#004488 100%);color:#fff;text-align:center;padding:36px 20px 28px;border-bottom:3px solid #0055aa;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:3px;margin-bottom:14px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.5);}
+.header-badge{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:#66aaff;text-transform:uppercase;margin-bottom:8px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(20px,4vw,36px);color:#fff;line-height:1.2;}
+header h1 span{color:#66aaff;}
+.subtitle{margin-top:6px;font-size:13px;color:rgba(255,255,255,.6);letter-spacing:1px;}
+.phase-nav{background:#fff;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:100;padding:10px 12px;display:flex;justify-content:center;flex-wrap:wrap;gap:4px;box-shadow:0 2px 8px rgba(0,60,120,.08);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);background:#f5f8fc;border:1px solid var(--border);padding:6px 12px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;white-space:nowrap;}
+.phase-btn:hover,.phase-btn.active{color:#fff;background:var(--accent);border-color:var(--accent);box-shadow:0 2px 8px rgba(0,85,170,.3);}
+.main{max-width:1100px;margin:0 auto;padding:28px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .3s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px 20px;background:#fff;border-radius:8px;border-left:4px solid var(--accent);box-shadow:var(--shadow);}
+.phase-icon-wrap{font-size:28px;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent2);font-size:11px;letter-spacing:3px;margin-bottom:3px;}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(14px,2.5vw,19px);font-weight:700;color:var(--text);}
+.progress-wrap{background:#fff;border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:6px;background:#e8eef5;border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--red);border-color:var(--red);}
+.alert-box{display:flex;gap:12px;padding:13px 16px;border-radius:6px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:#e8f4ff;border:1px solid #aaccee;border-left:4px solid var(--accent);}
+.alert-box.warn-box{background:#fff8e8;border:1px solid #eedd99;border-left:4px solid var(--warn);}
+.alert-box.green-box{background:#e8f8ee;border:1px solid #99ddaa;border-left:4px solid var(--green);}
+.alert-box.tip-box{background:#e8f8ff;border:1px solid #99ccee;border-left:4px solid var(--cyan);}
+.alert-box.mcdu-box{background:#0a1018;border:1px solid #1a3050;border-left:4px solid var(--accent2);}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;color:var(--text);}
+.mcdu-box .alert-text{color:#aaccee;}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--accent);}
+.warn-box .alert-text strong{color:var(--warn);}
+.green-box .alert-text strong{color:var(--green);}
+.tip-box .alert-text strong{color:var(--cyan);}
+.mcdu-box .alert-text strong{color:var(--mcdu-label);}
+.steps-grid{display:grid;gap:10px;margin-bottom:24px;}
+.step-card{background:#fff;border:1px solid var(--border);border-left:4px solid var(--border);border-radius:6px;padding:14px 16px 14px 14px;display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:start;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(0,85,170,.3);transform:translateX(3px);box-shadow:0 4px 16px rgba(0,60,120,.15);}
+.step-card.done{border-left-color:var(--green);background:#f4fbf6;}
+.step-card.done .step-num{background:var(--green);color:#fff;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.tip-card{border-left-color:var(--cyan);}
+.step-card.mcdu-card{border-left-color:var(--accent2);background:#f5f8ff;}
+.step-card:active{transform:scale(.98);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--accent);width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:14px;color:var(--text);margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-mid);line-height:1.7;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--red);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.mcdu-val{color:var(--mcdu-text);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:22px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+/* MCDU SCREEN MOCKUP */
+.mcdu-screen{background:var(--mcdu-bg);border:2px solid #1a3050;border-radius:6px;padding:14px 16px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.8;}
+.mcdu-row{display:flex;justify-content:space-between;align-items:center;}
+.mcdu-label{font-size:10px;color:var(--mcdu-label);letter-spacing:1px;}
+.mcdu-data{color:var(--mcdu-text);font-size:12px;}
+.mcdu-data.amber{color:#ffaa33;}
+.mcdu-data.white{color:#ffffff;}
+.mcdu-data.cyan{color:#00ddff;}
+.mcdu-data.green{color:#33cc44;}
+.mcdu-data.magenta{color:#ff44cc;}
+.mcdu-title{color:#fff;font-size:13px;font-weight:bold;text-align:center;border-bottom:1px solid #1a3050;padding-bottom:6px;margin-bottom:8px;letter-spacing:2px;}
+.mcdu-divider{border-top:1px solid #1a3050;margin:6px 0;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);text-align:left;padding:8px 12px;background:var(--accent3);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:#f5f9ff;}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent-dark);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--text-dim);background:#fff;border:1px solid var(--border);padding:10px 16px;border-radius:4px;cursor:pointer;transition:all .2s;text-transform:uppercase;box-shadow:var(--shadow);}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent3);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:20px;background:#001a33;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;}
+@media(max-width:640px){header{padding:22px 13px 18px;}header h1{font-size:19px;}.subtitle{font-size:11px;}.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:14px 10px 106px;}.step-card{grid-template-columns:46px 1fr 26px;gap:8px;padding:11px 10px;}.cockpit-icon{width:36px;height:36px;}.step-num{width:22px;height:22px;font-size:10px;}.step-action{font-size:13px;}.step-detail{font-size:12px;}.step-check{font-size:18px;}.phase-title h2{font-size:14px;}.alert-text{font-size:12px;}.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(0,26,51,.97);backdrop-filter:blur(16px);border-top:2px solid #0055aa;padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:18px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,.4);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:#66aaff;}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 6px #66aaff);}
+.tab-bar{width:24px;height:2px;background:rgba(255,255,255,.15);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);opacity:.5;padding:4px 0 0;}
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-mcdu-kbd" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a1018" stroke="#0055aa" stroke-width="1.5"/><rect x="6" y="6" width="36" height="10" rx="1" fill="#000a14"/><text x="24" y="13" fill="#00ddaa" font-size="6" font-family="monospace" font-weight="bold" text-anchor="middle">MCDU</text><rect x="6" y="19" width="7" height="5" rx="1" fill="#0d1820" stroke="#1a3050" stroke-width=".5"/><text x="9.5" y="22.8" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">INIT</text><rect x="14" y="19" width="7" height="5" rx="1" fill="#0d1820" stroke="#1a3050" stroke-width=".5"/><text x="17.5" y="22.8" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">F-PLN</text><rect x="22" y="19" width="7" height="5" rx="1" fill="#0d1820" stroke="#1a3050" stroke-width=".5"/><text x="25.5" y="22.8" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">PERF</text><rect x="30" y="19" width="7" height="5" rx="1" fill="#0d1820" stroke="#1a3050" stroke-width=".5"/><text x="33.5" y="22.8" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">RAD</text><rect x="6" y="26" width="36" height="5" rx="1" fill="#0d1820" stroke="#1a3050" stroke-width=".5"/><text x="24" y="29.8" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">A B C D E F G H I J K L M</text><rect x="6" y="33" width="36" height="5" rx="1" fill="#0d1820" stroke="#1a3050" stroke-width=".5"/><text x="24" y="36.8" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">1 2 3 4 5 6 7 8 9 0 . / SP</text><text x="3" y="46" fill="#4a6080" font-size="5" font-family="monospace">MCDU KEYBOARD</text></symbol>
+<symbol id="ico-lsk" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a1018" stroke="#0055aa" stroke-width="1.5"/><rect x="6" y="8" width="36" height="26" rx="1" fill="#000a14"/><text x="24" y="18" fill="#00ddaa" font-size="5.5" font-family="monospace" text-anchor="middle">FROM/TO</text><text x="6" y="22" fill="#66aaff" font-size="3.5" font-family="monospace">◀ LSK1L</text><text x="42" y="22" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="end">LSK1R ▶</text><text x="6" y="28" fill="#66aaff" font-size="3.5" font-family="monospace">◀ LSK2L</text><text x="42" y="28" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="end">LSK2R ▶</text><rect x="4" y="18" width="5" height="3" rx="1" fill="#0055aa" opacity=".6"/><rect x="39" y="18" width="5" height="3" rx="1" fill="#0055aa" opacity=".6"/><text x="24" y="40" fill="#4a6080" font-size="4.5" font-family="monospace" text-anchor="middle">LINE SELECT KEYS</text></symbol>
+<symbol id="ico-init-page" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a1018" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="9" fill="#fff" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">INIT A</text><text x="4" y="15" fill="#66aaff" font-size="3.5" font-family="monospace">CO RTE</text><text x="44" y="15" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="end">ALTN/CO RTE</text><text x="4" y="19" fill="#00ddaa" font-size="4" font-family="monospace">□□□□□□□□□</text><text x="4" y="24" fill="#66aaff" font-size="3.5" font-family="monospace">FROM/TO</text><text x="4" y="28" fill="#00ddaa" font-size="4" font-family="monospace">RCTP/RCSS</text><text x="4" y="33" fill="#66aaff" font-size="3.5" font-family="monospace">FLT NBR</text><text x="4" y="37" fill="#00ddaa" font-size="4" font-family="monospace">CI□5</text><text x="3" y="46" fill="#4a6080" font-size="5" font-family="monospace">INIT A</text></symbol>
+<symbol id="ico-fpln-page" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a1018" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="9" fill="#fff" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">F-PLN A</text><text x="4" y="15" fill="#66aaff" font-size="3" font-family="monospace">FROM</text><text x="4" y="19" fill="#00ddff" font-size="3.5" font-family="monospace">RCTP05L.SID</text><text x="4" y="24" fill="#00ddaa" font-size="3.5" font-family="monospace">TAPAG</text><text x="44" y="24" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="end">FL150</text><text x="4" y="29" fill="#00ddaa" font-size="3.5" font-family="monospace">LUCKY</text><text x="44" y="29" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="end">FL280</text><text x="4" y="34" fill="#33cc44" font-size="3.5" font-family="monospace">DISCO</text><text x="4" y="38" fill="#66aaff" font-size="3" font-family="monospace">TO RCSS</text><text x="3" y="46" fill="#4a6080" font-size="5" font-family="monospace">F-PLN</text></symbol>
+<symbol id="ico-perf-page" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a1018" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="9" fill="#fff" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">TAKE OFF</text><text x="4" y="15" fill="#66aaff" font-size="3" font-family="monospace">V1</text><text x="44" y="15" fill="#66aaff" font-size="3" font-family="monospace" text-anchor="end">VR</text><text x="4" y="19" fill="#ffaa33" font-size="4" font-family="monospace">148</text><text x="44" y="19" fill="#ffaa33" font-size="4" font-family="monospace" text-anchor="end">152</text><text x="4" y="24" fill="#66aaff" font-size="3" font-family="monospace">V2</text><text x="44" y="24" fill="#66aaff" font-size="3" font-family="monospace" text-anchor="end">FLEX TO</text><text x="4" y="28" fill="#ffaa33" font-size="4" font-family="monospace">158</text><text x="44" y="28" fill="#ffaa33" font-size="4" font-family="monospace" text-anchor="end">55°C</text><text x="4" y="33" fill="#66aaff" font-size="3" font-family="monospace">FLAPS/THS</text><text x="4" y="37" fill="#00ddaa" font-size="3.5" font-family="monospace">CONF2/UP2.0</text><text x="3" y="46" fill="#4a6080" font-size="5" font-family="monospace">PERF T/O</text></symbol>
+<symbol id="ico-sid-star" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="10" fill="#0055aa" font-size="5" font-family="monospace" text-anchor="middle">SID / STAR</text><path d="M8 16 L12 16 L16 20 L20 20 L24 16 L28 16 L32 20 L36 20 L40 16" fill="none" stroke="#0055aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="16" r="2" fill="#0055aa"/><circle cx="40" cy="16" r="2" fill="#0055aa"/><text x="8" y="28" fill="#1a9a44" font-size="3.5" font-family="monospace">RCTP05L</text><text x="8" y="33" fill="#0055aa" font-size="3.5" font-family="monospace">TAPAG1L</text><text x="8" y="38" fill="#cc7700" font-size="3.5" font-family="monospace">SID</text><text x="32" y="28" fill="#1a9a44" font-size="3.5" font-family="monospace">ILS06</text><text x="32" y="33" fill="#0055aa" font-size="3.5" font-family="monospace">TIGER5A</text><text x="32" y="38" fill="#cc7700" font-size="3.5" font-family="monospace">STAR</text><text x="3" y="46" fill="#8aaccc" font-size="5" font-family="monospace">PROCEDURE</text></symbol>
+<symbol id="ico-direct-to" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#0a1018" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="9" fill="#fff" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">DIR TO</text><circle cx="12" cy="22" r="3" fill="#66aaff"/><path d="M15 22 L33 22" stroke="#00ddaa" stroke-width="2" stroke-dasharray="3,2"/><path d="M30 19 L33 22 L30 25" fill="none" stroke="#00ddaa" stroke-width="2" stroke-linecap="round"/><circle cx="36" cy="22" r="3" fill="#00ddaa"/><text x="12" y="32" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">FROM</text><text x="36" y="32" fill="#00ddaa" font-size="3.5" font-family="monospace" text-anchor="middle">DEST</text><text x="24" y="38" fill="#ffaa33" font-size="4" font-family="monospace" text-anchor="middle">LUCKY ▶</text><text x="3" y="46" fill="#4a6080" font-size="5" font-family="monospace">DIR TO</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="A300_Home.html">← 返回 A300-600R 教學中心</a>
+  <div class="header-badge">INIBUILDS A300-600R · 進階模組</div>
+  <h1>MCDU <span>深度操作</span></h1>
+  <p class="subtitle">飛行計畫 · SID/STAR · PERF 性能計算 · 飛行中修改</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · MCDU 介面基礎</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · INIT 初始化頁面</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · F-PLN 飛行計畫</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · PERF 性能計算</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 飛行中 MCDU 操作</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🖥️</span><div><div class="phase-num">PHASE 01</div><h2>MCDU 介面基礎</h2></div></div>
+  <div class="alert-box mcdu-box"><span class="alert-icon">💻</span><div class="alert-text"><strong>MCDU 是什麼？</strong>
+<span style="color:#66aaff">MCDU（Multipurpose Control Display Unit，多功能控制顯示單元）</span>是 A300-600R 飛行管理系統（FMS）的主要操作介面。所有飛行計畫、性能資料、導航設定都在這裡完成。<span style="color:#00ddaa">左右兩側各有 6 個 LSK（行選鍵），對應螢幕上的各行資料。</span></div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card mcdu-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-mcdu-kbd"/></svg></div><div class="step-content"><div class="step-action">MCDU 鍵盤配置</div><div class="step-detail">
+    <table class="data-table" style="margin-top:4px">
+    <tr><th>區域</th><th>功能</th></tr>
+    <tr><td class="mono">上方功能鍵</td><td>INIT / F-PLN / PERF / RADIO / FUEL / MCDU MENU</td></tr>
+    <tr><td class="mono">英文字母鍵</td><td>輸入航路點、機場代碼、文字資料</td></tr>
+    <tr><td class="mono">數字鍵</td><td>輸入高度、速度、頻率等數值</td></tr>
+    <tr><td class="mono">SP / CLR / DEL</td><td>空格 / 清除 / 刪除暫存資料</td></tr>
+    </table></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-lsk"/></svg></div><div class="step-content"><div class="step-action">LSK 行選鍵操作邏輯</div><div class="step-detail">螢幕左右各有 <span class="val">6 個 LSK（L1–L6、R1–R6）</span>，對應螢幕每一行資料：<br>· 按對應 LSK → <span class="green-val">選取該行</span>（反白或橙色底）<br>· 用鍵盤輸入資料後 → <span class="green-val">按同一 LSK 確認</span>寫入<br>· 某些 LSK 按一下直接執行功能（如 ALIGN IRS）<br>· <span class="cyan-val">「scratchpad 暫存列」</span>在螢幕最底部，是輸入中的暫存區</div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-mcdu-kbd"/></svg></div><div class="step-content"><div class="step-action">顏色代碼意義</div><div class="step-detail">MCDU 螢幕顏色有含義：
+    <div class="mcdu-screen" style="margin-top:8px">
+      <div class="mcdu-row"><span class="mcdu-label">標籤</span><span class="mcdu-data cyan">藍色</span></div>
+      <div class="mcdu-row"><span class="mcdu-label">已輸入/確認資料</span><span class="mcdu-data">綠色</span></div>
+      <div class="mcdu-row"><span class="mcdu-label">待輸入/需要確認</span><span class="mcdu-data amber">橙色（琥珀）</span></div>
+      <div class="mcdu-row"><span class="mcdu-label">系統計算值</span><span class="mcdu-data magenta">洋紅色</span></div>
+      <div class="mcdu-row"><span class="mcdu-label">頁面標題</span><span class="mcdu-data white">白色</span></div>
+    </div></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mcdu-kbd"/></svg></div><div class="step-content"><div class="step-action">常用功能鍵</div><div class="step-detail">
+    <table class="data-table" style="margin-top:4px">
+    <tr><th>按鍵</th><th>功能</th></tr>
+    <tr><td class="mono">PREV PAGE / NEXT PAGE</td><td>頁面上下翻頁（如 F-PLN 多頁）</td></tr>
+    <tr><td class="mono">OVFY（Overfly）</td><td>設定飛越某航路點（不轉彎）</td></tr>
+    <tr><td class="mono">DIR（Direct To）</td><td>直飛某一航路點，跳過中間點</td></tr>
+    <tr><td class="mono">MCDU MENU</td><td>回到主選單</td></tr>
+    </table></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：INIT 初始化頁面 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">🛫</span><div><div class="phase-num">PHASE 02</div><h2>INIT 初始化頁面</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>INIT 頁面：飛機資料初始化</strong>
+INIT 頁面是每次飛行的起點，輸入<span style="color:var(--accent)">出發/目的機場、航班號、巡航高度、成本指數</span>等基本資料，並觸發 <span style="color:var(--accent)">IRS（慣性基準系統）對齊</span>。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card mcdu-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-init-page"/></svg></div><div class="step-content"><div class="step-action">FROM/TO：輸入出發/目的機場</div><div class="step-detail">鍵盤輸入 <span class="val">RCTP/RCSS</span>（斜線分隔），按 <span class="val">LSK 1L</span> 確認。系統自動計算大圓航線距離。
+    <div class="mcdu-screen" style="margin-top:8px">
+      <div class="mcdu-title">INIT A</div>
+      <div class="mcdu-row"><span class="mcdu-label">CO RTE</span><span class="mcdu-label">ALTN/CO RTE</span></div>
+      <div class="mcdu-row"><span class="mcdu-data">□□□□□□□□□</span><span class="mcdu-data cyan">RCSS/------</span></div>
+      <div class="mcdu-row"><span class="mcdu-label">FROM/TO</span></div>
+      <div class="mcdu-row"><span class="mcdu-data amber">RCTP/RCSS</span></div>
+    </div></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-init-page"/></svg></div><div class="step-content"><div class="step-action">FLT NBR / COST INDEX 輸入</div><div class="step-detail">· <span class="val">FLT NBR（航班號）</span>：輸入如 <span class="mcdu-val">CI5678</span>，按 LSK 3R 確認<br>· <span class="val">COST INDEX（成本指數）</span>：<span class="cyan-val">0 = 最省油、100 = 最快、30–50 為一般平衡值</span><br>CI 影響 FMS 計算的最佳速度：CI 越高飛得越快（油耗更多）</div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-init-page"/></svg></div><div class="step-content"><div class="step-action">CRZ FL / TEMP 輸入</div><div class="step-detail">輸入 <span class="val">巡航高度（如 350 代表 FL350）</span>按 LSK 5L，輸入 <span class="val">巡航層溫度（℃）</span>按 LSK 5R。這些資料影響 FMS 的速度和油耗計算。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-init-page"/></svg></div><div class="step-content"><div class="step-action">ALIGN IRS → 按 LSK 3L 啟動 IRS 對齊</div><div class="step-detail">按 <span class="warn-val">ALIGN IRS LSK</span>，系統開始對齊慣性基準系統。<span class="warn-val">對齊期間飛機必須靜止！</span>螢幕顯示倒計時，對齊完成後 IRS 顯示 <span class="green-val">NAV 模式</span>，導航功能正式可用。</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← MCDU 介面基礎</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：F-PLN 飛行計畫 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🗺️</span><div><div class="phase-num">PHASE 03</div><h2>F-PLN 飛行計畫建立</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>F-PLN 是飛行的路線圖</strong>
+F-PLN 頁面顯示完整飛行路線，從<span style="color:var(--accent)">出發機場 → SID 離場程序 → 航路點 → STAR 進場程序 → 目的地</span>。可手動插入、刪除、修改航路點，也可直接載入 SimBrief 計畫。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card mcdu-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-sid-star"/></svg></div><div class="step-content"><div class="step-action">選擇 SID（Standard Instrument Departure）離場程序</div><div class="step-detail">F-PLN 頁面第一行顯示出發機場，按 <span class="val">LSK 1L</span> 進入 <span class="val">DEPARTURE 頁面</span>。選擇：<br>· <span class="val">起飛跑道</span>（如 05L）<br>· <span class="val">SID 程序</span>（如 TAPAG1L）<br>· <span class="val">Transition（過渡航路）</span>（如有）<br>按 <span class="val">INSERT</span> 確認寫入飛行計畫。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-fpln-page"/></svg></div><div class="step-content"><div class="step-action">手動插入中間航路點</div><div class="step-detail">在 F-PLN 頁面的 <span class="val">DISCO（Discontinuity，不連續點）</span>或任意位置：<br>1. 用鍵盤輸入航路點 ICAO 代碼（如 <span class="mcdu-val">LUCKY</span>）<br>2. 按對應的 <span class="val">LSK</span> 插入該位置之前<br>3. 重複直到所有航路點都正確<br><span class="cyan-val">DISCO 代表計畫斷裂，需填入航路點或刪除解決。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-sid-star"/></svg></div><div class="step-content"><div class="step-action">選擇 STAR（Standard Terminal Arrival Route）進場程序</div><div class="step-detail">F-PLN 最後一行顯示目的地機場，按 <span class="val">LSK</span> 進入 <span class="val">ARRIVAL 頁面</span>。選擇：<br>· <span class="val">落地跑道</span>（如 ILS06）<br>· <span class="val">STAR 程序</span>（如 TIGER5A）<br>· <span class="val">Transition</span><br>· <span class="val">進場類型</span>（ILS/VOR/RNAV）<br>按 INSERT 確認。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-fpln-page"/></svg></div><div class="step-content"><div class="step-action">確認計畫完整性（無 DISCO）</div><div class="step-detail">翻頁檢查整個 F-PLN，確認：<br>· <span class="green-val">無 DISCO 不連續點</span>（藍色框框）<br>· <span class="green-val">所有航路點都有對應高度/速度限制</span>（橙色表示待確認）<br>· <span class="green-val">SID 和 STAR 均正確插入</span><br>· 總距離和預計油耗合理</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← INIT 初始化</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：PERF 性能計算 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">📊</span><div><div class="phase-num">PHASE 04</div><h2>PERF 性能計算</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>PERF 頁面：每個飛行階段的性能資料</strong>
+PERF 有多個子頁面：<span style="color:var(--accent)">TAKE OFF → CLB → CRZ → DES → APPR → GA</span>，各對應不同飛行階段。最重要的是起飛和進場兩個頁面。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card mcdu-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-perf-page"/></svg></div><div class="step-content"><div class="step-action">PERF → TAKE OFF：V1 / VR / V2 輸入</div><div class="step-detail">依起飛重量和條件查表或用計算機取得：<br>· <span class="val">V1（決定速度）</span>：如 148 kt，按 LSK 1L<br>· <span class="val">VR（抬頭速度）</span>：如 152 kt，按 LSK 1R<br>· <span class="val">V2（安全爬升速度）</span>：如 158 kt，按 LSK 2L<br><span class="cyan-val">這三個速度 FMS 不會自動計算，必須手動輸入！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-perf-page"/></svg></div><div class="step-content"><div class="step-action">FLEX TO 溫度（減推力起飛）</div><div class="step-detail"><span class="val">FLEX（彈性起飛推力）</span>是比 TOGA 低的起飛推力，降低引擎磨耗：<br>· 輸入 <span class="val">FLEX 溫度</span>（如 55°C）在 LSK 4R<br>· FLEX 溫度越高 = 推力越低<br>· 必須確保跑道夠長且飛機夠輕才能使用<br>· <span class="warn-val">若無把握或跑道短，輸入 TOGA（全推力）</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-perf-page"/></svg></div><div class="step-content"><div class="step-action">FLAPS / THS（水平安定面配平）</div><div class="step-detail">· <span class="val">FLAPS</span>：輸入起飛構型（如 CONF2）<br>· <span class="val">THS（Trimmable Horizontal Stabilizer）</span>：水平安定面角度，格式如 <span class="mcdu-val">UP2.0</span> 或 <span class="mcdu-val">DN1.5</span><br>· THS 設定依重心（CG）位置計算，MSFS 中一般設 <span class="cyan-val">UP2.0 至 UP3.0</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-perf-page"/></svg></div><div class="step-content"><div class="step-action">PERF → APPR：進場速度與 QNH</div><div class="step-detail">PERF APPR 頁面輸入：<br>· <span class="val">QNH</span>（目的地氣壓，如 1013 或 29.92）<br>· <span class="val">TEMP</span>（地面溫度）<br>· <span class="val">VAPP（進場速度）</span>：系統自動計算，確認即可<br>· <span class="val">MDA/DH（最低決定高）</span>：依進場圖，如 200 ft<br><span class="cyan-val">這些資料影響 FMS 的速度管理和警告觸發！</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← F-PLN 飛行計畫</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：飛行中 MCDU 操作 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">✈️</span><div><div class="phase-num">PHASE 05</div><h2>飛行中 MCDU 操作</h2></div></div>
+  <div class="alert-box green-box"><span class="alert-icon">🟢</span><div class="alert-text"><strong>飛行中最常用的 MCDU 功能</strong>
+飛行中 ATC 可能要求改變高度、路線，或需要直接飛往某個航路點。掌握這些功能，讓飛行更靈活。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card mcdu-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-direct-to"/></svg></div><div class="step-content"><div class="step-action">DIR TO（直飛）— 跳過中間航路點</div><div class="step-detail">ATC 要求直飛某點時：<br>1. 按 MCDU 上的 <span class="val">DIR</span> 鍵（Direct To）<br>2. 輸入目標航路點代碼（如 <span class="mcdu-val">LUCKY</span>）<br>3. 按 <span class="val">LSK 確認</span>，FMS 立即更新路線直飛該點<br><span class="cyan-val">中間所有航路點自動跳過，FCU 航向模式可能需要手動調整。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-fpln-page"/></svg></div><div class="step-content"><div class="step-action">修改巡航高度（CRZ FL）</div><div class="step-detail">ATC 要求改高度：<br>· 直接修改 <span class="val">FCU ALT 旋鈕</span>至新高度（最常用）<br>· 或進 <span class="val">PERF CRZ 頁面</span>修改 CRZ FL<br>· FMS 自動調整所有相關速度和油耗計算<br><span class="cyan-val">FCU 修改立即生效，MCDU 修改影響 FMS 長期規劃。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card mcdu-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-fpln-page"/></svg></div><div class="step-content"><div class="step-action">插入或刪除航路點</div><div class="step-detail"><span class="val">插入</span>：在 F-PLN 頁面，輸入新航路點代碼，按要插入位置的 LSK。新點插入在該 LSK 航路點之前。<br><span class="val">刪除</span>：按住 <span class="mcdu-val">CLR</span> 鍵後按對應航路點的 LSK，確認後刪除。<br><span class="warn-val">刪除前確認不影響飛行安全或 ATC 許可！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-mcdu-kbd"/></svg></div><div class="step-content"><div class="step-action">MCDU 使用總整理</div><div class="step-detail">
+    <table class="data-table" style="margin-top:4px">
+    <tr><th>功能</th><th>操作</th></tr>
+    <tr><td>出發/目的地</td><td class="mono">INIT → FROM/TO → LSK 1L</td></tr>
+    <tr><td>IRS 對齊</td><td class="mono">INIT → ALIGN IRS</td></tr>
+    <tr><td>SID 選擇</td><td class="mono">F-PLN → 出發機場 LSK → DEPARTURE</td></tr>
+    <tr><td>STAR 選擇</td><td class="mono">F-PLN → 目的地 LSK → ARRIVAL</td></tr>
+    <tr><td>V 速度輸入</td><td class="mono">PERF → TAKE OFF → V1/VR/V2</td></tr>
+    <tr><td>直飛某點</td><td class="mono">DIR → 輸入航路點 → LSK 確認</td></tr>
+    </table></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← PERF 性能計算</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green);background:#f4fbf6" disabled>單元完成！✅</button></div>
+</section>
+
+</div>
+
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🖥️</span><span class="tab-label">介面基礎</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">🛫</span><span class="tab-label">INIT</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🗺️</span><span class="tab-label">F-PLN</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">📊</span><span class="tab-label">PERF</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">✈️</span><span class="tab-label">飛行中</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>MSFS 2024 · iniBuilds A300-600R · MCDU 深度操作教學<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);const label=document.getElementById("pct-"+i);const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";if(label)label.textContent=pct+"%";if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){if(dx<0&&currentPhase<4)showPhase(currentPhase+1);else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);}
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
