@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A300 系統">
+<meta name="theme-color" content="#001a33">
+<title>MSFS 2024 · A300-600R · 系統深度解說</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f0f4f8;--panel:#ffffff;--border:#dde3ea;--accent:#0055aa;--accent2:#0088cc;--accent3:#e8f0ff;--accent-dark:#003377;--text:#1a2a3a;--text-mid:#4a6080;--text-dim:#8aaccc;--green:#1a9a44;--red:#cc2222;--warn:#cc7700;--cyan:#0099bb;--shadow:0 2px 12px rgba(0,60,120,.10);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+header{background:linear-gradient(135deg,#001a33 0%,#003366 60%,#004488 100%);color:#fff;text-align:center;padding:36px 20px 28px;border-bottom:3px solid #0055aa;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.6);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:3px;margin-bottom:14px;text-decoration:none;transition:all .2s;text-transform:uppercase;}
+.back-btn:hover{color:#fff;border-color:rgba(255,255,255,.5);}
+.header-badge{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:#66aaff;text-transform:uppercase;margin-bottom:8px;}
+header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(20px,4vw,36px);color:#fff;line-height:1.2;}
+header h1 span{color:#66aaff;}
+.subtitle{margin-top:6px;font-size:13px;color:rgba(255,255,255,.6);letter-spacing:1px;}
+.phase-nav{background:#fff;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:100;padding:10px 12px;display:flex;justify-content:center;flex-wrap:wrap;gap:4px;box-shadow:0 2px 8px rgba(0,60,120,.08);}
+.phase-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);background:#f5f8fc;border:1px solid var(--border);padding:6px 12px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;white-space:nowrap;}
+.phase-btn:hover,.phase-btn.active{color:#fff;background:var(--accent);border-color:var(--accent);box-shadow:0 2px 8px rgba(0,85,170,.3);}
+.main{max-width:1100px;margin:0 auto;padding:28px 16px 80px;}
+.phase-section{display:none;animation:fadeIn .3s ease;}
+.phase-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.phase-title{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px 20px;background:#fff;border-radius:8px;border-left:4px solid var(--accent);box-shadow:var(--shadow);}
+.phase-icon-wrap{font-size:28px;}
+.phase-num{font-family:'Share Tech Mono',monospace;color:var(--accent2);font-size:11px;letter-spacing:3px;margin-bottom:3px;}
+.phase-title h2{font-family:'Orbitron',monospace;font-size:clamp(14px,2.5vw,19px);font-weight:700;color:var(--text);}
+.progress-wrap{background:#fff;border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.progress-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.progress-bar-bg{flex:1;height:6px;background:#e8eef5;border-radius:3px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .4s ease;}
+.progress-pct{font-family:'Orbitron',monospace;font-size:12px;color:var(--accent);min-width:36px;text-align:right;}
+.reset-btn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:4px 10px;border-radius:3px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.reset-btn:hover{color:var(--red);border-color:var(--red);}
+.alert-box{display:flex;gap:12px;padding:13px 16px;border-radius:6px;margin-bottom:16px;align-items:flex-start;}
+.alert-box.info-box{background:#e8f4ff;border:1px solid #aaccee;border-left:4px solid var(--accent);}
+.alert-box.warn-box{background:#fff8e8;border:1px solid #eedd99;border-left:4px solid var(--warn);}
+.alert-box.green-box{background:#e8f8ee;border:1px solid #99ddaa;border-left:4px solid var(--green);}
+.alert-box.red-box{background:#ffeaea;border:1px solid #eeaaaa;border-left:4px solid var(--red);}
+.alert-box.tip-box{background:#e8f8ff;border:1px solid #99ccee;border-left:4px solid var(--cyan);}
+.alert-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;line-height:1.7;color:var(--text);}
+.alert-text strong{display:block;margin-bottom:3px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;}
+.info-box .alert-text strong{color:var(--accent);}
+.warn-box .alert-text strong{color:var(--warn);}
+.green-box .alert-text strong{color:var(--green);}
+.red-box .alert-text strong{color:var(--red);}
+.tip-box .alert-text strong{color:var(--cyan);}
+.steps-grid{display:grid;gap:10px;margin-bottom:24px;}
+.step-card{background:#fff;border:1px solid var(--border);border-left:4px solid var(--border);border-radius:6px;padding:14px 16px 14px 14px;display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:start;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);-webkit-tap-highlight-color:transparent;}
+.step-card:hover{border-left-color:var(--accent);border-color:rgba(0,85,170,.3);transform:translateX(3px);box-shadow:0 4px 16px rgba(0,60,120,.15);}
+.step-card.done{border-left-color:var(--green);background:#f4fbf6;}
+.step-card.done .step-num{background:var(--green);color:#fff;}
+.step-card.warn-card{border-left-color:var(--warn);}
+.step-card.tip-card{border-left-color:var(--cyan);}
+.step-card.red-card{border-left-color:var(--red);background:#fff8f8;}
+.step-card:active{transform:scale(.98);}
+.step-icon-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+.step-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--accent);width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cockpit-icon{width:46px;height:46px;flex-shrink:0;}
+.step-action{font-weight:500;font-size:14px;color:var(--text);margin-bottom:4px;line-height:1.4;}
+.step-detail{font-size:13px;color:var(--text-mid);line-height:1.7;}
+.val{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.green-val{color:var(--green);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.red-val{color:var(--red);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.warn-val{color:var(--warn);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.cyan-val{color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:13px;}
+.step-check{font-size:22px;opacity:0;transition:opacity .3s;align-self:center;}
+.step-card.done .step-check{opacity:1;}
+.sys-diagram{background:#f5f9ff;border:1px solid var(--border);border-radius:6px;padding:14px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:12px;}
+.sys-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.sys-box{background:#fff;border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:11px;color:var(--accent);white-space:nowrap;}
+.sys-box.green{border-color:var(--green);color:var(--green);background:#f0fff4;}
+.sys-box.warn{border-color:var(--warn);color:var(--warn);background:#fffbf0;}
+.sys-box.red{border-color:var(--red);color:var(--red);background:#fff5f5;}
+.sys-arrow{color:var(--text-dim);font-size:14px;}
+.data-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:13px;}
+.data-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--accent);text-align:left;padding:8px 12px;background:var(--accent3);border:1px solid var(--border);text-transform:uppercase;}
+.data-table td{padding:8px 12px;border:1px solid var(--border);color:var(--text);}
+.data-table tr:hover td{background:#f5f9ff;}
+.data-table .mono{font-family:'Share Tech Mono',monospace;color:var(--accent-dark);}
+.nav-arrows{display:flex;justify-content:space-between;margin-top:28px;padding-top:16px;border-top:1px solid var(--border);}
+.nav-arrow-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--text-dim);background:#fff;border:1px solid var(--border);padding:10px 16px;border-radius:4px;cursor:pointer;transition:all .2s;text-transform:uppercase;box-shadow:var(--shadow);}
+.nav-arrow-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--accent3);}
+.nav-arrow-btn:disabled{opacity:.3;cursor:not-allowed;}
+footer{text-align:center;padding:20px;background:#001a33;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;}
+@media(max-width:640px){header{padding:22px 13px 18px;}header h1{font-size:19px;}.subtitle{font-size:11px;}.phase-nav{display:none;}.mobile-bottom-nav{display:flex !important;}.main{padding:14px 10px 106px;}.step-card{grid-template-columns:46px 1fr 26px;gap:8px;padding:11px 10px;}.cockpit-icon{width:36px;height:36px;}.step-num{width:22px;height:22px;font-size:10px;}.step-action{font-size:13px;}.step-detail{font-size:12px;}.step-check{font-size:18px;}.phase-title h2{font-size:14px;}.alert-text{font-size:12px;}.nav-arrows{flex-direction:column;gap:8px;}.nav-arrow-btn{text-align:center;padding:12px;}.nav-arrow-btn:disabled{display:none;}.swipe-hint{display:block;}}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(0,26,51,.97);backdrop-filter:blur(16px);border-top:2px solid #0055aa;padding-bottom:env(safe-area-inset-bottom,0px);}
+.mobile-tab-row{display:flex;overflow-x:auto;scrollbar-width:none;}
+.mobile-tab-row::-webkit-scrollbar{display:none;}
+.mobile-tab{flex:1 1 0;min-width:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 3px 10px;cursor:pointer;border:none;background:transparent;-webkit-tap-highlight-color:transparent;}
+.tab-icon{font-size:18px;}.tab-label{font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,.4);white-space:nowrap;}
+.mobile-tab.active .tab-label{color:#66aaff;}.mobile-tab.active .tab-icon{filter:drop-shadow(0 0 6px #66aaff);}
+.tab-bar{width:24px;height:2px;background:rgba(255,255,255,.15);border-radius:1px;overflow:hidden;margin-top:2px;}
+.tab-bar-fill{height:100%;background:var(--green);border-radius:1px;transition:width .4s ease;width:0%;}
+.swipe-hint{display:none;text-align:center;font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,.3);opacity:.5;padding:4px 0 0;}
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ico-hyd-sys" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><rect x="6" y="8" width="10" height="22" rx="3" fill="#ddeeff" stroke="#0055aa" stroke-width="1.2"/><text x="11" y="21" fill="#0055aa" font-size="4.5" font-family="monospace" font-weight="bold" text-anchor="middle">G</text><text x="11" y="26" fill="#0055aa" font-size="3" font-family="monospace" text-anchor="middle">3000</text><rect x="19" y="8" width="10" height="22" rx="3" fill="#fff0e0" stroke="#cc7700" stroke-width="1.2"/><text x="24" y="21" fill="#cc7700" font-size="4.5" font-family="monospace" font-weight="bold" text-anchor="middle">B</text><text x="24" y="26" fill="#cc7700" font-size="3" font-family="monospace" text-anchor="middle">3000</text><rect x="32" y="8" width="10" height="22" rx="3" fill="#f0e8f8" stroke="#9944aa" stroke-width="1.2"/><text x="37" y="21" fill="#9944aa" font-size="4.5" font-family="monospace" font-weight="bold" text-anchor="middle">Y</text><text x="37" y="26" fill="#9944aa" font-size="3" font-family="monospace" text-anchor="middle">3000</text><text x="24" y="38" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">PSI · NORM</text><text x="3" y="46" fill="#8aaccc" font-size="5" font-family="monospace">HYD GREEN/BLUE/YLW</text></symbol>
+<symbol id="ico-elec-sys" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><rect x="6" y="8" width="8" height="6" rx="1" fill="#e8f0ff" stroke="#0055aa" stroke-width=".8"/><text x="10" y="12.5" fill="#0055aa" font-size="3" font-family="monospace" text-anchor="middle">BAT1</text><rect x="16" y="8" width="8" height="6" rx="1" fill="#e8f0ff" stroke="#0055aa" stroke-width=".8"/><text x="20" y="12.5" fill="#0055aa" font-size="3" font-family="monospace" text-anchor="middle">BAT2</text><rect x="26" y="8" width="8" height="6" rx="1" fill="#fff8e8" stroke="#cc9933" stroke-width=".8"/><text x="30" y="12.5" fill="#cc7700" font-size="3" font-family="monospace" text-anchor="middle">APU</text><rect x="36" y="8" width="6" height="6" rx="1" fill="#e8f8ee" stroke="#1a9a44" stroke-width=".8"/><text x="39" y="12.5" fill="#1a9a44" font-size="3" font-family="monospace" text-anchor="middle">GPU</text><line x1="10" y1="14" x2="24" y2="22" stroke="#0055aa" stroke-width="1" stroke-dasharray="2,1"/><line x1="20" y1="14" x2="24" y2="22" stroke="#0055aa" stroke-width="1" stroke-dasharray="2,1"/><line x1="30" y1="14" x2="24" y2="22" stroke="#cc7700" stroke-width="1" stroke-dasharray="2,1"/><rect x="18" y="22" width="12" height="6" rx="1" fill="#001040" stroke="#0055aa" stroke-width="1"/><text x="24" y="26.5" fill="#66aaff" font-size="3.5" font-family="monospace" text-anchor="middle">BUS BAR</text><text x="24" y="38" fill="#0055aa" font-size="4" font-family="monospace" text-anchor="middle">AC / DC POWER</text><text x="3" y="46" fill="#8aaccc" font-size="5" font-family="monospace">ELECTRICAL</text></symbol>
+<symbol id="ico-press-sys" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><ellipse cx="24" cy="22" rx="16" ry="12" fill="#e8f4ff" stroke="#0055aa" stroke-width="1.2"/><text x="24" y="20" fill="#0055aa" font-size="5" font-family="monospace" font-weight="bold" text-anchor="middle">CABIN</text><text x="24" y="26" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">8000 FT</text><path d="M6 14 Q6 8 12 8" fill="none" stroke="#cc7700" stroke-width="1.5" stroke-linecap="round"/><path d="M42 14 Q42 8 36 8" fill="none" stroke="#cc7700" stroke-width="1.5" stroke-linecap="round"/><text x="9" y="7" fill="#cc7700" font-size="3" font-family="monospace">AIR IN</text><text x="32" y="7" fill="#cc7700" font-size="3" font-family="monospace">OUTFLOW</text><text x="3" y="46" fill="#8aaccc" font-size="5" font-family="monospace">PRESSURIZATION</text></symbol>
+<symbol id="ico-fuel-mgmt" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><rect x="4" y="18" width="18" height="14" rx="2" fill="#e8f4ff" stroke="#0055aa" stroke-width="1"/><text x="13" y="27" fill="#0055aa" font-size="4" font-family="monospace" text-anchor="middle">L WING</text><rect x="26" y="18" width="18" height="14" rx="2" fill="#e8f4ff" stroke="#0055aa" stroke-width="1"/><text x="35" y="27" fill="#0055aa" font-size="4" font-family="monospace" text-anchor="middle">R WING</text><rect x="16" y="8" width="16" height="9" rx="2" fill="#fff0e0" stroke="#cc7700" stroke-width="1"/><text x="24" y="14" fill="#cc7700" font-size="3.5" font-family="monospace" text-anchor="middle">CENTER</text><line x1="24" y1="17" x2="24" y2="18" stroke="#0055aa" stroke-width="1.5"/><line x1="22" y1="18" x2="26" y2="18" stroke="#0055aa" stroke-width="1.5"/><text x="24" y="40" fill="#1a9a44" font-size="4" font-family="monospace" text-anchor="middle">CTR → WING ORDER</text><text x="3" y="46" fill="#8aaccc" font-size="5" font-family="monospace">FUEL MGMT</text></symbol>
+<symbol id="ico-bleed-air" viewBox="0 0 48 48"><rect x="2" y="2" width="44" height="38" rx="2" fill="#f0f6fc" stroke="#0055aa" stroke-width="1.5"/><rect x="6" y="12" width="14" height="10" rx="3" fill="#fff0e0" stroke="#cc7700" stroke-width="1.2"/><text x="13" y="19" fill="#cc7700" font-size="3.5" font-family="monospace" text-anchor="middle">ENG 1</text><rect x="28" y="12" width="14" height="10" rx="3" fill="#fff0e0" stroke="#cc7700" stroke-width="1.2"/><text x="35" y="19" fill="#cc7700" font-size="3.5" font-family="monospace" text-anchor="middle">ENG 2</text><path d="M20 17 L28 17" stroke="#cc7700" stroke-width="1.5" stroke-dasharray="2,1"/><path d="M24 17 L24 26" stroke="#0055aa" stroke-width="1.5"/><rect x="18" y="26" width="12" height="8" rx="2" fill="#e8f4ff" stroke="#0055aa" stroke-width="1"/><text x="24" y="31" fill="#0055aa" font-size="3" font-family="monospace" text-anchor="middle">PACK / XFLOW</text><text x="3" y="46" fill="#8aaccc" font-size="5" font-family="monospace">BLEED AIR</text></symbol>
+</defs></svg>
+
+<header>
+  <a class="back-btn" href="A300_Home.html">← 返回 A300-600R 教學中心</a>
+  <div class="header-badge">INIBUILDS A300-600R · 進階模組</div>
+  <h1>系統 <span>深度解說</span></h1>
+  <p class="subtitle">液壓 · 電力 · 增壓 · 燃油管理 · 引氣系統</p>
+</header>
+
+<nav class="phase-nav">
+  <button class="phase-btn active" onclick="showPhase(0)">01 · 液壓系統</button>
+  <button class="phase-btn" onclick="showPhase(1)">02 · 電力系統</button>
+  <button class="phase-btn" onclick="showPhase(2)">03 · 增壓系統</button>
+  <button class="phase-btn" onclick="showPhase(3)">04 · 燃油管理</button>
+  <button class="phase-btn" onclick="showPhase(4)">05 · 引氣與空調</button>
+</nav>
+
+<div class="main">
+
+<!-- PHASE 0 -->
+<section class="phase-section visible" id="phase-0">
+  <div class="phase-title"><span class="phase-icon-wrap">🔧</span><div><div class="phase-num">PHASE 01</div><h2>液壓系統 Hydraulic Systems</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>三套獨立液壓系統</strong>
+A300-600R 有 <span style="color:var(--accent)">GREEN、BLUE、YELLOW</span> 三套獨立液壓系統，工作壓力均為 <span style="color:var(--accent)">3,000 PSI</span>。三套系統互為備援，任一系統失效仍可完成飛行。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-0" style="width:0%"></div></div><span class="progress-pct" id="pct-0">0%</span><button class="reset-btn" onclick="resetPhase(0)">重置</button></div>
+  <div class="steps-grid" id="steps-0">
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-hyd-sys"/></svg></div><div class="step-content"><div class="step-action">GREEN 系統 — 主要液壓</div><div class="step-detail">由 <span class="val">1 號引擎（ENG 1）驅動的液壓泵</span>供壓，另有電動備用泵：<br>· 控制：<span class="green-val">飛控面（副翼/升降舵/方向舵）、起落架、正常煞車、反推 1 號</span><br>· 正常壓力：<span class="val">3,000 PSI</span><br>· 顯示位置：HYDRAULIC 頂板面板</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-hyd-sys"/></svg></div><div class="step-content"><div class="step-action">BLUE 系統 — 輔助液壓</div><div class="step-detail">由 <span class="val">2 號引擎（ENG 2）驅動的液壓泵</span>供壓：<br>· 控制：<span class="cyan-val">飛控面備援、前輪轉向、反推 2 號、備用起落架收放</span><br>· 某些飛控面同時由 GREEN 和 BLUE 共同驅動（雙重備援）</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-hyd-sys"/></svg></div><div class="step-content"><div class="step-action">YELLOW 系統 — 地面與備用</div><div class="step-detail">由 <span class="val">電動泵（Electric Pump）+ ENG 2 輔助泵</span>供壓：<br>· 控制：<span class="warn-val">備用煞車、貨艙門、備用飛控</span><br>· 地面停機時可單獨運作（只需 APU 電力）<br>· <span class="cyan-val">起飛前 YELLOW 電動泵應開啟確認壓力正常</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,0)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-hyd-sys"/></svg></div><div class="step-content"><div class="step-action">液壓系統故障應對</div><div class="step-detail">
+    <div class="sys-diagram">
+      <div class="sys-row"><span class="sys-box green">GREEN 失壓</span><span class="sys-arrow">→</span><span class="sys-box warn">備用煞車（YELLOW）、備用飛控（BLUE）</span></div>
+      <div class="sys-row"><span class="sys-box" style="border-color:#0088cc;color:#0088cc">BLUE 失壓</span><span class="sys-arrow">→</span><span class="sys-box warn">GREEN 接管大部分飛控</span></div>
+      <div class="sys-row"><span class="sys-box warn">YELLOW 失壓</span><span class="sys-arrow">→</span><span class="sys-box green">正常煞車仍可用（GREEN）</span></div>
+    </div>
+    <span class="cyan-val">三套同時失壓極為罕見，此時 RAT（衝壓空氣渦輪）自動展開提供應急液壓。</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" disabled>← 上一單元</button><button class="nav-arrow-btn" onclick="showPhase(1)">下一單元：電力系統 →</button></div>
+</section>
+
+<!-- PHASE 1 -->
+<section class="phase-section" id="phase-1">
+  <div class="phase-title"><span class="phase-icon-wrap">⚡</span><div><div class="phase-num">PHASE 02</div><h2>電力系統 Electrical System</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>AC / DC 雙軌電力架構</strong>
+A300 電力系統分為 <span style="color:var(--accent)">交流電（AC，115V 400Hz）</span>和 <span style="color:var(--accent)">直流電（DC，28V）</span>兩個層級，由不同電源供應，相互備援。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-1" style="width:0%"></div></div><span class="progress-pct" id="pct-1">0%</span><button class="reset-btn" onclick="resetPhase(1)">重置</button></div>
+  <div class="steps-grid" id="steps-1">
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-elec-sys"/></svg></div><div class="step-content"><div class="step-action">電力來源層級（優先順序）</div><div class="step-detail">
+    <table class="data-table" style="margin-top:4px">
+    <tr><th>優先順序</th><th>電源</th><th>說明</th></tr>
+    <tr><td class="mono">1</td><td>引擎發電機（IDG 1/2）</td><td>飛行中主要電源，各供一個 AC 匯流排</td></tr>
+    <tr><td class="mono">2</td><td>APU 發電機</td><td>地面或引擎失效備援</td></tr>
+    <tr><td class="mono">3</td><td>外部電源（GPU）</td><td>停機坪地面供電</td></tr>
+    <tr><td class="mono">4</td><td>電池（BAT 1/2）</td><td>緊急備用，DC 電源</td></tr>
+    </table></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-elec-sys"/></svg></div><div class="step-content"><div class="step-action">IDG（整合驅動發電機）</div><div class="step-detail">每具引擎各帶一個 <span class="val">IDG（Integrated Drive Generator）</span>，透過 <span class="val">CSD（恆速驅動器）</span>讓輸出頻率恆定在 <span class="val">400 Hz</span>，無論引擎轉速如何。<br><span class="warn-val">IDG 過熱時可斷開（DISC），斷開後無法在飛行中重接！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-elec-sys"/></svg></div><div class="step-content"><div class="step-action">AC / DC 匯流排架構</div><div class="step-detail">
+    <div class="sys-diagram">
+      <div class="sys-row"><span class="sys-box green">AC BUS 1（ENG 1 IDG）</span><span class="sys-arrow">→</span><span class="sys-box">航電、飛控電源</span></div>
+      <div class="sys-row"><span class="sys-box green">AC BUS 2（ENG 2 IDG）</span><span class="sys-arrow">→</span><span class="sys-box">液壓電動泵、廚房電源</span></div>
+      <div class="sys-row"><span class="sys-box warn">DC BUS（TR 整流）</span><span class="sys-arrow">→</span><span class="sys-box">飛控電腦、警告系統、電池充電</span></div>
+    </div></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,1)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-elec-sys"/></svg></div><div class="step-content"><div class="step-action">電力失效應對</div><div class="step-detail">
+    · <span class="val">單發電機失效</span>：另一台自動接管，所有 AC 負載轉至正常 BUS<br>
+    · <span class="val">雙發電機失效</span>：APU 發電機或 RAM AIR TURBINE（RAT）緊急供電<br>
+    · <span class="warn-val">全黑（Total Electrical Failure）</span>：電池提供約 30 分鐘緊急電力，優先確保飛控和通訊<br>
+    · <span class="cyan-val">ELEC 頂板上的 BUS TIES 開關控制 BUS 間的連接狀態</span></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(0)">← 液壓系統</button><button class="nav-arrow-btn" onclick="showPhase(2)">下一單元：增壓系統 →</button></div>
+</section>
+
+<!-- PHASE 2 -->
+<section class="phase-section" id="phase-2">
+  <div class="phase-title"><span class="phase-icon-wrap">🌡️</span><div><div class="phase-num">PHASE 03</div><h2>增壓系統 Pressurization</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>為什麼需要增壓？</strong>
+飛機在 FL350 巡航時，外部大氣壓力只有海平面的約 <span style="color:var(--accent)">23%</span>，人體無法在如此低壓環境下存活。增壓系統讓客艙維持在相當於 <span style="color:var(--accent)">6,000–8,000 ft 高度的氣壓</span>，保障乘客和機組安全。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-2" style="width:0%"></div></div><span class="progress-pct" id="pct-2">0%</span><button class="reset-btn" onclick="resetPhase(2)">重置</button></div>
+  <div class="steps-grid" id="steps-2">
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-press-sys"/></svg></div><div class="step-content"><div class="step-action">增壓原理：引氣加壓 + 外流閥控制</div><div class="step-detail">增壓系統由兩部分組成：<br>· <span class="val">引氣（Bleed Air）</span>：從引擎壓縮段抽取高壓熱空氣注入客艙<br>· <span class="val">外流閥（Outflow Valve）</span>：控制空氣排出速率，調節客艙壓力<br>兩者協同作業，維持客艙在目標高度等效氣壓。</div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-press-sys"/></svg></div><div class="step-content"><div class="step-action">客艙高度與差壓</div><div class="step-detail">兩個重要參數：<br>· <span class="val">客艙高度（Cabin Altitude）</span>：客艙氣壓等效的飛行高度，<span class="green-val">正常應低於 8,000 ft</span><br>· <span class="val">差壓（Differential Pressure / Delta P）</span>：機內外壓差，A300 最大差壓約 <span class="val">8.06 PSI</span><br><span class="warn-val">客艙高度超過 10,000 ft → 氧氣面罩自動落下！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-press-sys"/></svg></div><div class="step-content"><div class="step-action">自動增壓模式操作</div><div class="step-detail">A300 增壓通常設為 <span class="val">AUTO 模式</span>：<br>1. 在頂板 PRESS 面板輸入 <span class="val">目的地機場海拔高度</span><br>2. 系統自動計算加壓/減壓時機和速率<br>3. 爬升時逐漸加壓，下降時逐漸減壓<br><span class="cyan-val">目標：接地前客艙已回到機場高度，避免落地時壓差問題。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card warn-card" onclick="toggleStep(this,2)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-press-sys"/></svg></div><div class="step-content"><div class="step-action">緊急釋壓程序</div><div class="step-detail"><span class="warn-val">急速失壓（Rapid Decompression）</span>時：<br>· 氧氣面罩自動落下（乘客）<br>· 機組戴上氧氣面罩<br>· <span class="warn-val">緊急下降至 FL100 以下</span>（人體可承受高度）<br>· 速率：最快下降率（緊急下降模式）<br>· 通知 ATC：MAYDAY 呼號，申請緊急下降</div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(1)">← 電力系統</button><button class="nav-arrow-btn" onclick="showPhase(3)">下一單元：燃油管理 →</button></div>
+</section>
+
+<!-- PHASE 3 -->
+<section class="phase-section" id="phase-3">
+  <div class="phase-title"><span class="phase-icon-wrap">⛽</span><div><div class="phase-num">PHASE 04</div><h2>燃油管理 Fuel Management</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>A300 燃油系統架構</strong>
+A300-600R 有 <span style="color:var(--accent)">中央油箱（Center Tank）+ 左右主翼油箱（Wing Tank L/R）</span>，總容量依型號不同。正確的燃油管理不只是燃油夠用，還要維持<span style="color:var(--accent)">重量平衡（CG 管理）</span>。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-3" style="width:0%"></div></div><span class="progress-pct" id="pct-3">0%</span><button class="reset-btn" onclick="resetPhase(3)">重置</button></div>
+  <div class="steps-grid" id="steps-3">
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-fuel-mgmt"/></svg></div><div class="step-content"><div class="step-action">燃油耗用順序</div><div class="step-detail">A300 標準耗油順序：<br>1. <span class="val">中央油箱（Center Tank）</span>優先耗用：保持機翼油箱滿，減少機翼彎矩負擔<br>2. <span class="val">左右主翼油箱</span>最後耗用<br><span class="cyan-val">中央油箱燃油泵優先級高，系統自動管理，飛行員需監控確認順序正確。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-fuel-mgmt"/></svg></div><div class="step-content"><div class="step-action">左右翼平衡管理</div><div class="step-detail">飛行中監控左右油箱燃油量：<br>· <span class="green-val">平衡標準：左右差異小於 500 kg</span><br>· 不平衡原因：引擎油耗差異、燃油泵故障<br>· 修正方式：開啟 <span class="val">X-FEED（交叉輸送）</span>，讓油量多的一側補給另一側<br><span class="warn-val">嚴重不平衡會影響飛機橫向配平，增加操縱負擔！</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-fuel-mgmt"/></svg></div><div class="step-content"><div class="step-action">燃油計畫：TRIP / RESERVES</div><div class="step-detail">起飛前確認燃油計畫包含：<br>· <span class="val">TRIP FUEL</span>：航段消耗<br>· <span class="val">CONTINGENCY（備用燃油）</span>：通常 5% TRIP FUEL<br>· <span class="val">ALTERNATE FUEL</span>：飛往備降機場所需<br>· <span class="val">FINAL RESERVE</span>：到達備降後仍剩 30 分鐘燃油<br><span class="cyan-val">MCDU FUEL PRED 頁面可查看預計到達油量。</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,3)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-fuel-mgmt"/></svg></div><div class="step-content"><div class="step-action">燃油緊急狀況</div><div class="step-detail">
+    <table class="data-table" style="margin-top:4px">
+    <tr><th>狀況</th><th>應對</th></tr>
+    <tr><td>油量低警告（LOW FUEL）</td><td class="mono">立即申請優先落地，考慮備降</td></tr>
+    <tr><td>引擎燃油泵故障</td><td class="mono">開啟 X-FEED，用另一側泵供油</td></tr>
+    <tr><td>燃油洩漏</td><td class="mono">關閉對應油箱泵，申請緊急落地</td></tr>
+    </table></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(2)">← 增壓系統</button><button class="nav-arrow-btn" onclick="showPhase(4)">下一單元：引氣與空調 →</button></div>
+</section>
+
+<!-- PHASE 4 -->
+<section class="phase-section" id="phase-4">
+  <div class="phase-title"><span class="phase-icon-wrap">💨</span><div><div class="phase-num">PHASE 05</div><h2>引氣與空調系統</h2></div></div>
+  <div class="alert-box info-box"><span class="alert-icon">ℹ️</span><div class="alert-text"><strong>引氣（Bleed Air）是多個系統的共同來源</strong>
+從引擎抽取的 <span style="color:var(--accent)">高壓引氣</span>同時供應：<span style="color:var(--accent)">增壓空調（PACK）、引擎啟動、防冰系統</span>。理解引氣系統有助於理解為什麼某些操作要先開或後開引氣。</div></div>
+  <div class="progress-wrap"><span class="progress-label">完成進度</span><div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-4" style="width:0%"></div></div><span class="progress-pct" id="pct-4">0%</span><button class="reset-btn" onclick="resetPhase(4)">重置</button></div>
+  <div class="steps-grid" id="steps-4">
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">1</div><svg class="cockpit-icon"><use href="#ico-bleed-air"/></svg></div><div class="step-content"><div class="step-action">引氣來源與分配</div><div class="step-detail">引氣來自 <span class="val">ENG 1 / ENG 2 的高壓壓縮段</span>，或 <span class="val">APU</span>：<br>
+    <div class="sys-diagram" style="margin-top:8px">
+      <div class="sys-row"><span class="sys-box warn">引擎 Bleed</span><span class="sys-arrow">→</span><span class="sys-box">PACK（空調增壓）</span></div>
+      <div class="sys-row"><span class="sys-box warn">APU Bleed</span><span class="sys-arrow">→</span><span class="sys-box">引擎啟動氣動馬達</span></div>
+      <div class="sys-row"><span class="sys-box warn">引擎 Bleed</span><span class="sys-arrow">→</span><span class="sys-box">機翼前緣防冰</span></div>
+    </div></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">2</div><svg class="cockpit-icon"><use href="#ico-bleed-air"/></svg></div><div class="step-content"><div class="step-action">PACK（空調組件）運作</div><div class="step-detail">引氣經 <span class="val">ACM（空氣循環機）</span>冷卻後分配至客艙：<br>· A300 有 <span class="val">PACK 1 和 PACK 2</span> 兩個獨立系統<br>· 正常飛行兩個 PACK 均運作<br>· 起飛爬升時，部分 SOP 要求<span class="warn-val">關閉一個 PACK</span>以最大化引擎推力<br>· <span class="cyan-val">PACK 關閉時客艙仍有另一 PACK 供氣，乘客不受影響</span></div></div><div class="step-check">✅</div></div>
+    <div class="step-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">3</div><svg class="cockpit-icon"><use href="#ico-bleed-air"/></svg></div><div class="step-content"><div class="step-action">防冰系統（Anti-Ice / De-Ice）</div><div class="step-detail">A300 防冰使用引氣加熱：<br>· <span class="val">機翼前緣防冰（Wing A-ICE）</span>：引氣加熱前緣縫翼<br>· <span class="val">引擎進氣口防冰（ENG A-ICE）</span>：引氣加熱引擎整流罩<br>· <span class="warn-val">結冰條件（OAT &lt; +10°C 且有可見水氣）時必須開啟！</span><br>· 防冰開啟會消耗引氣，影響 PACK 效率和引擎推力</div></div><div class="step-check">✅</div></div>
+    <div class="step-card tip-card" onclick="toggleStep(this,4)"><div class="step-icon-col"><div class="step-num">4</div><svg class="cockpit-icon"><use href="#ico-bleed-air"/></svg></div><div class="step-content"><div class="step-action">A300 系統總覽</div><div class="step-detail">
+    <table class="data-table" style="margin-top:4px">
+    <tr><th>系統</th><th>動力來源</th><th>主要功能</th></tr>
+    <tr><td>液壓 GREEN</td><td class="mono">ENG 1 液壓泵</td><td>飛控、起落架、正常煞車</td></tr>
+    <tr><td>液壓 BLUE</td><td class="mono">ENG 2 液壓泵</td><td>備援飛控、前輪轉向</td></tr>
+    <tr><td>液壓 YELLOW</td><td class="mono">電動泵</td><td>備用煞車、貨艙門</td></tr>
+    <tr><td>電力 AC</td><td class="mono">IDG 1/2 / APU GEN</td><td>航電、液壓泵、廚房</td></tr>
+    <tr><td>增壓</td><td class="mono">引氣 + 外流閥</td><td>客艙氣壓維持</td></tr>
+    <tr><td>燃油</td><td class="mono">泵浦（中央優先）</td><td>供油管理、CG 平衡</td></tr>
+    <tr><td>引氣</td><td class="mono">ENG 壓縮段</td><td>空調、防冰、引擎啟動</td></tr>
+    </table></div></div><div class="step-check">✅</div></div>
+  </div>
+  <div class="nav-arrows"><button class="nav-arrow-btn" onclick="showPhase(3)">← 燃油管理</button><button class="nav-arrow-btn" style="color:var(--green);border-color:var(--green);background:#f4fbf6" disabled>全系列完成！🎉</button></div>
+</section>
+
+</div>
+
+<nav class="mobile-bottom-nav" id="mobile-nav">
+  <div class="mobile-tab-row">
+    <button class="mobile-tab active" onclick="showPhase(0)" id="mtab-0"><span class="tab-icon">🔧</span><span class="tab-label">液壓</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-0"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(1)" id="mtab-1"><span class="tab-icon">⚡</span><span class="tab-label">電力</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-1"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(2)" id="mtab-2"><span class="tab-icon">🌡️</span><span class="tab-label">增壓</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-2"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(3)" id="mtab-3"><span class="tab-icon">⛽</span><span class="tab-label">燃油</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-3"></div></div></button>
+    <button class="mobile-tab" onclick="showPhase(4)" id="mtab-4"><span class="tab-icon">💨</span><span class="tab-label">引氣空調</span><div class="tab-bar"><div class="tab-bar-fill" id="tbar-4"></div></div></button>
+  </div>
+</nav>
+
+<footer>MSFS 2024 · iniBuilds A300-600R · 系統深度解說<div class="swipe-hint">← 左右滑動切換單元 →</div></footer>
+
+<script>
+let currentPhase=0;
+function getStepCards(i){return document.getElementById("phase-"+i).querySelectorAll(".step-card");}
+function showPhase(index){
+  document.querySelectorAll(".phase-section").forEach(s=>s.classList.remove("visible"));
+  document.querySelectorAll(".phase-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".mobile-tab").forEach(b=>b.classList.remove("active"));
+  document.getElementById("phase-"+index).classList.add("visible");
+  const db=document.querySelectorAll(".phase-btn");if(db[index])db[index].classList.add("active");
+  const mt=document.getElementById("mtab-"+index);
+  if(mt){mt.classList.add("active");mt.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+  currentPhase=index;window.scrollTo({top:0,behavior:"smooth"});
+}
+function toggleStep(card,phaseIndex){card.classList.toggle("done");updateProgress(phaseIndex);}
+function updateProgress(i){
+  const cards=getStepCards(i);const done=[...cards].filter(c=>c.classList.contains("done")).length;
+  const pct=Math.round((done/cards.length)*100);
+  const fill=document.getElementById("prog-"+i);const label=document.getElementById("pct-"+i);const tbar=document.getElementById("tbar-"+i);
+  if(fill)fill.style.width=pct+"%";if(label)label.textContent=pct+"%";if(tbar)tbar.style.width=pct+"%";
+}
+function resetPhase(i){getStepCards(i).forEach(c=>c.classList.remove("done"));updateProgress(i);}
+let tx=0,ty=0;
+document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener("touchend",e=>{
+  const dx=e.changedTouches[0].clientX-tx;const dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>55){if(dx<0&&currentPhase<4)showPhase(currentPhase+1);else if(dx>0&&currentPhase>0)showPhase(currentPhase-1);}
+},{passive:true});
+for(let i=0;i<5;i++)updateProgress(i);
+</script>
+</body>
+</html>
